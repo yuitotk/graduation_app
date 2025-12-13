@@ -1,1 +1,1 @@
-# graduation_app
+# 卒業制作アプリ
