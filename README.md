@@ -1,5 +1,8 @@
 # graduation_app
 
+## 画面遷移図
+Figma：https://www.figma.com/board/PpIwMCpGPlmi68IROYUKwE/%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3?node-id=0-1&t=boAFElvQfy15jxo0-1
+
 ## サービス概要（3行）
 
 写真＋メモでアイデアを視覚的に整理し、AIが新しい発想を引き出す創作支援サービスです。
