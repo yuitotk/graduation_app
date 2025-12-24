@@ -1,7 +1,7 @@
 # graduation_app
 
 ### ER図
-![ER図](https://i.gyazo.com/a98ab96284c2088d681f972e2fd9e3e0.png)
+![Image from Gyazo](https://i.gyazo.com/30dabc98e41861c75e16d68e57231436.png)
 
 ## 画面遷移図
 Figma：https://www.figma.com/board/PpIwMCpGPlmi68IROYUKwE/%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB%E5%9B%B3?node-id=0-1&t=boAFElvQfy15jxo0-1
