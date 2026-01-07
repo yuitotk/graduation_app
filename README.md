@@ -1,5 +1,5 @@
 # graduation_app
-
+1/7 README更新
 ### ER図
 ![Image from Gyazo](https://i.gyazo.com/30dabc98e41861c75e16d68e57231436.png)
 
