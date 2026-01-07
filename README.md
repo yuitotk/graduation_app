@@ -206,77 +206,63 @@ MVPで実装した「辞書ワード × 辞書ワード」モードに加えて�
 ## 使用する技術スタック（予定）
 ## 使用する技術スタック
 
-✅ MVPで使う技術スタック（先に作って公開する範囲）
+## 使用する技術スタック（予定）※MVP / 本リリースで分けて記載
 
+### ✅ MVPで使う技術スタック（先に作って公開する範囲）
 このMVPで実際に使うものはこれだけです。
 
--フレームワーク / 言語
+#### フレームワーク / 言語
+- Ruby 3系
+- Ruby on Rails 7系（MVC + CRUDで実装）
 
-Ruby 3系
-Ruby on Rails 7系
-（MVC + CRUDで実装）
+#### データベース
+- 開発：MySQL 5.7
+- 本番：PostgreSQL
+- ORM：ActiveRecord
 
--データベース
+#### デプロイ / インフラ
+- Render（Rails + PostgreSQL）
+- 環境変数で `OPENAI_API_KEY` などを管理
+- GitHub連携の自動デプロイを想定
 
-開発：MySQL 5.7
-本番：PostgreSQL
-ORM：ActiveRecord
+#### 認証
+- Sorcery（ユーザー登録 / ログイン / ログアウト / パスワードリセット）
 
--デプロイ / インフラ
+#### フロントエンド / UI
+- Bootstrap 5（カード表示、ヘッダー・ボタン、レスポンシブ）
+- （必要なら）Font Awesome（アイコン）
 
-Render（Rails + PostgreSQL）
-環境変数で OPENAI_API_KEY などを管理
-GitHub連携の自動デプロイを想定
+#### AI連携
+- OpenAI API（`random_words` から2語 → 生成 → 表示 → 保存）
 
--認証
+#### ページネーション（必要になった場合）
+- Kaminari（必要になったら導入）
 
-Sorcery
-（ユーザー登録 / ログイン / ログアウト / パスワードリセット）
+#### 開発補助（任意）
+- RSpec
+- RuboCop
+- meta-tags（SEO）
 
--フロントエンド / UI
+#### MVPで使うテーブル
+- `users`
+- `ideas`（画像なし）
+- `random_words`
 
-Bootstrap 5
-（カード表示、ヘッダー・ボタン、レスポンシブ）
-（必要なら）Font Awesome（アイコン）
+---
 
--AI連携
-
-OpenAI API
-（random_words から2語→生成→表示→保存）
-
--ページネーション（必要になった場合）
-
-Kaminari（※必要になったら導入）
-
--開発補助（任意）
-
-RSpec
-RuboCop
-meta-tags（SEO）
-
--MVPで使うテーブル
-
-users
-ideas（画像なし）
-random_words
-
-🟦 本リリースで追加する技術スタック（MVPでは使わない）
-
+### 🟦 本リリースで追加する技術スタック（MVPでは使わない）
 MVPには入れず、後で追加するものはこれです。
 
--画像アップロード関連
-
-CarrierWave（画像アップロード）
-外部ストレージ：S3 または Cloudinary
-（本番で画像を外部保存する場合）
+#### 画像アップロード関連
+- CarrierWave（画像アップロード）
+- 外部ストレージ：S3 または Cloudinary（本番で画像を外部保存する場合）
 
 ※画像用テーブル（本リリースで追加）
-idea_images（アイデアに紐づく画像：1枚想定）
-（※MVPでは作らない）
+- `idea_images`（アイデアに紐づく画像：1枚想定）  
+  ※MVPでは作らない
 
--ストーリー整合性チェック関連（拡張機能）
+#### ストーリー整合性チェック関連（拡張機能）
+- `stories / events / characters / items` などのテーブル追加
+- 中間テーブルで多対多（イベント × 登場要素）
+- 絞り込み画面（キャラ選択 → 登場イベントを時系列表示）
 
-stories / events / characters / items などのテーブル追加
-
-中間テーブルで多対多（イベント×登場要素）
-絞り込み画面（キャラ選択 → 登場イベントを時系列表示）
