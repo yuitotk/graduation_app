@@ -12,6 +12,8 @@ gem "sprockets-rails"
 # Use mysql as the database for Active Record
 gem "mysql2", "~> 0.5"
 
+gem "sorcery"
+
 group :production do
   gem "pg"
 end
