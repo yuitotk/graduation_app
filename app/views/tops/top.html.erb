@@ -2,7 +2,12 @@
 
 <p>このアプリの説明</p>
 
-<ul>
-  <li><a href="/login">ログインへ</a></li>
-  <li><a href="/users/new">登録へ</a></li>
-</ul>
+<% if logged_in? %>
+  <p>ログイン中</p>
+  <%= link_to "ログアウト", logout_path, data: { turbo_method: :delete } %>
+<% else %>
+  <ul>
+    <li><%= link_to "ログインへ", login_path %></li>
+    <li><%= link_to "登録へ", signup_path %></li>
+  </ul>
+<% end %>

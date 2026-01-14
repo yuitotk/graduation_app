@@ -1,11 +1,13 @@
 Rails.application.routes.draw do
+  get 'user_sessions/new'
+  root "tops#top"
+
   # ユーザー登録
-  get "/signup", to: "users#new"
+  get  "/signup", to: "users#new"
   post "/signup", to: "users#create"
 
-  root "tops#top"
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
+  # ログイン
+  get    "/login",  to: "user_sessions#new"
+  post   "/login",  to: "user_sessions#create"
+  delete "/logout", to: "user_sessions#destroy"
 end
