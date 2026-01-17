@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  get 'ideas/index'
-  get 'ideas/new'
   get 'user_sessions/new'
   root "tops#top"
 
@@ -14,5 +12,5 @@ Rails.application.routes.draw do
   delete "/logout", to: "user_sessions#destroy"
 
   # アイデア（一覧＝ホーム）
-  resources :ideas, only: [:index, :new, :create]
+  resources :ideas, only: [:index, :new, :create, :show]
 end
