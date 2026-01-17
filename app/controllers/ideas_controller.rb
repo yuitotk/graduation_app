@@ -6,18 +6,22 @@ class IdeasController < ApplicationController
   end
 
   def new
-    @idea = Idea.new
+    @idea = current_user.ideas.build
   end
 
   def create
     @idea = current_user.ideas.build(idea_params)
 
     if @idea.save
-      redirect_to ideas_path, notice: "アイデアを作成しました"
+      redirect_to @idea, notice: "アイデアを作成しました"
     else
       flash.now[:alert] = "保存できませんでした"
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def show
+    @idea = current_user.ideas.find(params[:id])
   end
 
   private
