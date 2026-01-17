@@ -2,12 +2,27 @@ class IdeasController < ApplicationController
   before_action :require_login
 
   def index
-    # いまは表示できればOK（一覧取得は次IssueでもOK）
+    @ideas = current_user.ideas.order(created_at: :desc)
   end
 
   def new
+    @idea = Idea.new
   end
 
   def create
+    @idea = current_user.ideas.build(idea_params)
+
+    if @idea.save
+      redirect_to ideas_path, notice: "アイデアを作成しました"
+    else
+      flash.now[:alert] = "保存できませんでした"
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def idea_params
+    params.require(:idea).permit(:title, :memo)
   end
 end
