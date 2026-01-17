@@ -1,6 +1,19 @@
 <h1>アイデア一覧（ホーム）</h1>
 
-<%= link_to "投稿へ", new_idea_path %> |
+<%= link_to "投稿へ", new_idea_path %>
 
-<%# AIは未実装ならリンク無しでOK %>
 <p>AI作成（準備中）</p>
+
+<hr>
+
+<% if @ideas.any? %>
+  <% @ideas.each do |idea| %>
+    <div style="margin-bottom: 16px;">
+      <h2><%= idea.title %></h2>
+      <p><%= simple_format(idea.memo) %></p>
+      <small><%= l idea.created_at, format: :short %></small>
+    </div>
+  <% end %>
+<% else %>
+  <p>まだアイデアがありません</p>
+<% end %>
