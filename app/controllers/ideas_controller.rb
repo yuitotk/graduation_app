@@ -24,6 +24,21 @@ class IdeasController < ApplicationController
     @idea = current_user.ideas.find(params[:id])
   end
 
+  def edit
+    @idea = current_user.ideas.find(params[:id])
+  end
+
+  def update
+    @idea = current_user.ideas.find(params[:id])
+
+    if @idea.update(idea_params)
+      redirect_to @idea, notice: "アイデアを更新しました"
+    else
+      flash.now[:alert] = "更新できませんでした"
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def idea_params

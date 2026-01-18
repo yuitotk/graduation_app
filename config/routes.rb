@@ -12,5 +12,5 @@ Rails.application.routes.draw do
   delete "/logout", to: "user_sessions#destroy"
 
   # アイデア（一覧＝ホーム）
-  resources :ideas, only: [:index, :new, :create, :show]
+  resources :ideas, only: %i[index show new create edit update destroy]
 end
