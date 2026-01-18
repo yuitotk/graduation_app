@@ -3,4 +3,7 @@
 
 <%= link_to "編集", edit_idea_path(@idea) %>
 |
+<%= link_to "削除", idea_path(@idea),
+      data: { turbo_method: :delete, turbo_confirm: "削除しますか？" } %>
+|
 <%= link_to "一覧へ戻る", ideas_path %>

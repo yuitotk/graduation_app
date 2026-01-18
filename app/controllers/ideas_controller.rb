@@ -39,6 +39,12 @@ class IdeasController < ApplicationController
     end
   end
 
+  def destroy
+    @idea = current_user.ideas.find(params[:id])
+    @idea.destroy
+    redirect_to ideas_path, notice: "アイデアを削除しました"
+  end
+
   private
 
   def idea_params
