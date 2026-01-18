@@ -8,11 +8,13 @@
 
 <% if @ideas.any? %>
   <% @ideas.each do |idea| %>
-    <div style="margin-bottom: 16px;">
-      <h2><%= idea.title %></h2>
-      <p><%= simple_format(idea.memo) %></p>
-      <small><%= l idea.created_at, format: :short %></small>
-    </div>
+    <%= link_to idea_path(idea), class: "text-decoration-none text-dark d-block" do %>
+      <div style="margin-bottom: 16px;">
+        <h2><%= idea.title %></h2>
+        <p><%= simple_format(idea.memo) %></p>
+        <small><%= l idea.created_at, format: :short %></small>
+      </div>
+    <% end %>
   <% end %>
 <% else %>
   <p>まだアイデアがありません</p>
