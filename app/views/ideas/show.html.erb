@@ -1,4 +1,6 @@
 <h1><%= @idea.title %></h1>
 <p><%= simple_format(@idea.memo) %></p>
 
+<%= link_to "編集", edit_idea_path(@idea) %>
+|
 <%= link_to "一覧へ戻る", ideas_path %>
