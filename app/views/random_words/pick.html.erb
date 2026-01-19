@@ -1,0 +1,13 @@
+<h1>ランダム辞書ワード</h1>
+
+<% if @words.any? %>
+  <p><%= @words[0].word %></p>
+  <p><%= @words[1].word %></p>
+<% else %>
+  <p><%= @message %></p>
+<% end %>
+
+<%= link_to "再抽選", random_words_pick_path %>
+
+|
+<%= link_to "一覧へ戻る", ideas_path %>

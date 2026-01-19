@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'random_words/pick'
   get 'user_sessions/new'
   root "tops#top"
 
@@ -13,4 +14,7 @@ Rails.application.routes.draw do
 
   # アイデア（一覧＝ホーム）
   resources :ideas, only: %i[index show new create edit update destroy]
+
+  # 辞書ワード2語表示（再抽選）
+  get "random_words/pick", to: "random_words#pick"
 end
