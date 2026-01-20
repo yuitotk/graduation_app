@@ -1,0 +1,2 @@
+module AiGenerationsHelper
+end

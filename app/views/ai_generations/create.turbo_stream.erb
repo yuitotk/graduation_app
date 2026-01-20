@@ -1,0 +1,6 @@
+<% if @error.present? %>
+  <%= turbo_stream.update "ai_error", @error %>
+<% else %>
+  <%= turbo_stream.update "ai_result", simple_format(h(@text)) %>
+  <%= turbo_stream.update "ai_error", "" %>
+<% end %>

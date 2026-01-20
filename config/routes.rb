@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'random_words/pick'
+  get 'ai_generations/create'
   get 'user_sessions/new'
   root "tops#top"
 
@@ -17,4 +17,6 @@ Rails.application.routes.draw do
 
   # 辞書ワード2語表示（再抽選）
   get "random_words/pick", to: "random_words#pick"
+
+  resources :ai_generations, only: [:create]
 end

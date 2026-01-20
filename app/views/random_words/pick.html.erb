@@ -3,11 +3,21 @@
 <% if @words.any? %>
   <p><%= @words[0].word %></p>
   <p><%= @words[1].word %></p>
+
+  <div id="ai_error" style="color: red;"></div>
+  <div id="ai_result"></div>
+
+  <%= form_with url: ai_generations_path, method: :post, data: { turbo_stream: true } do |f| %>
+    <%= hidden_field_tag :word1, @words[0].word %>
+    <%= hidden_field_tag :word2, @words[1].word %>
+
+    <%= f.submit "AIで生成する", data: { disable_with: "生成中..." } %>
+  <% end %>
+
 <% else %>
   <p><%= @message %></p>
 <% end %>
 
 <%= link_to "再抽選", random_words_pick_path %>
-
 |
 <%= link_to "一覧へ戻る", ideas_path %>
