@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       auto_login(@user)  # 登録したらログイン状態にする（Sorcery）
-      redirect_to root_path, notice: "登録しました"
+      redirect_to ideas_path, notice: "登録しました"
     else
       render :new, status: :unprocessable_entity
     end
