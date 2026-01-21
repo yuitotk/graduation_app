@@ -1,6 +1,26 @@
 <% if @error.present? %>
-  <%= turbo_stream.update "ai_error", @error %>
+  <%= turbo_stream.update "ai_error" do %>
+    <%= @error %>
+  <% end %>
+
+  <%= turbo_stream.update "ai_result" do %>
+    <!-- エラー時は結果を空にする（任意） -->
+  <% end %>
 <% else %>
-  <%= turbo_stream.update "ai_result", simple_format(h(@text)) %>
-  <%= turbo_stream.update "ai_error", "" %>
+  <%= turbo_stream.update "ai_error" do %>
+    <!-- 成功時はエラーを消す -->
+  <% end %>
+
+  <%= turbo_stream.update "ai_result" do %>
+    <div>
+      <%= simple_format(h(@text)) %>
+    </div>
+
+    <%= form_with url: save_ai_generations_path, method: :post do %>
+      <%= hidden_field_tag :generated_text, @text %>
+      <%= hidden_field_tag :word1, @word1 %>
+      <%= hidden_field_tag :word2, @word2 %>
+      <%= submit_tag "アイデアとして保存" %>
+    <% end %>
+  <% end %>
 <% end %>

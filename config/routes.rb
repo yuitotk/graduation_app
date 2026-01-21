@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-  get 'ai_generations/create'
-  get 'user_sessions/new'
+  get 'user_sessions/new'  # これは残しても動くけど、下の /login があるなら不要でもOK
   root "tops#top"
 
   # ユーザー登録
@@ -18,5 +17,7 @@ Rails.application.routes.draw do
   # 辞書ワード2語表示（再抽選）
   get "random_words/pick", to: "random_words#pick"
 
-  resources :ai_generations, only: [:create]
+  resources :ai_generations, only: [:create] do
+    post :save, on: :collection
+  end
 end
