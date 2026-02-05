@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
-  get 'user_sessions/new'  # これは残しても動くけど、下の /login があるなら不要でもOK
+  get 'static_pages/terms'
+  get 'user_sessions/new'
   root "tops#top"
+
+  # 静的ページ
+  get "/terms", to: "static_pages#terms", as: :terms
 
   # ユーザー登録
   get  "/signup", to: "users#new"
