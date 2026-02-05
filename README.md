@@ -1,3 +1,4 @@
+[![CI](https://github.com/yuitotk/graduation_app/actions/workflows/ci.yml/badge.svg)](https://github.com/yuitotk/graduation_app/actions/workflows/ci.yml)
 # graduation_app
 1/7 README更新
 ### ER図
