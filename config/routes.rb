@@ -1,10 +1,10 @@
 Rails.application.routes.draw do
-  get 'static_pages/terms'
   get 'user_sessions/new'
   root "tops#top"
 
   # 静的ページ
-  get "/terms", to: "static_pages#terms", as: :terms
+  get "/terms",   to: "static_pages#terms",   as: :terms
+  get "/privacy", to: "static_pages#privacy", as: :privacy
 
   # ユーザー登録
   get  "/signup", to: "users#new"
@@ -15,10 +15,7 @@ Rails.application.routes.draw do
   post   "/login",  to: "user_sessions#create"
   delete "/logout", to: "user_sessions#destroy"
 
-  # アイデア（一覧＝ホーム）
   resources :ideas, only: %i[index show new create edit update destroy]
-
-  # 辞書ワード2語表示（再抽選）
   get "random_words/pick", to: "random_words#pick"
 
   resources :ai_generations, only: [:create] do

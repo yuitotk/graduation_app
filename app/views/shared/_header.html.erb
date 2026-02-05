@@ -1,10 +1,12 @@
 <header>
   <% if logged_in? %>
     <%= button_to "ログアウト", logout_path, method: :delete, form: { data: { turbo: false } } %> |
-    <%= link_to "利用規約", terms_path %>
+    <%= link_to "利用規約", terms_path %> |
+    <%= link_to "プライバシーポリシー", privacy_path %>
   <% else %>
     <%= link_to "ログイン", login_path %> |
     <%= link_to "新規登録", signup_path %> |
-    <%= link_to "利用規約", terms_path %>
+    <%= link_to "利用規約", terms_path %> |
+    <%= link_to "プライバシーポリシー", privacy_path %>
   <% end %>
 </header>
