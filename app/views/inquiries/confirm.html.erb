@@ -1,0 +1,14 @@
+<h1>お問い合わせ確認</h1>
+
+<p>名前：<%= @inquiry.name %></p>
+<p>メール：<%= @inquiry.email %></p>
+<p>本文：<%= simple_format(@inquiry.body) %></p>
+
+<%= form_with model: @inquiry, url: inquiries_path, method: :post, data: { turbo: false } do |f| %>
+  <%= f.hidden_field :name %>
+  <%= f.hidden_field :email %>
+  <%= f.hidden_field :body %>
+  <%= f.submit "送信する" %>
+<% end %>
+
+<p><a href="javascript:history.back()">戻る</a></p>

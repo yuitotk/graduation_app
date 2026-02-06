@@ -1,6 +1,7 @@
 <header>
   <% if logged_in? %>
     <%= button_to "ログアウト", logout_path, method: :delete, form: { data: { turbo: false } } %> |
+    <%= link_to "お問い合わせ", new_inquiry_path %> |
     <%= link_to "利用規約", terms_path %> |
     <%= link_to "プライバシーポリシー", privacy_path %>
   <% else %>

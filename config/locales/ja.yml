@@ -1,0 +1,8 @@
+ja:
+  inquiries:
+    create:
+      success: "お問い合わせを送信しました。"
+
+  time:
+    formats:
+      short: "%Y/%m/%d %H:%M"

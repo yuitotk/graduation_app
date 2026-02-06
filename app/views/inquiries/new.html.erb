@@ -1,0 +1,28 @@
+<h1>お問い合わせ</h1>
+
+<% if @inquiry.errors.any? %>
+  <ul>
+    <% @inquiry.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with model: @inquiry, url: confirm_inquiries_path, method: :post, data: { turbo: false } do |f| %>
+  <div>
+    <%= f.label :name, "名前" %><br>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :email, "メール" %><br>
+    <%= f.email_field :email %>
+  </div>
+
+  <div>
+    <%= f.label :body, "本文" %><br>
+    <%= f.text_area :body, rows: 8 %>
+  </div>
+
+  <%= f.submit "確認へ" %>
+<% end %>
