@@ -16,6 +16,14 @@ Rails.application.routes.draw do
   delete "/logout", to: "user_sessions#destroy"
 
   resources :ideas, only: %i[index show new create edit update destroy]
+
+  # お問い合わせ（入力→確認→完了）
+  resources :inquiries, only: %i[new create] do
+    post :confirm, on: :collection
+    get :done, on: :collection
+  end
+
+  # 辞書ワード2語表示（再抽選）
   get "random_words/pick", to: "random_words#pick"
 
   resources :ai_generations, only: [:create] do
