@@ -1,0 +1,12 @@
+<h1>パスワード再設定</h1>
+
+<%= form_with url: password_resets_path do |f| %>
+  <div>
+    <%= f.label :email, "メールアドレス" %><br>
+    <%= f.email_field :email, required: true %>
+  </div>
+
+  <div>
+    <%= f.submit "送信" %>
+  </div>
+<% end %>
