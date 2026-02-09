@@ -6,3 +6,14 @@ ja:
   time:
     formats:
       short: "%Y/%m/%d %H:%M"
+
+  password_resets:
+    email_sent: "メールを送信しました"
+    invalid_token: "リンクが無効または期限切れです"
+    password_mismatch: "パスワード確認が一致しません"
+    updated: "パスワードを更新しました"
+    update_failed: "パスワード更新に失敗しました"
+
+  user_mailer:
+    reset_password_email:
+      subject: "パスワード再設定"
