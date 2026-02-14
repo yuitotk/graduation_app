@@ -8,18 +8,6 @@
   </ul>
 <% end %>
 
-<%= form_with model: @idea do |f| %>
-  <div>
-    <%= f.label :title, "タイトル" %><br>
-    <%= f.text_field :title %>
-  </div>
-
-  <div>
-    <%= f.label :memo, "メモ" %><br>
-    <%= f.text_area :memo, rows: 6 %>
-  </div>
-
-  <%= f.submit "更新する" %>
-<% end %>
+<%= render "form", idea: @idea %>
 
 <%= link_to "詳細へ戻る", idea_path(@idea) %>

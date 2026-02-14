@@ -1,4 +1,11 @@
 <h1><%= @idea.title %></h1>
+
+<% if @idea.idea_image&.image? %>
+  <div>
+    <%= image_tag @idea.idea_image.image.url, style: "max-width: 100%; height: auto;" %>
+  </div>
+<% end %>
+
 <p><%= simple_format(@idea.memo) %></p>
 
 <%= link_to "編集", edit_idea_path(@idea) %>

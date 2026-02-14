@@ -14,6 +14,10 @@ gem "mysql2", "~> 0.5"
 
 gem "sorcery"
 
+gem "carrierwave"
+gem "cloudinary"
+gem "mimemagic", "0.3.10"
+
 group :production do
   gem "pg"
 end
