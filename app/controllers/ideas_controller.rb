@@ -7,6 +7,7 @@ class IdeasController < ApplicationController
 
   def new
     @idea = current_user.ideas.build
+    @idea.build_idea_image
   end
 
   def create
@@ -26,6 +27,7 @@ class IdeasController < ApplicationController
 
   def edit
     @idea = current_user.ideas.find(params[:id])
+    @idea.build_idea_image unless @idea.idea_image
   end
 
   def update
@@ -48,6 +50,6 @@ class IdeasController < ApplicationController
   private
 
   def idea_params
-    params.require(:idea).permit(:title, :memo)
+    params.require(:idea).permit(:title, :memo, idea_image_attributes: [:id, :image])
   end
 end

@@ -1,0 +1,34 @@
+<<% if idea.errors.any? %>
+  <ul>
+    <% idea.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with model: idea, local: true, html: { multipart: true } do |f| %>
+  <div>
+    <%= f.label :title, "タイトル" %><br>
+    <%= f.text_field :title %>
+  </div>
+
+  <div>
+    <%= f.label :memo, "メモ" %><br>
+    <%= f.text_area :memo %>
+  </div>
+
+  <% if idea.idea_image&.image? %>
+    <div style="margin-top: 12px;">
+      <%= image_tag idea.idea_image.image.url, style: "max-width: 100%; height: auto;" %>
+    </div>
+  <% end %>
+
+  <div style="margin-top: 12px;">
+    <%= f.fields_for :idea_image do |ii| %>
+      <%= ii.label :image, "画像" %><br>
+      <%= ii.file_field :image %>
+    <% end %>
+  </div>
+
+  <%= f.submit (idea.persisted? ? "更新する" : "保存") %>
+<% end %>
