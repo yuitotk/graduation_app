@@ -1,0 +1,13 @@
+<p>
+  <%= link_to "イベントへ戻る", story_path(@story) %> |
+</p>
+
+<h1><%= @story_event.title %></h1>
+
+<div>
+  <%= simple_format(@story_event.body) %>
+</div>
+
+<p>
+  <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
+</p>

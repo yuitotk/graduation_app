@@ -1,5 +1,19 @@
 <p><%= link_to "ストーリー一覧へ", stories_path %></p>
 
+<p>
+  <%= link_to "ストーリー編集", edit_story_path(@story) %>
+</p>
+
+<h1><%= @story.title %></h1>
+
+<% if @story.description.present? %>
+  <div>
+    <%= simple_format(@story.description) %>
+  </div>
+<% end %>
+
+<hr>
+
 <h2>イベント（時系列）</h2>
 
 <p><%= link_to "イベント追加", new_story_story_event_path(@story) %></p>
@@ -7,13 +21,13 @@
 <ul>
   <% @story_events.each do |event| %>
     <li>
-      <strong><%= event.title %></strong><br>
-      <%= simple_format(event.body) %>
+      <strong><%= link_to event.title, story_story_event_path(@story, event) %></strong><br>
+      <%= simple_format(truncate(event.body.to_s, length: 120)) %>
 
-      <%= link_to "編集", edit_story_story_event_path(@story, event) %>
-
-      <%= button_to "↑", move_up_story_story_event_path(@story, event), method: :patch, form: { style: "display:inline" } %>
-      <%= button_to "↓", move_down_story_story_event_path(@story, event), method: :patch, form: { style: "display:inline" } %>
+      <%= button_to "↑", move_up_story_story_event_path(@story, event),
+            method: :patch, form: { style: "display:inline" } %>
+      <%= button_to "↓", move_down_story_story_event_path(@story, event),
+            method: :patch, form: { style: "display:inline" } %>
     </li>
   <% end %>
 </ul>

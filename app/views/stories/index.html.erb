@@ -6,7 +6,11 @@
 <ul>
   <% @stories.each do |story| %>
     <li>
-      <%= link_to story.title, story_path(story) %>
+      <strong><%= link_to story.title, story_path(story) %></strong><br>
+
+      <% if story.description.present? %>
+        <%= simple_format(truncate(story.description, length: 120)) %>
+      <% end %>
 
       <%= button_to "↑", move_up_story_path(story), method: :patch, form: { style: "display:inline" } %>
       <%= button_to "↓", move_down_story_path(story), method: :patch, form: { style: "display:inline" } %>

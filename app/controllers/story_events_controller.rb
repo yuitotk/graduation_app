@@ -1,7 +1,9 @@
 class StoryEventsController < ApplicationController
   before_action :require_login
   before_action :set_story
-  before_action :set_story_event, only: %i[edit update destroy move_up move_down]
+  before_action :set_story_event, only: %i[show edit update destroy move_up move_down]
+
+  def show; end
 
   def new
     @story_event = @story.story_events.new
@@ -33,7 +35,6 @@ class StoryEventsController < ApplicationController
     redirect_to story_path(@story), notice: t(".success")
   end
 
-  # ↑へ移動
   def move_up
     return redirect_to(story_path(@story)) if @story_event.position.nil?
 
@@ -47,7 +48,6 @@ class StoryEventsController < ApplicationController
     redirect_to story_path(@story)
   end
 
-  # ↓へ移動
   def move_down
     return redirect_to(story_path(@story)) if @story_event.position.nil?
 
