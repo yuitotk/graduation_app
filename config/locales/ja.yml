@@ -17,3 +17,19 @@ ja:
   user_mailer:
     reset_password_email:
       subject: "パスワード再設定"
+
+  stories:
+    create:
+      success: "ストーリーを作成しました"
+    update:
+      success: "ストーリーを更新しました"
+    destroy:
+      success: "ストーリーを削除しました"
+
+  story_events:
+    create:
+      success: "イベントを追加しました"
+    update:
+      success: "イベントを更新しました"
+    destroy:
+      success: "イベントを削除しました"

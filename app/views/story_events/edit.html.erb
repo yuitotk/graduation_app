@@ -1,0 +1,7 @@
+<h1>イベント編集</h1>
+<%= render "form" %>
+<%= button_to "削除",
+      story_story_event_path(@story, @story_event),
+      method: :delete,
+      data: { turbo_confirm: "本当に削除しますか？" } %>
+<p><%= link_to "戻る", story_path(@story) %></p>

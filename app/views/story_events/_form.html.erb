@@ -1,0 +1,21 @@
+<%= form_with model: [@story, @story_event] do |f| %>
+  <% if @story_event.errors.any? %>
+    <ul>
+      <% @story_event.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= f.label :title, "タイトル" %><br>
+    <%= f.text_field :title %>
+  </div>
+
+  <div>
+    <%= f.label :body, "本文" %><br>
+    <%= f.text_area :body, rows: 5 %>
+  </div>
+
+  <%= f.submit %>
+<% end %>
