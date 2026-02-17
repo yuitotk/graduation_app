@@ -1,0 +1,15 @@
+<h1>ストーリー一覧</h1>
+
+<p><%= link_to "アイデア一覧へ", ideas_path %></p>
+<p><%= link_to "ストーリー作成", new_story_path %></p>
+
+<ul>
+  <% @stories.each do |story| %>
+    <li>
+      <%= link_to story.title, story_path(story) %>
+
+      <%= button_to "↑", move_up_story_path(story), method: :patch, form: { style: "display:inline" } %>
+      <%= button_to "↓", move_down_story_path(story), method: :patch, form: { style: "display:inline" } %>
+    </li>
+  <% end %>
+</ul>

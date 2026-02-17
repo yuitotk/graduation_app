@@ -1,9 +1,5 @@
+# rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
-  get 'password_resets/new'
-  get 'password_resets/create'
-  get 'password_resets/edit'
-  get 'password_resets/update'
-  get 'user_sessions/new'
   root "tops#top"
 
   # 静的ページ
@@ -19,20 +15,39 @@ Rails.application.routes.draw do
   post   "/login",  to: "user_sessions#create"
   delete "/logout", to: "user_sessions#destroy"
 
+  # パスワードリセット
   resources :password_resets, only: %i[new create edit update]
 
+  # アイデア
   resources :ideas, only: %i[index show new create edit update destroy]
+
+  # ストーリー（時系列）
+  resources :stories do
+    member do
+      patch :move_up
+      patch :move_down
+    end
+
+    resources :story_events, except: %i[index show] do
+      member do
+        patch :move_up
+        patch :move_down
+      end
+    end
+  end
 
   # お問い合わせ（入力→確認→完了）
   resources :inquiries, only: %i[new create] do
     post :confirm, on: :collection
-    get :done, on: :collection
+    get  :done,    on: :collection
   end
 
   # 辞書ワード2語表示（再抽選）
   get "random_words/pick", to: "random_words#pick"
 
+  # AI生成
   resources :ai_generations, only: [:create] do
     post :save, on: :collection
   end
 end
+# rubocop:enable Metrics/BlockLength

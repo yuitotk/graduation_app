@@ -1,0 +1,19 @@
+<p><%= link_to "ストーリー一覧へ", stories_path %></p>
+
+<h2>イベント（時系列）</h2>
+
+<p><%= link_to "イベント追加", new_story_story_event_path(@story) %></p>
+
+<ul>
+  <% @story_events.each do |event| %>
+    <li>
+      <strong><%= event.title %></strong><br>
+      <%= simple_format(event.body) %>
+
+      <%= link_to "編集", edit_story_story_event_path(@story, event) %>
+
+      <%= button_to "↑", move_up_story_story_event_path(@story, event), method: :patch, form: { style: "display:inline" } %>
+      <%= button_to "↓", move_down_story_story_event_path(@story, event), method: :patch, form: { style: "display:inline" } %>
+    </li>
+  <% end %>
+</ul>
