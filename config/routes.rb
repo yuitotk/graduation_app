@@ -28,7 +28,7 @@ Rails.application.routes.draw do
       patch :move_down
     end
 
-    resources :story_events, except: %i[index show] do
+    resources :story_events, except: %i[index] do
       member do
         patch :move_up
         patch :move_down
