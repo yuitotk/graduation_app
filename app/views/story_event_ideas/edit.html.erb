@@ -1,0 +1,15 @@
+<h1>詳細メモ編集</h1>
+
+<%= render "form" %>
+
+<hr>
+
+<p>
+  <%= link_to "削除",
+              story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
+              data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" } %>
+</p>
+
+<p>
+  <%= link_to "戻る", story_story_event_path(@story, @story_event) %>
+</p>
