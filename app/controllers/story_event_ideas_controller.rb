@@ -7,20 +7,20 @@ class StoryEventIdeasController < ApplicationController
     @story_event_idea = @story_event.story_event_ideas.new
   end
 
+  def edit; end
+
   def create
     @story_event_idea = @story_event.story_event_ideas.new(story_event_idea_params)
     if @story_event_idea.save
-      redirect_to story_story_event_path(@story, @story_event), notice: "詳細メモを追加しました"
+      redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.created")
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  def edit; end
-
   def update
     if @story_event_idea.update(story_event_idea_params)
-      redirect_to story_story_event_path(@story, @story_event), notice: "詳細メモを更新しました"
+      redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.updated")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -28,10 +28,9 @@ class StoryEventIdeasController < ApplicationController
 
   def destroy
     @story_event_idea.destroy!
-    redirect_to story_story_event_path(@story, @story_event), notice: "詳細メモを削除しました"
+    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.destroyed")
   end
 
-  # --- 並び替え ---
   def move_up
     ideas = @story_event.story_event_ideas.order(:position, :created_at).to_a
     idx = ideas.index(@story_event_idea)
@@ -40,7 +39,7 @@ class StoryEventIdeasController < ApplicationController
     ideas[idx], ideas[idx - 1] = ideas[idx - 1], ideas[idx]
     resequence_positions!(ideas)
 
-    redirect_to story_story_event_path(@story, @story_event), notice: "並び替えました"
+    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
   end
 
   def move_down
@@ -51,7 +50,7 @@ class StoryEventIdeasController < ApplicationController
     ideas[idx], ideas[idx + 1] = ideas[idx + 1], ideas[idx]
     resequence_positions!(ideas)
 
-    redirect_to story_story_event_path(@story, @story_event), notice: "並び替えました"
+    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
   end
 
   private
@@ -72,7 +71,7 @@ class StoryEventIdeasController < ApplicationController
   def resequence_positions!(ideas)
     ActiveRecord::Base.transaction do
       ideas.each_with_index do |idea, i|
-        idea.update_column(:position, i + 1) # 確実に順番を更新
+        idea.update!(position: i + 1) # update_column禁止対応（バリデーション通す）
       end
     end
   end

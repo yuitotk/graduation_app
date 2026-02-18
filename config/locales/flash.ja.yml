@@ -1,0 +1,8 @@
+ja:
+  flash:
+    story_event_ideas:
+      created: "詳細メモを追加しました"
+      updated: "詳細メモを更新しました"
+      destroyed: "詳細メモを削除しました"
+      reordered: "並び替えました"
+      
