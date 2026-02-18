@@ -33,6 +33,14 @@ Rails.application.routes.draw do
         patch :move_up
         patch :move_down
       end
+
+      # ✅ イベント詳細メモ（アイデア形式）＋ 並び替え
+      resources :story_event_ideas, only: %i[new create edit update destroy] do
+        member do
+          patch :move_up
+          patch :move_down
+        end
+      end
     end
   end
 

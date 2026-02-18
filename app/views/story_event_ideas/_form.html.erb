@@ -1,0 +1,26 @@
+<%= form_with model: [@story, @story_event, @story_event_idea], local: true do |f| %>
+  <% if @story_event_idea.errors.any? %>
+    <ul>
+      <% @story_event_idea.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= f.label :title, "タイトル" %><br>
+    <%= f.text_field :title %>
+  </div>
+
+  <div>
+    <%= f.label :memo, "メモ" %><br>
+    <%= f.text_area :memo, rows: 8 %>
+  </div>
+
+  <div>
+    <%= f.label :image, "画像（任意）" %><br>
+    <%= f.file_field :image %>
+  </div>
+
+  <%= f.submit "保存" %>
+<% end %>

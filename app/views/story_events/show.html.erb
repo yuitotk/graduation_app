@@ -11,3 +11,41 @@
 <p>
   <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
 </p>
+
+<hr>
+
+<h2>詳細メモ</h2>
+
+<p>
+  <%= link_to "詳細メモを追加", new_story_story_event_story_event_idea_path(@story, @story_event) %>
+</p>
+
+<% if @story_event.story_event_ideas.any? %>
+  <% @story_event.story_event_ideas.order(:position, :created_at).each do |idea| %>
+    <div style="margin-bottom: 24px;">
+      <h3><%= idea.title %></h3>
+
+      <% if idea.image.present? %>
+        <%= image_tag idea.image.url, style: "max-width: 100%; height: auto;" %>
+      <% end %>
+
+      <div>
+        <%= simple_format(idea.memo) %>
+      </div>
+
+      <p>
+        <%= link_to "↑",
+                    move_up_story_story_event_story_event_idea_path(@story, @story_event, idea),
+                    data: { turbo_method: :patch } %>
+        <%= link_to "↓",
+                    move_down_story_story_event_story_event_idea_path(@story, @story_event, idea),
+                    data: { turbo_method: :patch } %>
+        |
+        <%= link_to "編集", edit_story_story_event_story_event_idea_path(@story, @story_event, idea) %> 
+        
+      </p>
+    </div>
+  <% end %>
+<% else %>
+  <p>まだ詳細メモはありません</p>
+<% end %>
