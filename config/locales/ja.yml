@@ -33,3 +33,11 @@ ja:
       success: "イベントを更新しました"
     destroy:
       success: "イベントを削除しました"
+
+  story_elements:
+    create:
+      success: "要素を追加しました"
+    update:
+      success: "要素を更新しました"
+    destroy:
+      success: "要素を削除しました"    

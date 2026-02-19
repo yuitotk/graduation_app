@@ -28,6 +28,9 @@ Rails.application.routes.draw do
       patch :move_down
     end
 
+    # ✅ 要素（キャラ/アイテム/設定）
+    resources :story_elements, except: %i[show]
+
     resources :story_events, except: %i[index] do
       member do
         patch :move_up

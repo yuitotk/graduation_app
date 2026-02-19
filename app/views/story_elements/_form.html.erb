@@ -1,0 +1,31 @@
+<%= form_with model: [@story, @story_element] do |f| %>
+  <% if @story_element.errors.any? %>
+    <ul>
+      <% @story_element.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= f.label :kind %>
+    <%= f.select :kind, StoryElement.kinds.keys.map { |k| [k, k] }, include_blank: true %>
+  </div>
+
+  <div>
+    <%= f.label :marker %>
+    <%= f.text_field :marker, placeholder: "例：🃏 🗡️ 🔰 🤴🏻" %>
+  </div>
+
+  <div>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :memo %>
+    <%= f.text_area :memo %>
+  </div>
+
+  <%= f.submit %>
+<% end %>
