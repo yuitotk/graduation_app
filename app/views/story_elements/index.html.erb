@@ -1,0 +1,16 @@
+<h1>要素一覧</h1>
+
+<%= link_to "＋要素追加", new_story_story_element_path(@story) %>
+
+<ul>
+  <% @story_elements.each do |e| %>
+    <li>
+      <%= e.marker.present? ? "#{e.marker} " : "" %><%= e.kind %> / <%= e.name %>
+      <%= link_to "編集", edit_story_story_element_path(@story, e) %>
+      <%= button_to "削除", story_story_element_path(@story, e),
+            method: :delete, data: { turbo_confirm: "削除しますか？" } %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to "ストーリー詳細へ戻る", story_path(@story) %>

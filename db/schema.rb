@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_02_17_093318) do
+ActiveRecord::Schema[7.0].define(version: 2026_02_19_035322) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -55,6 +55,17 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_17_093318) do
     t.index ["user_id"], name: "index_stories_on_user_id"
   end
 
+  create_table "story_elements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "story_id", null: false
+    t.integer "kind"
+    t.string "name"
+    t.text "memo"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "marker"
+    t.index ["story_id"], name: "index_story_elements_on_story_id"
+  end
+
   create_table "story_event_ideas", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "story_event_id", null: false
     t.string "title", null: false
@@ -94,6 +105,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_17_093318) do
   add_foreign_key "ideas", "users"
   add_foreign_key "inquiries", "users"
   add_foreign_key "stories", "users"
+  add_foreign_key "story_elements", "stories"
   add_foreign_key "story_event_ideas", "story_events"
   add_foreign_key "story_events", "stories"
 end
