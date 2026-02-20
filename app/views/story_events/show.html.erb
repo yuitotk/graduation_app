@@ -8,6 +8,18 @@
   <%= simple_format(@story_event.body) %>
 </div>
 
+<!-- イベント本体の登場要素（マーカー付き） -->
+<h2>イベントの登場要素</h2>
+<% if @story_event.story_elements.any? %>
+  <ul>
+    <% @story_event.story_elements.each do |el| %>
+      <li><%= story_element_label(el) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>未設定</p>
+<% end %>
+
 <p>
   <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
 </p>
@@ -33,6 +45,16 @@
         <%= simple_format(idea.memo) %>
       </div>
 
+      <!-- 詳細メモごとの登場要素（マーカー付き） -->
+      <div>
+        <strong>このメモの登場要素：</strong>
+        <% if idea.story_elements.any? %>
+          <%= idea.story_elements.map { |el| story_element_label(el) }.join(" / ") %>
+        <% else %>
+          <span>未設定</span>
+        <% end %>
+      </div>
+
       <p>
         <%= link_to "↑",
                     move_up_story_story_event_story_event_idea_path(@story, @story_event, idea),
@@ -41,8 +63,7 @@
                     move_down_story_story_event_story_event_idea_path(@story, @story_event, idea),
                     data: { turbo_method: :patch } %>
         |
-        <%= link_to "編集", edit_story_story_event_story_event_idea_path(@story, @story_event, idea) %> 
-        
+        <%= link_to "編集", edit_story_story_event_story_event_idea_path(@story, @story_event, idea) %>
       </p>
     </div>
   <% end %>

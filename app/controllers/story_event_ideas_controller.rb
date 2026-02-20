@@ -1,3 +1,4 @@
+# app/controllers/story_event_ideas_controller.rb
 class StoryEventIdeasController < ApplicationController
   before_action :require_login
   before_action :set_story_and_event
@@ -61,11 +62,16 @@ class StoryEventIdeasController < ApplicationController
   end
 
   def set_story_event_idea
-    @story_event_idea = @story_event.story_event_ideas.find(params[:id])
+    @story_event_idea = @story_event.story_event_ideas
+                                    .includes(:story_elements)
+                                    .find(params[:id])
   end
 
   def story_event_idea_params
-    params.require(:story_event_idea).permit(:title, :memo, :image, :position)
+    params.require(:story_event_idea).permit(
+      :title, :memo, :image, :position,
+      story_element_ids: []
+    )
   end
 
   def resequence_positions!(ideas)
