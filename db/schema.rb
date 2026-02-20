@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_02_19_035322) do
+ActiveRecord::Schema[7.0].define(version: 2026_02_19_104338) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -66,6 +66,26 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_19_035322) do
     t.index ["story_id"], name: "index_story_elements_on_story_id"
   end
 
+  create_table "story_event_elements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "story_event_id", null: false
+    t.bigint "story_element_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["story_element_id"], name: "index_story_event_elements_on_story_element_id"
+    t.index ["story_event_id", "story_element_id"], name: "idx_see_event_element", unique: true
+    t.index ["story_event_id"], name: "index_story_event_elements_on_story_event_id"
+  end
+
+  create_table "story_event_idea_elements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "story_event_idea_id", null: false
+    t.bigint "story_element_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["story_element_id"], name: "index_story_event_idea_elements_on_story_element_id"
+    t.index ["story_event_idea_id", "story_element_id"], name: "idx_seie_idea_element", unique: true
+    t.index ["story_event_idea_id"], name: "index_story_event_idea_elements_on_story_event_idea_id"
+  end
+
   create_table "story_event_ideas", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "story_event_id", null: false
     t.string "title", null: false
@@ -106,6 +126,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_19_035322) do
   add_foreign_key "inquiries", "users"
   add_foreign_key "stories", "users"
   add_foreign_key "story_elements", "stories"
+  add_foreign_key "story_event_elements", "story_elements"
+  add_foreign_key "story_event_elements", "story_events"
+  add_foreign_key "story_event_idea_elements", "story_elements"
+  add_foreign_key "story_event_idea_elements", "story_event_ideas"
   add_foreign_key "story_event_ideas", "story_events"
   add_foreign_key "story_events", "stories"
 end

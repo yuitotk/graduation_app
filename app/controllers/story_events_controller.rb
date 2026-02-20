@@ -1,3 +1,4 @@
+# app/controllers/story_events_controller.rb
 class StoryEventsController < ApplicationController
   before_action :require_login
   before_action :set_story
@@ -68,11 +69,16 @@ class StoryEventsController < ApplicationController
   end
 
   def set_story_event
-    @story_event = @story.story_events.find(params[:id])
+    @story_event = @story.story_events
+                         .includes(:story_elements, story_event_ideas: :story_elements)
+                         .find(params[:id])
   end
 
   def story_event_params
-    params.require(:story_event).permit(:title, :body)
+    params.require(:story_event).permit(
+      :title, :body,
+      story_element_ids: []
+    )
   end
 
   def swap_positions(first_record, second_record)

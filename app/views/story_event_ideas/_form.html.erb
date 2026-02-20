@@ -22,5 +22,21 @@
     <%= f.file_field :image %>
   </div>
 
+  <div>
+    <%= f.label :story_element_ids, "このメモの登場要素" %><br>
+
+    <% if @story.story_elements.any? %>
+      <%= f.collection_check_boxes :story_element_ids, @story.story_elements, :id,
+                                   ->(el) { story_element_label(el) } do |b| %>
+        <div>
+          <%= b.check_box %>
+          <%= b.label %>
+        </div>
+      <% end %>
+    <% else %>
+      <p>登場要素がまだありません（先に要素を作成してください）</p>
+    <% end %>
+  </div>
+
   <%= f.submit "保存" %>
 <% end %>
