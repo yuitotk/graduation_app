@@ -1,6 +1,6 @@
 class StoriesController < ApplicationController
   before_action :require_login
-  before_action :set_story, only: %i[show edit update destroy]
+  before_action :set_story, only: %i[show edit update destroy consistency]
 
   def index
     @stories = current_user.stories.order(:position, created_at: :desc)
@@ -8,6 +8,26 @@ class StoriesController < ApplicationController
 
   def show
     @story_events = @story.story_events.order(:position)
+  end
+
+  # ✅ 整合性チェック（要素で絞り込み）
+  def consistency
+    @elements = @story.story_elements.order(:kind, :name, :id)
+
+    @selected_element =
+      @elements.find_by(id: params[:story_element_id])
+
+    @events =
+      if @selected_element
+        @story.story_events
+              .joins(:story_elements)
+              .where(story_elements: { id: @selected_element.id })
+              .includes(:story_elements, story_event_ideas: :story_elements)
+              .distinct
+              .order(:position)
+      else
+        []
+      end
   end
 
   def new
