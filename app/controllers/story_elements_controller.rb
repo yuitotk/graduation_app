@@ -1,11 +1,13 @@
 class StoryElementsController < ApplicationController
   before_action :require_login
   before_action :set_story
-  before_action :set_story_element, only: %i[edit update destroy]
+  before_action :set_story_element, only: %i[show edit update destroy]
 
   def index
     @story_elements = @story.story_elements.order(:id)
   end
+
+  def show; end
 
   def new
     @story_element = @story.story_elements.new
@@ -16,7 +18,7 @@ class StoryElementsController < ApplicationController
   def create
     @story_element = @story.story_elements.new(story_element_params)
     if @story_element.save
-      redirect_to story_story_elements_path(@story), notice: t('.success')
+      redirect_to story_story_elements_path(@story), notice: t(".success")
     else
       render :new, status: :unprocessable_entity
     end
@@ -24,7 +26,7 @@ class StoryElementsController < ApplicationController
 
   def update
     if @story_element.update(story_element_params)
-      redirect_to story_story_elements_path(@story), notice: t('.success')
+      redirect_to story_story_elements_path(@story), notice: t(".success")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -32,7 +34,7 @@ class StoryElementsController < ApplicationController
 
   def destroy
     @story_element.destroy!
-    redirect_to story_story_elements_path(@story), notice: t('.success')
+    redirect_to story_story_elements_path(@story), notice: t(".success")
   end
 
   private

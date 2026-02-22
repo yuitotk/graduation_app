@@ -1,3 +1,12 @@
 <h1>要素編集</h1>
+
 <%= render "form" %>
-<%= link_to "戻る", story_story_elements_path(@story) %>
+
+<hr>
+
+<%= button_to "削除",
+      story_story_element_path(@story, @story_element),
+      method: :delete,
+      data: { turbo_confirm: "削除しますか？" } %>
+
+<%= link_to "戻る", story_story_element_path(@story, @story_element) %>
