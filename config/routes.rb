@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   # ストーリー（時系列）
   resources :stories do
     member do
+      get :consistency
       patch :move_up
       patch :move_down
     end

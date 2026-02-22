@@ -1,0 +1,95 @@
+<h1>整合性チェック</h1>
+
+<p><%= link_to "イベント一覧へ戻る", story_path(@story) %></p>
+
+<%= form_with url: consistency_story_path(@story), method: :get, local: true do %>
+  <div>
+    <%= label_tag :story_element_id, "要素を選ぶ" %><br>
+
+    <%= select_tag :story_element_id,
+      options_for_select(
+        @elements.map { |e| [[e.try(:marker), e.name].compact.join(" "), e.id] },
+        params[:story_element_id]
+      ),
+      include_blank: "選択してください" %>
+
+    <%= submit_tag "表示" %>
+  </div>
+<% end %>
+
+<hr>
+
+<% if @selected_element %>
+  <% selected_label = [@selected_element.try(:marker), @selected_element.name].compact.join(" ") %>
+
+  <p>選択中：<strong><%= selected_label %></strong></p>
+
+  <% element_memo = @selected_element.try(:memo) ||
+                    @selected_element.try(:description) ||
+                    @selected_element.try(:body) ||
+                    @selected_element.try(:content) %>
+
+  <% if element_memo.present? %>
+    <div style="margin: 8px 0;">
+      <div><strong>要素メモ（<%= selected_label %>）</strong></div>
+      <%= simple_format(element_memo.to_s) %>
+    </div>
+    <hr>
+  <% end %>
+
+  <% if @events.blank? %>
+    <p>この要素はどのイベントにも登場していません。</p>
+  <% else %>
+    <% @events.each do |event| %>
+      <div style="margin: 16px 0;">
+        <div><strong><%= event.title %></strong></div>
+
+        <%# ✅ イベント説明（本文） %>
+        <% if event.body.present? %>
+          <div style="margin: 6px 0;">
+            <%= simple_format(truncate(event.body.to_s, length: 160)) %>
+          </div>
+        <% end %>
+
+        <%# ✅ このイベントの詳細メモのうち「選択要素がチェックされているメモだけ」 %>
+        <% ideas = event.story_event_ideas
+                       .joins(:story_elements)
+                       .where(story_elements: { id: @selected_element.id })
+                       .distinct
+                       .order(:position) %>
+
+        <% if ideas.any? %>
+          <div style="margin-top: 8px;">
+            <div><strong>詳細メモ（<%= selected_label %>）</strong></div>
+
+            <% ideas.each do |idea| %>
+              <% memo = idea.try(:memo) || idea.try(:body) || idea.try(:content) || idea.try(:description) %>
+
+              <% if idea.respond_to?(:title) && idea.title.present? %>
+                <div><strong><%= idea.title %></strong></div>
+              <% end %>
+
+              <div style="margin: 6px 0;">
+                <%= simple_format(truncate(memo.to_s, length: 160)) %>
+              </div>
+              <hr>
+            <% end %>
+          </div>
+        <% else %>
+          <div style="margin-top: 8px;">詳細メモ（<%= selected_label %>）：なし</div>
+        <% end %>
+
+        <div style="margin-top: 8px;">
+          登場要素：<%= event.story_elements.map(&:name).join(" / ") %>
+        </div>
+
+        <div style="margin-top: 8px;">
+          <%= link_to "イベント詳細へ", story_story_event_path(@story, event) %>
+        </div>
+      </div>
+      <hr>
+    <% end %>
+  <% end %>
+<% else %>
+  <p>要素を選ぶと、登場イベントの時系列が表示されます。</p>
+<% end %>
