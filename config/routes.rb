@@ -29,8 +29,8 @@ Rails.application.routes.draw do
       patch :move_down
     end
 
-    # ✅ 要素（キャラ/アイテム/設定）
-    resources :story_elements, except: %i[show]
+    # ✅ 要素（キャラ/アイテム/設定）※ show（詳細）も使う
+    resources :story_elements
 
     resources :story_events, except: %i[index] do
       member do

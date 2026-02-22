@@ -1,0 +1,22 @@
+<h1>要素詳細</h1>
+
+<p><%= link_to "要素一覧へ戻る", story_story_elements_path(@story) %></p>
+
+<hr>
+
+<p>
+  <%= link_to "編集", edit_story_story_element_path(@story, @story_element) %>
+</p>
+
+<p><strong>種別：</strong><%= @story_element.kind %></p>
+<p><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
+<p><strong>名前：</strong><%= @story_element.name %></p>
+
+<% if @story_element.memo.present? %>
+  <p><strong>メモ：</strong></p>
+  <div><%= simple_format(@story_element.memo) %></div>
+<% else %>
+  <p><strong>メモ：</strong>なし</p>
+<% end %>
+
+<hr>
