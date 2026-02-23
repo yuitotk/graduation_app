@@ -19,7 +19,10 @@ Rails.application.routes.draw do
   resources :password_resets, only: %i[new create edit update]
 
   # アイデア
-  resources :ideas, only: %i[index show new create edit update destroy]
+  resources :ideas, only: %i[index show new create edit update destroy] do
+    # ✅ 即移動（保存→移動先詳細へリダイレクト）
+    resource :idea_placement, only: [:create]
+  end
 
   # ストーリー（時系列）
   resources :stories do

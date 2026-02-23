@@ -40,4 +40,8 @@ ja:
     update:
       success: "要素を更新しました"
     destroy:
-      success: "要素を削除しました"    
+      success: "要素を削除しました"
+
+  flash:
+    idea_placements:
+      moved: "アイデアを移動しました"   

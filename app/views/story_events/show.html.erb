@@ -8,6 +8,23 @@
   <%= simple_format(@story_event.body) %>
 </div>
 
+<!-- ✅ ここに移動したアイデア -->
+<hr>
+
+<h3>ここに移動したアイデア</h3>
+
+<% if @story_event.placed_ideas.any? %>
+  <ul>
+    <% @story_event.placed_ideas.order(created_at: :desc).each do |idea| %>
+      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
+<% end %>
+
+<hr>
+
 <!-- イベント本体の登場要素（マーカー付き） -->
 <h2>イベントの登場要素</h2>
 <% if @story_event.story_elements.any? %>

@@ -6,6 +6,12 @@ class StoryEventIdeasController < ApplicationController
 
   def new
     @story_event_idea = @story_event.story_event_ideas.new
+
+    # ✅ idea詳細から飛んできた場合に紐付けを初期セット（安全に）
+    return if params[:idea_id].blank?
+
+    idea = current_user.ideas.find_by(id: params[:idea_id])
+    @story_event_idea.idea_id = idea.id if idea
   end
 
   def edit; end
@@ -70,6 +76,7 @@ class StoryEventIdeasController < ApplicationController
   def story_event_idea_params
     params.require(:story_event_idea).permit(
       :title, :memo, :image, :position,
+      :idea_id, # ✅ 追加（これがないと紐付けできない）
       story_element_ids: []
     )
   end
@@ -77,7 +84,7 @@ class StoryEventIdeasController < ApplicationController
   def resequence_positions!(ideas)
     ActiveRecord::Base.transaction do
       ideas.each_with_index do |idea, i|
-        idea.update!(position: i + 1) # update_column禁止対応（バリデーション通す）
+        idea.update!(position: i + 1)
       end
     end
   end

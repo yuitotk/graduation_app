@@ -14,3 +14,89 @@
       data: { turbo_method: :delete, turbo_confirm: "削除しますか？" } %>
 |
 <%= link_to "一覧へ戻る", ideas_path %>
+
+<hr>
+
+<% tab = params[:tab].presence || @tab %>
+
+<h3>どこへ移動する？（まず3つから選ぶ）</h3>
+
+<ul>
+  <li><%= link_to "キャラ（要素）詳細ページへ", idea_path(@idea, tab: "elements") %></li>
+  <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories") %></li>
+  <li><%= link_to "イベント詳細（メモ一覧）ページへ", idea_path(@idea, tab: "events") %></li>
+</ul>
+
+<% if tab.present? %>
+  <p><%= link_to "← 3択に戻る", idea_path(@idea) %></p>
+<% end %>
+
+<% if tab == "elements" %>
+  <hr>
+  <h3>要素を選ぶ（種類＋マーカー表示）</h3>
+
+  <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
+  <% grouped = @story_elements.group_by(&:kind) %>
+
+  <% %w[character item setting].each do |kind| %>
+    <% next if grouped[kind].blank? %>
+
+    <h4><%= kind_labels[kind] %></h4>
+
+    <ul>
+      <% grouped[kind].sort_by { |e| [e.story.title.to_s, e.name.to_s] }.each do |el| %>
+        <% marker = el.marker.presence %>
+        <% name_with_marker = [marker, el.name].compact.join(" ") %>
+
+        <li>
+          <strong><%= name_with_marker %></strong>（<%= el.story.title %>）
+          |
+          <%= button_to "ここへ移動",
+                        idea_idea_placement_path(@idea),
+                        method: :post,
+                        params: { placeable_type: "StoryElement", placeable_id: el.id } %>
+          |
+          <%= link_to "詳細を見る", story_story_element_path(el.story, el) %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+<% elsif tab == "stories" %>
+  <hr>
+  <h3>ストーリーを選ぶ</h3>
+
+  <ul>
+    <% @stories.each do |story| %>
+      <li>
+        <strong><%= story.title %></strong>
+        |
+        <%= button_to "ここへ移動",
+                      idea_idea_placement_path(@idea),
+                      method: :post,
+                      params: { placeable_type: "Story", placeable_id: story.id } %>
+        |
+        <%= link_to "詳細を見る", story_path(story) %>
+      </li>
+    <% end %>
+  </ul>
+
+<% elsif tab == "events" %>
+  <hr>
+  <h3>イベントを選ぶ（イベント詳細＝メモ一覧へ）</h3>
+
+  <ul>
+    <% @story_events.each do |event| %>
+      <li>
+        <strong><%= event.story.title %> / <%= event.title %></strong>
+        |
+        <%= button_to "ここへ移動",
+                      idea_idea_placement_path(@idea),
+                      method: :post,
+                      params: { placeable_type: "StoryEvent", placeable_id: event.id } %>
+        |
+        <%= link_to "詳細を見る", story_story_event_path(event.story, event) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

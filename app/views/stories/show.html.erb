@@ -18,6 +18,22 @@
 
 <p><%= link_to "整合性チェック（登場イベント）", consistency_story_path(@story) %></p>
 
+<hr>
+
+<h3>ここに移動したアイデア</h3>
+
+<% if @story.placed_ideas.any? %>
+  <ul>
+    <% @story.placed_ideas.order(created_at: :desc).each do |idea| %>
+      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
+<% end %>
+
+<hr>
+
 <h2>イベント（時系列）</h2>
 
 <p><%= link_to "イベント追加", new_story_story_event_path(@story) %></p>
