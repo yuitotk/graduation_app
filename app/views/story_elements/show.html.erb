@@ -20,3 +20,15 @@
 <% end %>
 
 <hr>
+
+<h3>ここに移動したアイデア</h3>
+
+<% if @story_element.placed_ideas.any? %>
+  <ul>
+    <% @story_element.placed_ideas.order(created_at: :desc).each do |idea| %>
+      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
+<% end %>

@@ -1,10 +1,9 @@
 class StoryEventIdea < ApplicationRecord
   belongs_to :story_event
+  belongs_to :idea, optional: true # ✅ 追加
 
-  # 追加ここから
   has_many :story_event_idea_elements, dependent: :destroy
   has_many :story_elements, through: :story_event_idea_elements
-  # 追加ここまで
 
   validates :title, presence: true
 

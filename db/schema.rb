@@ -10,13 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_02_19_104338) do
+ActiveRecord::Schema[7.0].define(version: 2026_02_23_030011) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["idea_id"], name: "index_idea_images_on_idea_id", unique: true
+  end
+
+  create_table "idea_placements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "idea_id", null: false
+    t.string "placeable_type", null: false
+    t.bigint "placeable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["idea_id"], name: "index_idea_placements_on_idea_id", unique: true
+    t.index ["placeable_type", "placeable_id"], name: "index_idea_placements_on_placeable"
   end
 
   create_table "ideas", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -94,6 +104,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_19_104338) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "idea_id"
+    t.index ["idea_id"], name: "index_story_event_ideas_on_idea_id"
     t.index ["story_event_id"], name: "index_story_event_ideas_on_story_event_id"
   end
 
@@ -122,6 +134,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_19_104338) do
   end
 
   add_foreign_key "idea_images", "ideas"
+  add_foreign_key "idea_placements", "ideas"
   add_foreign_key "ideas", "users"
   add_foreign_key "inquiries", "users"
   add_foreign_key "stories", "users"
@@ -130,6 +143,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_19_104338) do
   add_foreign_key "story_event_elements", "story_events"
   add_foreign_key "story_event_idea_elements", "story_elements"
   add_foreign_key "story_event_idea_elements", "story_event_ideas"
+  add_foreign_key "story_event_ideas", "ideas"
   add_foreign_key "story_event_ideas", "story_events"
   add_foreign_key "story_events", "stories"
 end

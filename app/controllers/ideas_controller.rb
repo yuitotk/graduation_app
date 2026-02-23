@@ -2,7 +2,9 @@ class IdeasController < ApplicationController
   before_action :require_login
 
   def index
-    @ideas = current_user.ideas.order(created_at: :desc)
+    @ideas = current_user.ideas
+                         .where.missing(:idea_placement) # ✅ 移動先があるか結合
+                         .order(created_at: :desc)
   end
 
   def new
@@ -23,6 +25,29 @@ class IdeasController < ApplicationController
 
   def show
     @idea = current_user.ideas.find(params[:id])
+    @tab = params[:tab] # "elements" / "stories" / "events"
+
+    case @tab
+    when "elements"
+      # キャラ（要素）一覧：自分のストーリー配下だけ
+      @story_elements = StoryElement
+                        .joins(:story)
+                        .where(stories: { user_id: current_user.id })
+                        .includes(:story)
+                        .order("stories.created_at DESC, story_elements.created_at DESC")
+
+    when "stories"
+      # ストーリー一覧
+      @stories = current_user.stories.order(created_at: :desc)
+
+    when "events"
+      # イベント一覧（=イベント詳細に行ける）
+      @story_events = StoryEvent
+                      .joins(:story)
+                      .where(stories: { user_id: current_user.id })
+                      .includes(:story)
+                      .order("stories.created_at DESC, story_events.position ASC, story_events.created_at ASC")
+    end
   end
 
   def edit
