@@ -7,7 +7,19 @@ class StoryElementsController < ApplicationController
     @story_elements = @story.story_elements.order(:id)
   end
 
-  def show; end
+  def show
+    @created_here_ideas =
+      @story_element.placed_ideas
+                    .joins(:idea_placement)
+                    .where(idea_placements: { created_here: true })
+                    .order(created_at: :desc)
+
+    @moved_ideas =
+      @story_element.placed_ideas
+                    .joins(:idea_placement)
+                    .where(idea_placements: { created_here: false })
+                    .order(created_at: :desc)
+  end
 
   def new
     @story_element = @story.story_elements.new

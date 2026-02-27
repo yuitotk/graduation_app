@@ -10,6 +10,8 @@ class Idea < ApplicationRecord
 
   # ✅ 追加（「移動先」を1つだけ持つため）
   has_one :idea_placement, dependent: :destroy
+  accepts_nested_attributes_for :idea_placement, update_only: true
+
   # ※任意：現在の移動先を取りたければ（使わなくてもOK）
   # has_one :placeable, through: :idea_placement, source: :placeable
 

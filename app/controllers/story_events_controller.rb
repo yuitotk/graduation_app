@@ -4,7 +4,19 @@ class StoryEventsController < ApplicationController
   before_action :set_story
   before_action :set_story_event, only: %i[show edit update destroy move_up move_down]
 
-  def show; end
+  def show
+    @created_here_ideas =
+      @story_event.placed_ideas
+                  .joins(:idea_placement)
+                  .where(idea_placements: { created_here: true })
+                  .order(created_at: :desc)
+
+    @moved_ideas =
+      @story_event.placed_ideas
+                  .joins(:idea_placement)
+                  .where(idea_placements: { created_here: false })
+                  .order(created_at: :desc)
+  end
 
   def new
     @story_event = @story.story_events.new

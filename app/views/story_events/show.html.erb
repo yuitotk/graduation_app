@@ -8,37 +8,9 @@
   <%= simple_format(@story_event.body) %>
 </div>
 
-<!-- ✅ ここに移動したアイデア -->
-<hr>
-
-<h3>ここに移動したアイデア</h3>
-
-<% if @story_event.placed_ideas.any? %>
-  <ul>
-    <% @story_event.placed_ideas.order(created_at: :desc).each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea) %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>まだありません</p>
-<% end %>
-
-<hr>
-
-<!-- イベント本体の登場要素（マーカー付き） -->
-<h2>イベントの登場要素</h2>
-<% if @story_event.story_elements.any? %>
-  <ul>
-    <% @story_event.story_elements.each do |el| %>
-      <li><%= story_element_label(el) %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>未設定</p>
-<% end %>
-
 <p>
-  <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %> |
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %>
 </p>
 
 <hr>
@@ -62,7 +34,6 @@
         <%= simple_format(idea.memo) %>
       </div>
 
-      <!-- 詳細メモごとの登場要素（マーカー付き） -->
       <div>
         <strong>このメモの登場要素：</strong>
         <% if idea.story_elements.any? %>
@@ -87,3 +58,48 @@
 <% else %>
   <p>まだ詳細メモはありません</p>
 <% end %>
+
+<hr>
+
+<h3>新規アイデア</h3>
+
+<% if @created_here_ideas.present? %>
+  <ul>
+    <% @created_here_ideas.each do |idea| %>
+      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
+<% end %>
+
+<hr>
+
+<h3>ここに移動したアイデア</h3>
+
+<% if @moved_ideas.present? %>
+  <ul>
+    <% @moved_ideas.each do |idea| %>
+      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
+<% end %>
+
+<hr>
+
+<h2>イベントの登場要素</h2>
+<% if @story_event.story_elements.any? %>
+  <ul>
+    <% @story_event.story_elements.each do |el| %>
+      <li><%= story_element_label(el) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>未設定</p>
+<% end %>
+
+<p>
+  <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
+</p>
