@@ -29,6 +29,11 @@
       <%= hidden_field_tag :word1, words[0].word %>
       <%= hidden_field_tag :word2, words[1].word %>
 
+      <%# ✅ ホームからは必ず /ideas に戻す（sessionの残り香を上書き） %>
+      <%= hidden_field_tag :return_to, (local_assigns[:return_to] || ideas_path) %>
+      <%= hidden_field_tag :placeable_type, local_assigns[:placeable_type] %>
+      <%= hidden_field_tag :placeable_id, local_assigns[:placeable_id] %>
+
       <%= f.submit "AIで生成する", data: { disable_with: "生成中..." } %>
     <% end %>
   <% end %>

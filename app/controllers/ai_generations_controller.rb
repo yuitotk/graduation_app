@@ -2,6 +2,7 @@
 class AiGenerationsController < ApplicationController
   before_action :require_login
 
+  # rubocop:disable Metrics/AbcSize
   def create
     store_ai_context
     prepare_marker_select_for_ai
@@ -19,14 +20,20 @@ class AiGenerationsController < ApplicationController
     @word1 = word1
     @word2 = word2
 
+    # ✅ create -> save で「どのページから来たか」を引き継ぐ
+    @return_to      = ai_return_to
+    @placeable_type = ai_placeable_type
+    @placeable_id   = ai_placeable_id
+
     render :create
   rescue StandardError => e
     Rails.logger.error("[AI_GENERATE] #{e.class}: #{e.message}")
     @error = "生成に失敗しました。時間をおいてもう一度試してください。"
     render :create, status: :unprocessable_entity
   end
+  # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
   def save
     text  = params[:generated_text].to_s
     word1 = params[:word1].to_s
@@ -42,13 +49,21 @@ class AiGenerationsController < ApplicationController
 
     if idea.save
       attach_placement_if_needed(idea, created_here: true, marker: placement_marker_param)
-      redirect_to(ai_return_to || idea_path(idea), notice: "アイデアを保存しました")
+
+      return_to =
+        if params[:return_to].present?
+          safe_path(params[:return_to])
+        else
+          ideas_path
+        end
+
+      redirect_to(return_to || idea_path(idea), notice: "アイデアを保存しました")
     else
       redirect_back fallback_location: ai_return_to || random_words_pick_path,
                     alert: "保存に失敗しました"
     end
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize, Metrics/PerceivedComplexity
 
   private
 
@@ -56,6 +71,9 @@ class AiGenerationsController < ApplicationController
   def store_ai_context
     rt = safe_path(params[:return_to])
     session[:ai_return_to] = rt if rt.present?
+
+    # ✅ ホーム（placeableなし）で return_to が来ない場合は、前回のストーリー(return_to)が残るのを防ぐ
+    session[:ai_return_to] = ideas_path if rt.blank? && params[:placeable_type].blank? && params[:placeable_id].blank?
 
     if params[:placeable_type].present? && params[:placeable_id].present?
       session[:ai_placeable_type] = params[:placeable_type].to_s
