@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_02_23_030011) do
+ActiveRecord::Schema[7.0].define(version: 2026_02_27_015113) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -19,12 +19,24 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_23_030011) do
     t.index ["idea_id"], name: "index_idea_images_on_idea_id", unique: true
   end
 
+  create_table "idea_placement_elements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "idea_placement_id", null: false
+    t.bigint "story_element_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["idea_placement_id", "story_element_id"], name: "idx_ipe_placement_element", unique: true
+    t.index ["idea_placement_id"], name: "index_idea_placement_elements_on_idea_placement_id"
+    t.index ["story_element_id"], name: "index_idea_placement_elements_on_story_element_id"
+  end
+
   create_table "idea_placements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "placeable_type", null: false
     t.bigint "placeable_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "created_here", default: false, null: false
+    t.string "marker"
     t.index ["idea_id"], name: "index_idea_placements_on_idea_id", unique: true
     t.index ["placeable_type", "placeable_id"], name: "index_idea_placements_on_placeable"
   end
@@ -134,6 +146,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_02_23_030011) do
   end
 
   add_foreign_key "idea_images", "ideas"
+  add_foreign_key "idea_placement_elements", "idea_placements"
+  add_foreign_key "idea_placement_elements", "story_elements"
   add_foreign_key "idea_placements", "ideas"
   add_foreign_key "ideas", "users"
   add_foreign_key "inquiries", "users"

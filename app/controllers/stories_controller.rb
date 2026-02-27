@@ -8,6 +8,20 @@ class StoriesController < ApplicationController
 
   def show
     @story_events = @story.story_events.order(:position)
+
+    base =
+      @story.placed_ideas
+            .includes(idea_placement: :story_elements) # ✅ 複数マーカー表示用
+            .joins(:idea_placement)
+            .order(created_at: :desc)
+
+    # このストーリー内で「ここで新規作成」されたアイデア（created_here: true）
+    @created_here_ideas =
+      base.where(idea_placements: { created_here: true })
+
+    # 「ここに移動したアイデア」（created_here: false）
+    @moved_ideas =
+      base.where(idea_placements: { created_here: false })
   end
 
   # ✅ 整合性チェック（要素で絞り込み）

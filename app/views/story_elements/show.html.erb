@@ -12,20 +12,40 @@
 <p><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
 <p><strong>名前：</strong><%= @story_element.name %></p>
 
+<h2>詳細メモ</h2>
+
 <% if @story_element.memo.present? %>
-  <p><strong>メモ：</strong></p>
   <div><%= simple_format(@story_element.memo) %></div>
 <% else %>
-  <p><strong>メモ：</strong>なし</p>
+  <p>なし</p>
+<% end %>
+
+<p>
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryElement", placeable_id: @story_element.id) %> |
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryElement", placeable_id: @story_element.id) %>
+</p>
+
+<hr>
+
+<h3>新規アイデア</h3>
+
+<% if @created_here_ideas.present? %>
+  <ul>
+    <% @created_here_ideas.each do |idea| %>
+      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
 <% end %>
 
 <hr>
 
 <h3>ここに移動したアイデア</h3>
 
-<% if @story_element.placed_ideas.any? %>
+<% if @moved_ideas.present? %>
   <ul>
-    <% @story_element.placed_ideas.order(created_at: :desc).each do |idea| %>
+    <% @moved_ideas.each do |idea| %>
       <li><%= link_to idea.title, idea_path(idea) %></li>
     <% end %>
   </ul>

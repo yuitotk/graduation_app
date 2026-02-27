@@ -1,2 +1,48 @@
-<h1>AiGenerations#create</h1>
-<p>Find me in app/views/ai_generations/create.html.erb</p>
+<h1>AI生成結果</h1>
+
+<p>
+  <%= link_to "戻る", (params[:return_to].presence || session[:ai_return_to] || random_words_pick_path) %>
+</p>
+
+<% if @error.present? %>
+  <p style="color: red;"><%= @error %></p>
+<% end %>
+
+<% if @text.present? %>
+  <hr>
+
+  <h2>生成テキスト</h2>
+  <div>
+    <%= simple_format(@text) %>
+  </div>
+
+  <hr>
+
+  <h2>保存</h2>
+
+  <%= form_with url: save_ai_generations_path, method: :post, local: true do %>
+    <%= hidden_field_tag :generated_text, @text %>
+    <%= hidden_field_tag :word1, @word1 %>
+    <%= hidden_field_tag :word2, @word2 %>
+
+    <%= hidden_field_tag :return_to, params[:return_to] %>
+    <%= hidden_field_tag :placeable_type, params[:placeable_type] %>
+    <%= hidden_field_tag :placeable_id, params[:placeable_id] %>
+
+    <% if @show_marker_select %>
+      <div style="margin-top: 12px;">
+        <%= label_tag :placement_marker, "マーカー（任意）" %><br>
+        <%= select_tag :placement_marker,
+                       options_for_select(@marker_options, @selected_marker),
+                       include_blank: "なし" %>
+      </div>
+    <% end %>
+
+    <div style="margin-top: 12px;">
+      <%= submit_tag "この内容で保存" %>
+    </div>
+  <% end %>
+
+<% else %>
+  <p>生成結果がありません。もう一度お試しください。</p>
+<% end %>

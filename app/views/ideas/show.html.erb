@@ -1,5 +1,32 @@
 <h1><%= @idea.title %></h1>
 
+<% placement = @idea.idea_placement %>
+
+<%# ✅ 複数マーカー表示（選択された story_elements をそのまま出す） %>
+<% if placement.present? && placement.story_elements.present? %>
+  <% elements = placement.story_elements.to_a %>
+
+  <%# 並び順：できれば kind → name → id（安定） %>
+  <% elements =
+      if elements.first.respond_to?(:kind) && elements.first.respond_to?(:name)
+        elements.sort_by { |e| [e.kind.to_s, e.name.to_s, e.id.to_i] }
+      else
+        elements.sort_by { |e| e.id.to_i }
+      end
+  %>
+
+  <div style="margin: 12px 0;">
+    <strong>マーカー：</strong>
+    <ul style="margin: 8px 0;">
+      <% elements.each do |el| %>
+        <% label = [el.marker.presence, el.name.presence, el.kind.presence].compact.join(" ") %>
+        <% next if label.blank? %>
+        <li><%= label %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <% if @idea.idea_image&.image? %>
   <div>
     <%= image_tag @idea.idea_image.image.url, style: "max-width: 100%; height: auto;" %>
@@ -36,7 +63,7 @@
   <h3>要素を選ぶ（種類＋マーカー表示）</h3>
 
   <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
-  <% grouped = @story_elements.group_by(&:kind) %>
+  <% grouped = (@story_elements || []).group_by(&:kind) %>
 
   <% %w[character item setting].each do |kind| %>
     <% next if grouped[kind].blank? %>
@@ -44,12 +71,11 @@
     <h4><%= kind_labels[kind] %></h4>
 
     <ul>
-      <% grouped[kind].sort_by { |e| [e.story.title.to_s, e.name.to_s] }.each do |el| %>
-        <% marker = el.marker.presence %>
-        <% name_with_marker = [marker, el.name].compact.join(" ") %>
+      <% grouped[kind].sort_by { |e| [e.story&.title.to_s, e.name.to_s] }.each do |el| %>
+        <% name_with_marker = [el.marker.presence, el.name].compact.join(" ") %>
 
         <li>
-          <strong><%= name_with_marker %></strong>（<%= el.story.title %>）
+          <strong><%= name_with_marker %></strong>（<%= el.story&.title %>）
           |
           <%= button_to "ここへ移動",
                         idea_idea_placement_path(@idea),
@@ -67,7 +93,7 @@
   <h3>ストーリーを選ぶ</h3>
 
   <ul>
-    <% @stories.each do |story| %>
+    <% (@stories || []).each do |story| %>
       <li>
         <strong><%= story.title %></strong>
         |
@@ -86,9 +112,9 @@
   <h3>イベントを選ぶ（イベント詳細＝メモ一覧へ）</h3>
 
   <ul>
-    <% @story_events.each do |event| %>
+    <% (@story_events || []).each do |event| %>
       <li>
-        <strong><%= event.story.title %> / <%= event.title %></strong>
+        <strong><%= event.story&.title %> / <%= event.title %></strong>
         |
         <%= button_to "ここへ移動",
                       idea_idea_placement_path(@idea),

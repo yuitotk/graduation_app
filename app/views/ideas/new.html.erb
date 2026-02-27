@@ -10,4 +10,4 @@
 
 <%= render "form", idea: @idea %>
 
-<%= link_to "一覧へ戻る", ideas_path %>
+<%= link_to "戻る", (params[:return_to].presence || ideas_path) %>

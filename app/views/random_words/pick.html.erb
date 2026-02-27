@@ -11,6 +11,10 @@
     <%= hidden_field_tag :word1, @words[0].word %>
     <%= hidden_field_tag :word2, @words[1].word %>
 
+    <%= hidden_field_tag :return_to, params[:return_to] %>
+    <%= hidden_field_tag :placeable_type, params[:placeable_type] %>
+    <%= hidden_field_tag :placeable_id, params[:placeable_id] %>
+
     <%= f.submit "AIで生成する", data: { disable_with: "生成中..." } %>
   <% end %>
 
@@ -18,6 +22,10 @@
   <p><%= @message %></p>
 <% end %>
 
-<%= link_to "再抽選", random_words_pick_path %>
+<%= link_to "再抽選", random_words_pick_path(
+      return_to: params[:return_to],
+      placeable_type: params[:placeable_type],
+      placeable_id: params[:placeable_id]
+    ) %>
 |
 <%= link_to "一覧へ戻る", ideas_path %>

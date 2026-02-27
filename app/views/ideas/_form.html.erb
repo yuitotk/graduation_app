@@ -1,12 +1,16 @@
-<<% if idea.errors.any? %>
-  <ul>
-    <% idea.errors.full_messages.each do |msg| %>
-      <li><%= msg %></li>
-    <% end %>
-  </ul>
-<% end %>
+<%= form_with(model: idea, local: true, html: { multipart: true }) do |f| %>
+  <% if idea.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% idea.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-<%= form_with model: idea, local: true, html: { multipart: true } do |f| %>
+  <h1><%= idea.persisted? ? "アイデア編集" : "アイデア投稿" %></h1>
+
   <div>
     <%= f.label :title, "タイトル" %><br>
     <%= f.text_field :title %>
@@ -14,21 +18,80 @@
 
   <div>
     <%= f.label :memo, "メモ" %><br>
-    <%= f.text_area :memo %>
+    <%= f.text_area :memo, rows: 8 %>
   </div>
 
-  <% if idea.idea_image&.image? %>
-    <div style="margin-top: 12px;">
-      <%= image_tag idea.idea_image.image.url, style: "max-width: 100%; height: auto;" %>
+  <%= f.fields_for :idea_image do |imgf| %>
+    <%= imgf.hidden_field :id if imgf.object&.persisted? %>
+
+    <div style="margin-top: 16px;">
+      <%= imgf.label :image, "画像（任意）" %><br>
+      <%= imgf.file_field :image %>
+
+      <% if idea.idea_image&.image? %>
+        <div style="margin-top: 8px;">
+          <%= image_tag idea.idea_image.image.url, style: "max-width: 320px; height: auto;" %>
+        </div>
+      <% end %>
     </div>
   <% end %>
 
-  <div style="margin-top: 12px;">
-    <%= f.fields_for :idea_image do |ii| %>
-      <%= ii.label :image, "画像" %><br>
-      <%= ii.file_field :image %>
+  <%# ✅ ストーリー文脈がある時だけ表示 %>
+  <% if idea.idea_placement.present? || @marker_options.present? || params[:placeable_type].present? %>
+    <%= f.fields_for :idea_placement do |pf| %>
+      <%= pf.hidden_field :id if pf.object&.persisted? %>
+
+      <%= pf.hidden_field :placeable_type, value: (pf.object&.placeable_type || params[:placeable_type]) %>
+      <%= pf.hidden_field :placeable_id,   value: (pf.object&.placeable_id   || params[:placeable_id]) %>
+
+      <div style="margin-top: 16px;">
+        <div><strong>このアイデアの登場要素（複数選択OK）</strong></div>
+
+        <% if @marker_options.present? %>
+          <%# ✅ 全部外した時に空配列を送る %>
+          <%= hidden_field_tag "idea[idea_placement_attributes][story_element_ids][]", "" %>
+
+          <% selected_ids =
+              if pf.object&.story_elements.present?
+                pf.object.story_elements.pluck(:id).map(&:to_s)
+              else
+                []
+              end
+          %>
+
+          <% @marker_options.each_with_index do |(label, value), i| %>
+            <div>
+              <label for="idea_marker_<%= i %>">
+                <%= check_box_tag(
+                      "idea[idea_placement_attributes][story_element_ids][]",
+                      value,
+                      selected_ids.include?(value.to_s),
+                      id: "idea_marker_#{i}"
+                    ) %>
+                <%= label %>
+              </label>
+            </div>
+          <% end %>
+        <% else %>
+          <div>
+            （このアイデアはストーリー文脈が特定できないため、要素一覧を表示できません）
+          </div>
+        <% end %>
+      </div>
     <% end %>
+  <% end %>
+
+  <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
+
+  <div style="margin-top: 12px;">
+    <%= f.submit(idea.persisted? ? "アイデアの更新" : "アイデアを作成") %>
   </div>
 
-  <%= f.submit (idea.persisted? ? "更新する" : "保存") %>
+  <div style="margin-top: 12px;">
+    <% if idea.persisted? %>
+      <%= link_to "詳細へ戻る", idea_path(idea) %>
+    <% else %>
+      <%= link_to "一覧へ戻る", ideas_path %>
+    <% end %>
+  </div>
 <% end %>

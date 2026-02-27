@@ -6,11 +6,22 @@
 
 <h1><%= @story.title %></h1>
 
+<hr>
+
+<h2>詳細メモ</h2>
+
 <% if @story.description.present? %>
   <div>
     <%= simple_format(@story.description) %>
   </div>
+<% else %>
+  <p>なし</p>
 <% end %>
+
+<p>
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %> |
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %>
+</p>
 
 <hr>
 
@@ -20,12 +31,57 @@
 
 <hr>
 
+<%# ✅ 追加：アイデアのマーカー（複数）表示用 %>
+<% marker_labels_for = lambda do |idea| %>
+  <% placement = idea.idea_placement %>
+  <% next "" if placement.blank? %>
+
+  <% labels = [] %>
+  <% if placement.story_elements.present? %>
+    <% placement.story_elements.each do |el| %>
+      <% labels << [el.marker.presence, el.name.presence, el.kind.presence].compact.join(" ") %>
+    <% end %>
+  <% end %>
+
+  <% labels.reject(&:blank?).join(" / ") %>
+<% end %>
+
+<h3>新規アイデア</h3>
+
+<% if @created_here_ideas.present? %>
+  <ul>
+    <% @created_here_ideas.each do |idea| %>
+      <% markers = marker_labels_for.call(idea) %>
+      <li>
+        <%= link_to idea.title, idea_path(idea) %>
+        <% if markers.present? %>
+          <div style="font-size: 0.9em; opacity: 0.85;">
+            <strong>マーカー：</strong><%= markers %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだありません</p>
+<% end %>
+
+<hr>
+
 <h3>ここに移動したアイデア</h3>
 
-<% if @story.placed_ideas.any? %>
+<% if @moved_ideas.present? %>
   <ul>
-    <% @story.placed_ideas.order(created_at: :desc).each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea) %></li>
+    <% @moved_ideas.each do |idea| %>
+      <% markers = marker_labels_for.call(idea) %>
+      <li>
+        <%= link_to idea.title, idea_path(idea) %>
+        <% if markers.present? %>
+          <div style="font-size: 0.9em; opacity: 0.85;">
+            <strong>マーカー：</strong><%= markers %>
+          </div>
+        <% end %>
+      </li>
     <% end %>
   </ul>
 <% else %>
