@@ -1,3 +1,4 @@
+# app/controllers/idea_placements_controller.rb
 class IdeaPlacementsController < ApplicationController
   before_action :require_login
 
@@ -8,6 +9,7 @@ class IdeaPlacementsController < ApplicationController
     # ✅ 即移動：既存があれば更新（1アイデア=1移動先）
     placement = idea.idea_placement || idea.build_idea_placement
     placement.placeable = placeable
+    placement.created_here = false
     placement.save!
 
     redirect_to redirect_target(placeable), notice: t("flash.idea_placements.moved")

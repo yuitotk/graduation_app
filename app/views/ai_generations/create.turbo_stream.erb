@@ -20,6 +20,12 @@
       <%= hidden_field_tag :generated_text, @text %>
       <%= hidden_field_tag :word1, @word1 %>
       <%= hidden_field_tag :word2, @word2 %>
+
+      <%# ✅ create -> save で「どのページから来たか」を引き継ぐ %>
+      <%= hidden_field_tag :return_to, (@return_to.presence || params[:return_to]) %>
+      <%= hidden_field_tag :placeable_type, (@placeable_type.presence || params[:placeable_type]) %>
+      <%= hidden_field_tag :placeable_id, (@placeable_id.presence || params[:placeable_id]) %>
+
       <%= submit_tag "アイデアとして保存" %>
     <% end %>
   <% end %>
