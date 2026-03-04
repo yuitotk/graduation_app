@@ -64,5 +64,9 @@ Rails.application.routes.draw do
   resources :ai_generations, only: [:create] do
     post :save, on: :collection
   end
+
+  # 検索（最終仕様）
+  get "search",             to: "search#index"
+  get "search/suggestions", to: "search#suggestions"
 end
 # rubocop:enable Metrics/BlockLength

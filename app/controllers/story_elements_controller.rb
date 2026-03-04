@@ -2,12 +2,15 @@ class StoryElementsController < ApplicationController
   before_action :require_login
   before_action :set_story
   before_action :set_story_element, only: %i[show edit update destroy]
+  before_action :sync_search_story_session, only: %i[index show new edit]
 
   def index
     @story_elements = @story.story_elements.order(:id)
   end
 
   def show
+    @current_story = @story
+
     @created_here_ideas =
       @story_element.placed_ideas
                     .joins(:idea_placement)
@@ -57,6 +60,12 @@ class StoryElementsController < ApplicationController
 
   def set_story_element
     @story_element = @story.story_elements.find(params[:id])
+  end
+
+  # ✅ ストーリー配下に入ったら「この作品」を session に固定
+  def sync_search_story_session
+    session[:search_story_id] = @story.id
+    session[:search_in_story] = true
   end
 
   def story_element_params
