@@ -1,12 +1,16 @@
+# rubocop:disable Metrics/ClassLength
 class StoriesController < ApplicationController
   before_action :require_login
   before_action :set_story, only: %i[show edit update destroy consistency]
+  before_action :sync_search_story_session, only: %i[show consistency]
 
   def index
     @stories = current_user.stories.order(:position, created_at: :desc)
   end
 
   def show
+    @current_story = @story
+
     @story_events = @story.story_events.order(:position)
 
     base =
@@ -110,6 +114,13 @@ class StoriesController < ApplicationController
     @story = current_user.stories.find(params[:id])
   end
 
+  # ✅ ストーリー配下に入ったら「この作品」を session に固定
+  # これでヘッダーの「この作品内（◯◯）」が安定する
+  def sync_search_story_session
+    session[:search_story_id] = @story.id
+    session[:search_in_story] = true
+  end
+
   def story_params
     params.require(:story).permit(:title, :description)
   end
@@ -126,3 +137,4 @@ class StoriesController < ApplicationController
     (user.stories.maximum(:position) || 0) + 10
   end
 end
+# rubocop:enable Metrics/ClassLength

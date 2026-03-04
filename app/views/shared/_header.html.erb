@@ -4,6 +4,193 @@
     <%= link_to "お問い合わせ", new_inquiry_path %> |
     <%= link_to "利用規約", terms_path %> |
     <%= link_to "プライバシーポリシー", privacy_path %>
+
+    <hr>
+
+    <!-- 検索UI -->
+    <%= form_with url: search_path, method: :get, local: true,
+                  data: { controller: "search-autocomplete" } do %>
+
+      <%= text_field_tag :q, params[:q],
+                         placeholder: "検索",
+                         style: "width: 220px;",
+                         data: { "search-autocomplete-target": "input",
+                                 action: "input->search-autocomplete#onInput" } %>
+
+      <% hide_within_story_ui =
+           (controller_name == "ideas" && action_name == "index") ||
+           (controller_name == "ideas" && action_name == "new" && params[:placeable_type].blank? && params[:placeable_id].blank?) ||
+           (controller_name == "stories" && %w[index new].include?(action_name)) ||
+           (controller_name == "random_words" && params[:placeable_type].blank? && params[:placeable_id].blank?) %>
+
+      <% in_story_ui = search_in_story? && !hide_within_story_ui %>
+
+      <% scope_options =
+           if in_story_ui
+             [
+               ["すべて", "all"],
+               ["ストーリー内", "story"],
+               ["イベント内", "event"],
+               ["要素内", "element"]
+             ]
+           else
+             [
+               ["すべて", "all"],
+               ["ホーム未所属", "home"],
+               ["ストーリー内", "story"],
+               ["イベント内", "event"],
+               ["要素内", "element"]
+             ]
+           end %>
+
+      <% selected_scope = params[:scope].presence || "all" %>
+      <% selected_scope = "all" if in_story_ui && selected_scope == "home" %>
+
+      <%= select_tag :scope,
+                     options_for_select(scope_options, selected_scope),
+                     id: "search_scope_select",
+                     data: { "search-autocomplete-target": "scope" } %>
+
+      <% header_story =
+           begin
+             # 1) ストーリー詳細 /stories/:id  + 整合性チェック /stories/:id/consistency
+             if controller_name == "stories" && %w[show consistency].include?(action_name) && params[:id].present?
+               current_user.stories.find_by(id: params[:id])
+
+             # 2) ストーリー配下（/stories/:story_id/..）
+             elsif params[:story_id].present?
+               current_user.stories.find_by(id: params[:story_id])
+
+             # 3) イベント詳細 /story_events/:id（もし単独ルートがある場合）
+             elsif controller_name == "story_events" && action_name == "show" && params[:id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
+
+             # 4) 要素詳細 /story_elements/:id（もし単独ルートがある場合）
+             elsif controller_name == "story_elements" && action_name == "show" && params[:id].present?
+               StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
+
+             # 5) アイデア新規（ストーリー/イベント/要素から来た placeable）
+             elsif params[:placeable_type].present? && params[:placeable_id].present?
+               case params[:placeable_type].to_s
+               when "Story"
+                 current_user.stories.find_by(id: params[:placeable_id])
+               when "StoryEvent"
+                 StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story
+               when "StoryElement"
+                 StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story
+               end
+
+             # 6) 検索結果は session の current_search_story を使う（ただしホーム検索では出さない）
+             elsif controller_name == "search" && action_name == "index"
+               params[:story_id].present? ? current_search_story : nil
+
+             else
+               nil
+             end
+           end %>
+
+      <% # ✅ チェックを出していいページだけ許可（ホワイトリスト）＋ 出したくない場所は強制ブロック
+         allow_within_story_toggle =
+           (
+             (controller_name == "search" && action_name == "index") ||
+             (controller_name == "stories" && action_name == "show") ||
+             (controller_name == "stories" && action_name == "consistency") ||
+             (controller_name == "story_events" && action_name == "show") ||
+             (controller_name == "story_events" && %w[new edit].include?(action_name)) ||
+             (controller_name == "story_event_ideas" && %w[new edit].include?(action_name)) ||
+             (controller_name == "story_elements" && action_name == "show") ||
+             (controller_name == "story_elements" && action_name == "index") ||
+             (controller_name == "story_elements" && %w[new edit].include?(action_name)) ||
+             (controller_name == "ideas" && action_name == "new" &&
+               params[:placeable_type].present? && params[:placeable_id].present?) ||
+             (controller_name == "ideas" && %w[show edit update].include?(action_name)) ||
+             (controller_name == "random_words" && action_name == "pick" &&
+               params[:placeable_type].present? && params[:placeable_id].present?)
+           ) && !hide_within_story_ui %>
+
+      <% if header_story.blank? && allow_within_story_toggle %>
+        <% unless controller_name == "search" && action_name == "index" && params[:story_id].blank? %>
+          <% header_story = current_search_story %>
+        <% end %>
+      <% end %>
+
+      <% if header_story.present? && allow_within_story_toggle %>
+        <label style="margin-left: 8px;">
+          <%= check_box_tag :within_story, "1", in_story_ui,
+                            id: "within_story_checkbox",
+                            data: { "search-autocomplete-target": "withinStory" } %>
+          この作品内（<%= header_story.title %>）
+        </label>
+
+        <%= hidden_field_tag :story_id, header_story.id,
+                             data: { "search-autocomplete-target": "storyId" } %>
+      <% end %>
+
+      <% return_to_value =
+           if controller_name == "search" && action_name == "index"
+             # ✅ 検索結果で再検索しても /search を return_to にしない（無限ループ防止）
+             session[:search_return_to].presence || params[:return_to].presence
+           else
+             request.fullpath
+           end %>
+      <%= hidden_field_tag :return_to, return_to_value %>
+
+      <%= submit_tag "検索" %>
+
+      <ul data-search-autocomplete-target="list"
+          hidden
+          style="list-style:none; margin:4px 0 0; padding:6px; border:1px solid #ccc; width: 360px;">
+      </ul>
+
+      <script>
+        const setupSearchHeader = () => {
+          const checkbox = document.getElementById("within_story_checkbox");
+          const select = document.getElementById("search_scope_select");
+          if (!checkbox || !select) return;
+
+          // ✅ Turbo遷移などで多重にイベントが付くのを防ぐ
+          if (checkbox.dataset.bound === "1") return;
+          checkbox.dataset.bound = "1";
+
+          const ensureHomeOption = () => {
+            const exists = Array.from(select.options).some((o) => o.value === "home");
+            if (exists) return;
+
+            const opt = document.createElement("option");
+            opt.value = "home";
+            opt.textContent = "ホーム未所属";
+
+            const allOpt = Array.from(select.options).find((o) => o.value === "all");
+            if (allOpt && allOpt.nextSibling) {
+              select.insertBefore(opt, allOpt.nextSibling);
+            } else {
+              select.appendChild(opt);
+            }
+          };
+
+          const removeHomeOption = () => {
+            Array.from(select.options).forEach((o) => {
+              if (o.value === "home") o.remove();
+            });
+          };
+
+          const sync = () => {
+            if (checkbox.checked) {
+              if (select.value === "home") select.value = "all";
+              removeHomeOption();
+            } else {
+              ensureHomeOption();
+            }
+          };
+
+          checkbox.addEventListener("change", sync);
+          sync();
+        };
+
+        document.addEventListener("DOMContentLoaded", setupSearchHeader);
+        document.addEventListener("turbo:load", setupSearchHeader);
+      </script>
+    <% end %>
   <% else %>
     <%= link_to "ログイン", login_path %> |
     <%= link_to "新規登録", signup_path %> |

@@ -1,0 +1,148 @@
+<!-- app/views/search/index.html.erb -->
+<h1>検索結果</h1>
+
+<p>
+  <%= link_to "ホームに戻る", ideas_path %>
+  |
+  <%= link_to "ストーリー一覧に戻る", stories_path %>
+</p>
+<hr>
+
+<% q = @query.to_s %>
+<% scope = (@scope.presence || "all").to_s %>
+
+<h2>検索条件</h2>
+<ul>
+  <li>検索ワード：<%= q.presence || "（未入力）" %></li>
+  <li>
+    範囲：
+    <%= ({ "all" => "すべて", "home" => "ホーム未所属", "story" => "ストーリー内", "event" => "イベント内", "element" => "要素内" }[scope] || "すべて") %>
+  </li>
+  <li>
+    検索対象：
+    <% if @within_story && @story.present? %>
+      この作品内（<%= @story.title %>）のみ
+    <% else %>
+      全体アイデア
+    <% end %>
+  </li>
+</ul>
+
+<hr>
+
+<% results = (@results || {}).with_indifferent_access %>
+
+<% pair_total = ->(pair) { (pair[:created_here]&.count || 0) + (pair[:moved]&.count || 0) } %>
+<% home_total = ->(pair) { (pair[:created_here]&.count || 0) } %>
+
+<% snippet_for = lambda do |text, keyword|
+     s = text.to_s
+     k = keyword.to_s
+     if k.present? && (i = s.index(k))
+       left  = [i - 40, 0].max
+       right = [i + k.length + 40, s.length].min
+       "…#{s[left...right]}…"
+     else
+       s.length > 80 ? "#{s[0, 80]}…" : s
+     end
+   end %>
+
+<% if q.blank? %>
+  <p>検索ワードを入力して検索してください。</p>
+<% else %>
+  <h2>件数</h2>
+
+  <% if scope == "all" %>
+    <ul>
+      <li>ホーム未所属: <%= home_total.call(results[:home] || {}) %> 件</li>
+      <li>ストーリー内: <%= pair_total.call(results[:story] || {}) %> 件</li>
+      <li>イベント内: <%= pair_total.call(results[:event] || {}) %> 件</li>
+      <li>要素内: <%= pair_total.call(results[:element] || {}) %> 件</li>
+    </ul>
+  <% else %>
+    <% label =
+         { "home" => "ホーム未所属", "story" => "ストーリー内", "event" => "イベント内", "element" => "要素内" }[scope] || "すべて" %>
+
+    <% count =
+         if scope == "home"
+           home_total.call(results[:home] || {})
+         else
+           pair_total.call(results[scope.to_sym] || {})
+         end %>
+
+    <p><strong><%= label %></strong>: <%= count %> 件</p>
+  <% end %>
+
+  <hr>
+
+  <% render_category = lambda do |title, key, is_home: false|
+       pair = results[key] || {}
+       created_rel = pair[:created_here] || Idea.none
+       moved_rel   = pair[:moved] || Idea.none
+  %>
+    <section style="margin-bottom: 24px;">
+      <h2><%= title %></h2>
+
+      <% if is_home %>
+        <% if created_rel.count == 0 %>
+          <p>該当なし</p>
+        <% else %>
+          <ul>
+            <% created_rel.limit(50).each do |idea| %>
+              <li style="margin-bottom: 10px;">
+                <strong><%= idea.title %></strong><br>
+                <small><%= snippet_for.call(idea.memo, q) %></small><br>
+                <%= link_to "詳細", idea_path(idea) %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% else %>
+        <h3>新規作成</h3>
+        <% if created_rel.count == 0 %>
+          <p>該当なし</p>
+        <% else %>
+          <ul>
+            <% created_rel.limit(50).each do |idea| %>
+              <li style="margin-bottom: 10px;">
+                <strong><%= idea.title %></strong><br>
+                <small><%= snippet_for.call(idea.memo, q) %></small><br>
+                <%= link_to "詳細", idea_path(idea) %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <h3>移動</h3>
+        <% if moved_rel.count == 0 %>
+          <p>該当なし</p>
+        <% else %>
+          <ul>
+            <% moved_rel.limit(50).each do |idea| %>
+              <li style="margin-bottom: 10px;">
+                <strong><%= idea.title %></strong><br>
+                <small><%= snippet_for.call(idea.memo, q) %></small><br>
+                <%= link_to "詳細", idea_path(idea) %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if scope == "all" %>
+    <% render_category.call("ホーム未所属", :home, is_home: true) %>
+    <% render_category.call("ストーリー内", :story) %>
+    <% render_category.call("イベント内", :event) %>
+    <% render_category.call("要素内", :element) %>
+  <% elsif scope == "home" %>
+    <% render_category.call("ホーム未所属", :home, is_home: true) %>
+  <% elsif scope == "story" %>
+    <% render_category.call("ストーリー内", :story) %>
+  <% elsif scope == "event" %>
+    <% render_category.call("イベント内", :event) %>
+  <% elsif scope == "element" %>
+    <% render_category.call("要素内", :element) %>
+  <% end %>
+<% end %>

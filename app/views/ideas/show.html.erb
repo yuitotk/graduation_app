@@ -40,7 +40,30 @@
 <%= link_to "削除", idea_path(@idea),
       data: { turbo_method: :delete, turbo_confirm: "削除しますか？" } %>
 |
-<%= link_to "一覧へ戻る", ideas_path %>
+<%
+  back_label = nil
+  back_path  = nil
+
+  if placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
+    case placement.placeable
+    when Story
+      back_label = "ストーリー詳細に戻る"
+      back_path  = story_path(placement.placeable)
+    when StoryEvent
+      back_label = "イベント詳細に戻る"
+      back_path  = story_story_event_path(placement.placeable.story, placement.placeable)
+    when StoryElement
+      back_label = "要素詳細に戻る"
+      back_path  = story_story_element_path(placement.placeable.story, placement.placeable)
+    end
+  end
+
+  if back_path.blank?
+    back_label = "ホームに戻る"
+    back_path  = ideas_path
+  end
+%>
+<%= link_to back_label, back_path %>
 
 <hr>
 

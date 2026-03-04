@@ -1,7 +1,10 @@
+# app/controllers/ideas_controller.rb
 # rubocop:disable Metrics/ClassLength
 class IdeasController < ApplicationController
   before_action :require_login
+  before_action :sync_search_story_context_from_placeable, only: %i[new create]
   before_action :set_idea, only: %i[show edit update destroy]
+  before_action :sync_search_story_context_from_idea, only: %i[show edit update]
 
   def index
     # ✅ ホーム＝「どこにも移動していないアイデア」だけ表示
@@ -106,8 +109,59 @@ class IdeasController < ApplicationController
 
   private
 
+  # ✅ ideas/new で placeable が来ている場合、ヘッダー用の story context を入れる
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def sync_search_story_context_from_placeable
+    pt = params[:placeable_type].to_s
+    pid = params[:placeable_id].presence&.to_i
+    return if pt.blank? || pid.blank?
+
+    story =
+      case pt
+      when "Story"
+        current_user.stories.find_by(id: pid)
+      when "StoryEvent"
+        StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: pid)&.story
+      when "StoryElement"
+        StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: pid)&.story
+      end
+
+    return if story.blank?
+
+    session[:search_story_id] = story.id
+    # 初回はON寄せ。すでにfalseなら尊重する
+    session[:search_in_story] = true if session[:search_in_story].nil?
+  end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+
   def set_idea
     @idea = current_user.ideas.find(params[:id])
+  end
+
+  # ✅ アイデア詳細/編集は「ホームかストーリー配下か」で session を確定させる
+  # - ホームアイデア(placementなし): 絶対にチェックを出さないため session を消す
+  # - placementあり: そのストーリーIDを session に入れる（ON/OFFはユーザー操作を尊重）
+  def sync_search_story_context_from_idea
+    placement = @idea.idea_placement
+
+    if placement.blank?
+      session[:search_story_id] = nil
+      session[:search_in_story] = false
+      return
+    end
+
+    story =
+      case placement.placeable
+      when Story
+        placement.placeable
+      when StoryEvent, StoryElement
+        placement.placeable.story
+      end
+
+    return if story.blank?
+
+    session[:search_story_id] = story.id
+    session[:search_in_story] = true if session[:search_in_story].nil?
   end
 
   # ✅ story_element_ids: [] を許可
