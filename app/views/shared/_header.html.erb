@@ -126,6 +126,25 @@
                              data: { "search-autocomplete-target": "storyId" } %>
       <% end %>
 
+      <% if header_story.present? && allow_within_story_toggle %>
+        <% story_element_options =
+             [["（要素で絞り込み：なし）", ""]] +
+             header_story.story_elements
+                        .order(:kind, :name, :id)
+                        .map { |e|
+                          label = [e.marker.presence, e.name.presence, e.kind.presence].compact.join(" ")
+                          [label, e.id]
+                        } %>
+
+        <span id="story_element_filter_wrapper"
+              style="margin-left: 8px; display: <%= in_story_ui ? 'inline-block' : 'none' %>;">
+          <%= select_tag :story_element_id,
+                         options_for_select(story_element_options, params[:story_element_id].to_s),
+                         id: "story_element_select",
+                         data: { "search-autocomplete-target": "storyElement" } %>
+        </span>
+      <% end %>
+
       <% return_to_value =
            if controller_name == "search" && action_name == "index"
              # ✅ 検索結果で再検索しても /search を return_to にしない（無限ループ防止）
@@ -147,6 +166,9 @@
           const checkbox = document.getElementById("within_story_checkbox");
           const select = document.getElementById("search_scope_select");
           if (!checkbox || !select) return;
+
+          const elementWrap = document.getElementById("story_element_filter_wrapper");
+          const elementSelect = document.getElementById("story_element_select");
 
           // ✅ Turbo遷移などで多重にイベントが付くのを防ぐ
           if (checkbox.dataset.bound === "1") return;
@@ -178,8 +200,13 @@
             if (checkbox.checked) {
               if (select.value === "home") select.value = "all";
               removeHomeOption();
+
+              if (elementWrap) elementWrap.style.display = "inline-block";
             } else {
               ensureHomeOption();
+
+              if (elementSelect) elementSelect.value = "";
+              if (elementWrap) elementWrap.style.display = "none";
             }
           };
 

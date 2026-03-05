@@ -26,6 +26,15 @@
       全体アイデア
     <% end %>
   </li>
+
+  <li>
+    マーカー：
+    <% if @selected_story_element.present? %>
+      <%= @selected_story_element.marker %> <%= @selected_story_element.name %> / <%= @selected_story_element.kind %>
+    <% else %>
+      （なし）
+    <% end %>
+  </li>
 </ul>
 
 <hr>
@@ -47,7 +56,7 @@
      end
    end %>
 
-<% if q.blank? %>
+<% if q.blank? && @story_element_id.blank? %>
   <p>検索ワードを入力して検索してください。</p>
 <% else %>
   <h2>件数</h2>
