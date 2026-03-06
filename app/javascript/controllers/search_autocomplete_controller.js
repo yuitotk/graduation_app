@@ -2,7 +2,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "scope", "withinStory", "storyId", "list"]
+  static targets = ["input", "scope", "withinStory", "storyId", "storyElement", "list"]
 
   connect() {
     this.timer = null
@@ -44,6 +44,7 @@ export default class extends Controller {
     const withinStory =
       this.hasWithinStoryTarget ? (this.withinStoryTarget.checked ? "1" : "0") : "0"
     const storyId = this.hasStoryIdTarget ? (this.storyIdTarget.value || "") : ""
+    const storyElementId = this.hasStoryElementTarget ? (this.storyElementTarget.value || "") : ""
 
     const url = new URL("/search/suggestions", window.location.origin)
     url.searchParams.set("q", q)
@@ -51,6 +52,9 @@ export default class extends Controller {
     if (withinStory === "1" && storyId) {
       url.searchParams.set("within_story", "1")
       url.searchParams.set("story_id", storyId)
+      if (storyElementId) {
+        url.searchParams.set("story_element_id", storyElementId)
+      }
     }
 
     this.abortRequest()
