@@ -5,11 +5,12 @@ module Search
     LIMIT = 10
 
     # rubocop:disable Naming/MethodParameterName
-    def initialize(q:, scope:, story_id:, user:)
-      @q        = q.to_s.strip
-      @scope    = normalize_scope(scope)
-      @story_id = story_id.presence&.to_i
-      @user     = user
+    def initialize(q:, scope:, story_id:, story_element_id:, user:)
+      @q                = q.to_s.strip
+      @scope            = normalize_scope(scope)
+      @story_id         = story_id.presence&.to_i
+      @story_element_id = story_element_id.presence&.to_i
+      @user             = user
     end
     # rubocop:enable Naming/MethodParameterName
 
@@ -53,6 +54,14 @@ module Search
       rel.where("ideas.title LIKE :q", q: like)
     end
 
+    def apply_story_element_filter(rel)
+      return rel if @story_element_id.blank?
+
+      rel.joins(idea_placement: :idea_placement_elements)
+         .where(idea_placement_elements: { story_element_id: @story_element_id })
+         .distinct
+    end
+
     # MySQL対応：title重複を潰しつつ、最新順で返す
     def select_titles(rel)
       rel.group("ideas.title")
@@ -65,6 +74,7 @@ module Search
     # ※「この作品内」ON（= story_id指定）のときはホームは対象外なので空
     def build_home
       return [] if @story_id.present?
+      return [] if @story_element_id.present?
 
       rel =
         apply_title_search(base_ideas)
@@ -81,6 +91,7 @@ module Search
         .where(idea_placements: { placeable_type: "Story" })
 
       rel = rel.where(idea_placements: { placeable_id: @story_id }) if @story_id.present?
+      rel = apply_story_element_filter(rel)
       select_titles(rel)
     end
 
@@ -97,6 +108,7 @@ module Search
                  .where(story_events: { story_id: @story_id })
       end
 
+      rel = apply_story_element_filter(rel)
       select_titles(rel)
     end
 
@@ -113,6 +125,7 @@ module Search
                  .where(story_elements: { story_id: @story_id })
       end
 
+      rel = apply_story_element_filter(rel)
       select_titles(rel)
     end
   end
