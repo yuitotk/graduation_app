@@ -20,7 +20,6 @@ class AiGenerationsController < ApplicationController
     @word1 = word1
     @word2 = word2
 
-    # ✅ create -> save で「どのページから来たか」を引き継ぐ
     @return_to      = ai_return_to
     @placeable_type = ai_placeable_type
     @placeable_id   = ai_placeable_id
@@ -35,7 +34,7 @@ class AiGenerationsController < ApplicationController
 
   # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
   def save
-    text  = params[:generated_text].to_s
+    text  = params[:memo].to_s
     word1 = params[:word1].to_s
     word2 = params[:word2].to_s
 
@@ -72,7 +71,6 @@ class AiGenerationsController < ApplicationController
     rt = safe_path(params[:return_to])
     session[:ai_return_to] = rt if rt.present?
 
-    # ✅ ホーム（placeableなし）で return_to が来ない場合は、前回のストーリー(return_to)が残るのを防ぐ
     session[:ai_return_to] = ideas_path if rt.blank? && params[:placeable_type].blank? && params[:placeable_id].blank?
 
     if params[:placeable_type].present? && params[:placeable_id].present?

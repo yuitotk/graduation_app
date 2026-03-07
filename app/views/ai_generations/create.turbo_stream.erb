@@ -12,12 +12,12 @@
   <% end %>
 
   <%= turbo_stream.update "ai_result" do %>
-    <div>
-      <%= simple_format(h(@text)) %>
-    </div>
-
     <%= form_with url: save_ai_generations_path, method: :post do %>
-      <%= hidden_field_tag :generated_text, @text %>
+      <div style="margin-bottom: 12px;">
+        <%= label_tag :memo, "メモ（すぐ編集できます）" %><br>
+        <%= text_area_tag :memo, @text, rows: 12, cols: 80 %>
+      </div>
+
       <%= hidden_field_tag :word1, @word1 %>
       <%= hidden_field_tag :word2, @word2 %>
 
