@@ -66,6 +66,7 @@ class AiGenerationsController < ApplicationController
 
   private
 
+  # rubocop:disable Metrics/AbcSize
   def store_ai_context
     rt = safe_path(params[:return_to])
     session[:ai_return_to] = rt if rt.present?
@@ -80,6 +81,7 @@ class AiGenerationsController < ApplicationController
       session[:ai_placeable_id]   = nil
     end
   end
+  # rubocop:enable Metrics/AbcSize
 
   def ai_return_to
     safe_path(params[:return_to]) || session[:ai_return_to]
