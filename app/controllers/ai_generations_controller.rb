@@ -2,23 +2,34 @@
 class AiGenerationsController < ApplicationController
   before_action :require_login
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def create
     store_ai_context
     prepare_marker_select_for_ai
 
     word1 = params[:word1].to_s.strip
     word2 = params[:word2].to_s.strip
+    word1_pos = normalize_part_of_speech(params[:word1_pos], default: "noun")
+    word2_pos = normalize_part_of_speech(params[:word2_pos], default: "verb")
 
     if word1.blank? || word2.blank?
       @error = "2語が取得できませんでした。もう一度やり直してください。"
       return render :create, status: :unprocessable_entity
     end
 
-    @text = Ai::IdeaGenerator.call(word1: word1, word2: word2)
+    @text = Ai::IdeaGenerator.call(
+      word1: word1,
+      word2: word2,
+      word1_pos: word1_pos,
+      word2_pos: word2_pos
+    )
     @error = ""
     @word1 = word1
     @word2 = word2
+    @word1_pos = word1_pos
+    @word2_pos = word2_pos
+    @lock_word1 = params[:lock_word1] == "1"
+    @lock_word2 = params[:lock_word2] == "1"
 
     @return_to      = ai_return_to
     @placeable_type = ai_placeable_type
@@ -30,16 +41,21 @@ class AiGenerationsController < ApplicationController
     @error = "生成に失敗しました。時間をおいてもう一度試してください。"
     render :create, status: :unprocessable_entity
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
-  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/MethodLength
   def save
     text  = params[:memo].to_s
     word1 = params[:word1].to_s
     word2 = params[:word2].to_s
+    word1_pos = normalize_part_of_speech(params[:word1_pos], default: "noun")
+    word2_pos = normalize_part_of_speech(params[:word2_pos], default: "verb")
 
     memo = text
-    memo = "元ワード: #{word1} / #{word2}\n\n#{text}" if word1.present? && word2.present?
+    if word1.present? && word2.present?
+      memo = "元ワード: #{word1}(#{part_of_speech_label(word1_pos)}) / " \
+             "#{word2}(#{part_of_speech_label(word2_pos)})\n\n#{text}"
+    end
 
     idea = current_user.ideas.build(
       title: "#{word1}×#{word2}".presence || "AI生成アイデア",
@@ -62,7 +78,7 @@ class AiGenerationsController < ApplicationController
                     alert: "保存に失敗しました"
     end
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/PerceivedComplexity
+  # rubocop:enable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/MethodLength
 
   private
 
@@ -162,6 +178,14 @@ class AiGenerationsController < ApplicationController
          .distinct
          .order(:marker)
          .pluck(:marker)
+  end
+
+  def normalize_part_of_speech(value, default:)
+    %w[noun verb].include?(value.to_s) ? value.to_s : default
+  end
+
+  def part_of_speech_label(value)
+    value == "verb" ? "動詞" : "名詞"
   end
 end
 # rubocop:enable Metrics/ClassLength

@@ -7,16 +7,18 @@ module Ai
   class IdeaGenerator
     ENDPOINT = "https://api.openai.com/v1/responses"
 
-    def self.call(word1:, word2:)
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def self.call(word1:, word2:, word1_pos:, word2_pos:)
       raise "OPENAI_API_KEY is missing" if ENV["OPENAI_API_KEY"].to_s.strip.empty?
 
       prompt = <<~TEXT
         次の2語を必ず使って、物語のタネになる短いアイデア文を日本語で作ってください。
         ・2〜4文
         ・説明は不要
+        ・それぞれ指定された品詞の役割を意識して使うこと
 
-        1) #{word1}
-        2) #{word2}
+        1) #{word1}（#{part_of_speech_label(word1_pos)}）
+        2) #{word2}（#{part_of_speech_label(word2_pos)}）
       TEXT
 
       conn = Faraday.new do |f|
@@ -38,10 +40,9 @@ module Ai
 
       extract_text(res.body)
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     def self.extract_text(body)
-      # Responses APIは output 配列に message / output_text などが入る想定。
-      # SDKなら response.output_text で集約されるが、Rubyは自前で拾う。:contentReference[oaicite:3]{index=3}
       output = body["output"] || []
 
       message = output.find { |x| x["type"] == "message" }
@@ -51,11 +52,14 @@ module Ai
         return text.to_s.strip if text.present?
       end
 
-      # フォールバック（形が違う時）
       text = output.dig(0, "content", 0, "text")
       text.to_s.strip
     end
 
-    private_class_method :extract_text
+    def self.part_of_speech_label(value)
+      value.to_s == "verb" ? "動詞" : "名詞"
+    end
+
+    private_class_method :extract_text, :part_of_speech_label
   end
 end
