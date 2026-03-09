@@ -10,6 +10,8 @@
     <p>
       <%= @words[0].word %>
       <%= hidden_field_tag :word1, @words[0].word %>
+      <%= select_tag :word1_pos,
+            options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word1_pos) %>
       <%= check_box_tag :lock_word1, "1", params[:lock_word1] == "1" %>
       固定
     </p>
@@ -17,6 +19,8 @@
     <p>
       <%= @words[1].word %>
       <%= hidden_field_tag :word2, @words[1].word %>
+      <%= select_tag :word2_pos,
+            options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word2_pos) %>
       <%= check_box_tag :lock_word2, "1", params[:lock_word2] == "1" %>
       固定
     </p>
