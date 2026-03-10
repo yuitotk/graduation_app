@@ -1,13 +1,28 @@
 <header>
-  <div>
-    <% logo_path = logged_in? ? ideas_path : root_path %>
-    <%= link_to "ロゴ", logo_path %>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <% logo_path = logged_in? ? ideas_path : root_path %>
+      <%= link_to "ロゴ", logo_path %>
+    </div>
+
+    <% if logged_in? %>
+      <%= button_to "ログアウト", logout_path, method: :delete,
+                    form: { data: { turbo: false }, style: "display: inline-block; margin: 0;" },
+                    style: "padding: 8px 14px; border: 1px solid #333; border-radius: 6px; background: white; color: #333; cursor: pointer;" %>
+    <% else %>
+      <div style="display: flex; gap: 8px;">
+        <%= link_to "ログイン", login_path,
+                    style: "display: inline-block; padding: 8px 14px; border: 1px solid #333; border-radius: 6px; text-decoration: none; color: #333;" %>
+
+        <%= link_to "新規登録", signup_path,
+                    style: "display: inline-block; padding: 8px 14px; border: 1px solid #333; border-radius: 6px; text-decoration: none; color: #333;" %>
+      </div>
+    <% end %>
   </div>
 
   <hr>
 
   <% if logged_in? %>
-    <%= button_to "ログアウト", logout_path, method: :delete, form: { data: { turbo: false } } %> |
     <%= link_to "お問い合わせ", new_inquiry_path %> |
     <%= link_to "利用規約", terms_path %> |
     <%= link_to "プライバシーポリシー", privacy_path %>
@@ -60,23 +75,14 @@
 
       <% header_story =
            begin
-             # 1) ストーリー詳細 /stories/:id  + 整合性チェック /stories/:id/consistency
              if controller_name == "stories" && %w[show consistency].include?(action_name) && params[:id].present?
                current_user.stories.find_by(id: params[:id])
-
-             # 2) ストーリー配下（/stories/:story_id/..）
              elsif params[:story_id].present?
                current_user.stories.find_by(id: params[:story_id])
-
-             # 3) イベント詳細 /story_events/:id（もし単独ルートがある場合）
              elsif controller_name == "story_events" && action_name == "show" && params[:id].present?
                StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
-
-             # 4) 要素詳細 /story_elements/:id（もし単独ルートがある場合）
              elsif controller_name == "story_elements" && action_name == "show" && params[:id].present?
                StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
-
-             # 5) アイデア新規（ストーリー/イベント/要素から来た placeable）
              elsif params[:placeable_type].present? && params[:placeable_id].present?
                case params[:placeable_type].to_s
                when "Story"
@@ -86,18 +92,14 @@
                when "StoryElement"
                  StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story
                end
-
-             # 6) 検索結果は session の current_search_story を使う（ただしホーム検索では出さない）
              elsif controller_name == "search" && action_name == "index"
                params[:story_id].present? ? current_search_story : nil
-
              else
                nil
              end
            end %>
 
-      <% # ✅ チェックを出していいページだけ許可（ホワイトリスト）＋ 出したくない場所は強制ブロック
-         allow_within_story_toggle =
+      <% allow_within_story_toggle =
            (
              (controller_name == "search" && action_name == "index") ||
              (controller_name == "stories" && action_name == "show") ||
@@ -154,7 +156,6 @@
 
       <% return_to_value =
            if controller_name == "search" && action_name == "index"
-             # ✅ 検索結果で再検索しても /search を return_to にしない（無限ループ防止）
              session[:search_return_to].presence || params[:return_to].presence
            else
              request.fullpath
@@ -177,7 +178,6 @@
           const elementWrap = document.getElementById("story_element_filter_wrapper");
           const elementSelect = document.getElementById("story_element_select");
 
-          // ✅ Turbo遷移などで多重にイベントが付くのを防ぐ
           if (checkbox.dataset.bound === "1") return;
           checkbox.dataset.bound = "1";
 
@@ -226,8 +226,6 @@
       </script>
     <% end %>
   <% else %>
-    <%= link_to "ログイン", login_path %> |
-    <%= link_to "新規登録", signup_path %> |
     <%= link_to "利用規約", terms_path %> |
     <%= link_to "プライバシーポリシー", privacy_path %>
   <% end %>
