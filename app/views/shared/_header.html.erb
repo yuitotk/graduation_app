@@ -1,5 +1,13 @@
 <header>
   <style>
+    .header-mobile-break {
+      display: inline;
+    }
+
+    .header-mobile-break-prefix {
+      display: inline;
+    }
+
     @media (max-width: 767px) {
       .header-search-form {
         display: flex;
@@ -49,6 +57,15 @@
         width: 100% !important;
         box-sizing: border-box;
       }
+
+      .header-mobile-break {
+        display: block;
+        margin-top: 4px;
+      }
+
+      .header-mobile-break-prefix {
+        display: none;
+      }
     }
   </style>
 
@@ -76,9 +93,13 @@
   <hr>
 
   <% if logged_in? %>
-    <%= link_to "お問い合わせ", new_inquiry_path %> |
-    <%= link_to "利用規約", terms_path %> |
-    <%= link_to "プライバシーポリシー", privacy_path %>
+    <%= link_to "使い方・ヘルプ", help_path %> |
+    <%= link_to "お問い合わせ", new_inquiry_path %>
+    <span class="header-mobile-break">
+      <span class="header-mobile-break-prefix"> | </span>
+      <%= link_to "利用規約", terms_path %> |
+      <%= link_to "プライバシーポリシー", privacy_path %>
+    </span>
 
     <hr>
 
@@ -288,7 +309,11 @@
       </script>
     <% end %>
   <% else %>
-    <%= link_to "利用規約", terms_path %> |
-    <%= link_to "プライバシーポリシー", privacy_path %>
+    <%= link_to "使い方・ヘルプ", help_path %> |
+    <%= link_to "利用規約", terms_path %>
+    <span class="header-mobile-break">
+      <span class="header-mobile-break-prefix"> | </span>
+      <%= link_to "プライバシーポリシー", privacy_path %>
+    </span>
   <% end %>
 </header>
