@@ -13,7 +13,7 @@
     <%= form_with url: save_ai_generations_path, method: :post do %>
       <div style="margin-bottom: 12px;">
         <%= label_tag :memo, "メモ（すぐ編集できます）" %><br>
-        <%= text_area_tag :memo, @text, rows: 12, cols: 80 %>
+        <%= text_area_tag :memo, @text, rows: 12, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
       </div>
 
       <%= hidden_field_tag :word1, @word1 %>
