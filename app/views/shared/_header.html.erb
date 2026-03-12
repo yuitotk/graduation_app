@@ -1,4 +1,57 @@
 <header>
+  <style>
+    @media (max-width: 767px) {
+      .header-search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .header-search-input {
+        width: calc(100% - 120px) !important;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+
+      .header-search-scope {
+        width: 112px;
+        flex: 0 0 112px;
+        box-sizing: border-box;
+      }
+
+      .header-search-within-story {
+        display: block;
+        width: 100%;
+      }
+
+      .header-search-within-story label {
+        margin-left: 0 !important;
+      }
+
+      .header-search-element-filter {
+        display: block !important;
+        width: 100%;
+        margin-left: 0 !important;
+      }
+
+      #story_element_select {
+        width: 300px;
+        box-sizing: border-box;
+      }
+
+      .header-search-submit-wrap {
+        display: block;
+        width: 100%;
+      }
+
+      .header-search-autocomplete-list {
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+    }
+  </style>
+
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <div>
       <% logo_path = logged_in? ? ideas_path : root_path %>
@@ -31,10 +84,12 @@
 
     <!-- 検索UI -->
     <%= form_with url: search_path, method: :get, local: true,
+                  class: "header-search-form",
                   data: { controller: "search-autocomplete" } do %>
 
       <%= text_field_tag :q, params[:q],
                          placeholder: "検索",
+                         class: "header-search-input",
                          style: "width: 220px;",
                          data: { "search-autocomplete-target": "input",
                                  action: "input->search-autocomplete#onInput" } %>
@@ -71,6 +126,7 @@
       <%= select_tag :scope,
                      options_for_select(scope_options, selected_scope),
                      id: "search_scope_select",
+                     class: "header-search-scope",
                      data: { "search-autocomplete-target": "scope" } %>
 
       <% header_story =
@@ -124,15 +180,17 @@
       <% end %>
 
       <% if header_story.present? && allow_within_story_toggle %>
-        <label style="margin-left: 8px;">
-          <%= check_box_tag :within_story, "1", in_story_ui,
-                            id: "within_story_checkbox",
-                            data: { "search-autocomplete-target": "withinStory" } %>
-          この作品内（<%= header_story.title %>）
-        </label>
+        <span class="header-search-within-story">
+          <label style="margin-left: 8px;">
+            <%= check_box_tag :within_story, "1", in_story_ui,
+                              id: "within_story_checkbox",
+                              data: { "search-autocomplete-target": "withinStory" } %>
+            この作品内（<%= header_story.title %>）
+          </label>
 
-        <%= hidden_field_tag :story_id, header_story.id,
-                             data: { "search-autocomplete-target": "storyId" } %>
+          <%= hidden_field_tag :story_id, header_story.id,
+                               data: { "search-autocomplete-target": "storyId" } %>
+        </span>
       <% end %>
 
       <% if header_story.present? && allow_within_story_toggle %>
@@ -146,6 +204,7 @@
                         } %>
 
         <span id="story_element_filter_wrapper"
+              class="header-search-element-filter"
               style="margin-left: 8px; display: <%= in_story_ui ? 'inline-block' : 'none' %>;">
           <%= select_tag :story_element_id,
                          options_for_select(story_element_options, params[:story_element_id].to_s),
@@ -162,9 +221,12 @@
            end %>
       <%= hidden_field_tag :return_to, return_to_value %>
 
-      <%= submit_tag "検索" %>
+      <span class="header-search-submit-wrap">
+        <%= submit_tag "検索" %>
+      </span>
 
       <ul data-search-autocomplete-target="list"
+          class="header-search-autocomplete-list"
           hidden
           style="list-style:none; margin:4px 0 0; padding:6px; border:1px solid #ccc; width: 360px;">
       </ul>
