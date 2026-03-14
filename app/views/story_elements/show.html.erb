@@ -1,18 +1,12 @@
-<h1>要素詳細</h1>
-
 <p><%= link_to "要素一覧へ戻る", story_story_elements_path(@story) %></p>
 
-<hr>
-
-<p>
-  <%= link_to "編集", edit_story_story_element_path(@story, @story_element) %>
-</p>
+<h1>要素詳細</h1>
 
 <p><strong>種別：</strong><%= @story_element.kind %></p>
 <p><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
 <p><strong>名前：</strong><%= @story_element.name %></p>
 
-<h2>詳細メモ</h2>
+<h2>メモ</h2>
 
 <% if @story_element.memo.present? %>
   <div><%= simple_format(@story_element.memo) %></div>
@@ -21,13 +15,17 @@
 <% end %>
 
 <p>
-  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryElement", placeable_id: @story_element.id) %> |
-  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryElement", placeable_id: @story_element.id) %>
+  <%= link_to "編集", edit_story_story_element_path(@story, @story_element) %>
 </p>
 
 <hr>
 
 <h3>新規アイデア</h3>
+
+<p>
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryElement", placeable_id: @story_element.id) %> |
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryElement", placeable_id: @story_element.id) %>
+</p>
 
 <% if @created_here_ideas.present? %>
   <ul>
