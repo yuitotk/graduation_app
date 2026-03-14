@@ -1,3 +1,5 @@
+<%= link_to "戻る", (params[:return_to].presence || ideas_path) %>
+
 <h1>アイデア投稿</h1>
 
 <% if @idea.errors.any? %>
@@ -9,5 +11,3 @@
 <% end %>
 
 <%= render "form", idea: @idea %>
-
-<%= link_to "戻る", (params[:return_to].presence || ideas_path) %>

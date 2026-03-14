@@ -1,6 +1,32 @@
-<h1><%= @idea.title %></h1>
-
 <% placement = @idea.idea_placement %>
+
+<%
+  back_label = nil
+  back_path  = nil
+
+  if placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
+    case placement.placeable
+    when Story
+      back_label = "ストーリー詳細に戻る"
+      back_path  = story_path(placement.placeable)
+    when StoryEvent
+      back_label = "イベント詳細に戻る"
+      back_path  = story_story_event_path(placement.placeable.story, placement.placeable)
+    when StoryElement
+      back_label = "要素詳細に戻る"
+      back_path  = story_story_element_path(placement.placeable.story, placement.placeable)
+    end
+  end
+
+  if back_path.blank?
+    back_label = "ホームに戻る"
+    back_path  = ideas_path
+  end
+%>
+
+<p><%= link_to back_label, back_path %></p>
+
+<h1><%= @idea.title %></h1>
 
 <%# ✅ 複数マーカー表示（選択された story_elements をそのまま出す） %>
 <% if placement.present? && placement.story_elements.present? %>
@@ -36,34 +62,6 @@
 <p><%= simple_format(@idea.memo) %></p>
 
 <%= link_to "編集", edit_idea_path(@idea) %>
-|
-<%= link_to "削除", idea_path(@idea),
-      data: { turbo_method: :delete, turbo_confirm: "削除しますか？" } %>
-|
-<%
-  back_label = nil
-  back_path  = nil
-
-  if placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
-    case placement.placeable
-    when Story
-      back_label = "ストーリー詳細に戻る"
-      back_path  = story_path(placement.placeable)
-    when StoryEvent
-      back_label = "イベント詳細に戻る"
-      back_path  = story_story_event_path(placement.placeable.story, placement.placeable)
-    when StoryElement
-      back_label = "要素詳細に戻る"
-      back_path  = story_story_element_path(placement.placeable.story, placement.placeable)
-    end
-  end
-
-  if back_path.blank?
-    back_label = "ホームに戻る"
-    back_path  = ideas_path
-  end
-%>
-<%= link_to back_label, back_path %>
 
 <hr>
 

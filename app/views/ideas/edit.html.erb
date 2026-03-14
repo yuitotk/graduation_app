@@ -1,3 +1,5 @@
+<%= link_to "詳細へ戻る", idea_path(@idea) %>
+
 <h1>アイデア編集</h1>
 
 <% if @idea.errors.any? %>
@@ -10,4 +12,7 @@
 
 <%= render "form", idea: @idea %>
 
-<%= link_to "詳細へ戻る", idea_path(@idea) %>
+<div style="margin-top: 32px;">
+  <%= link_to "削除", idea_path(@idea),
+        data: { turbo_method: :delete, turbo_confirm: "削除しますか？" } %>
+</div>
