@@ -59,7 +59,7 @@ class IdeasController < ApplicationController
     end
 
     if @idea.save
-      redirect_to(safe_path(params[:return_to]) || @idea, notice: "アイデアを作成しました")
+      redirect_to(safe_path(params[:return_to]) || ideas_path, notice: "アイデアを作成しました")
     else
       @idea.build_idea_image if @idea.idea_image.nil?
       set_marker_options
@@ -103,8 +103,20 @@ class IdeasController < ApplicationController
   end
 
   def destroy
+    redirect_path =
+      case @idea.idea_placement&.placeable
+      when Story
+        story_path(@idea.idea_placement.placeable)
+      when StoryEvent
+        story_story_event_path(@idea.idea_placement.placeable.story, @idea.idea_placement.placeable)
+      when StoryElement
+        story_story_element_path(@idea.idea_placement.placeable.story, @idea.idea_placement.placeable)
+      else
+        ideas_path
+      end
+
     @idea.destroy!
-    redirect_to ideas_path, notice: "アイデアを削除しました"
+    redirect_to redirect_path, notice: "アイデアを削除しました"
   end
 
   private
