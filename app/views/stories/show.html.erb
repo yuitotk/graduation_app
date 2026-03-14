@@ -1,14 +1,6 @@
 <p><%= link_to "ストーリー一覧へ", stories_path %></p>
 
-<p>
-  <%= link_to "ストーリー編集", edit_story_path(@story) %>
-</p>
-
 <h1><%= @story.title %></h1>
-
-<hr>
-
-<h2>詳細メモ</h2>
 
 <% if @story.description.present? %>
   <div>
@@ -19,11 +11,12 @@
 <% end %>
 
 <p>
-  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %> |
-  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %>
+  <%= link_to "ストーリー編集", edit_story_path(@story) %>
 </p>
 
 <hr>
+
+<h2>要素</h2>
 
 <p><%= link_to "要素を管理する", story_story_elements_path(@story) %></p>
 
@@ -46,7 +39,32 @@
   <% labels.reject(&:blank?).join(" / ") %>
 <% end %>
 
+<h2>イベント（時系列）</h2>
+
+<p><%= link_to "イベント追加", new_story_story_event_path(@story) %></p>
+
+<ul>
+  <% @story_events.each do |event| %>
+    <li>
+      <strong><%= link_to event.title, story_story_event_path(@story, event) %></strong><br>
+      <%= simple_format(truncate(event.body.to_s, length: 120)) %>
+
+      <%= button_to "↑", move_up_story_story_event_path(@story, event),
+            method: :patch, form: { style: "display:inline" } %>
+      <%= button_to "↓", move_down_story_story_event_path(@story, event),
+            method: :patch, form: { style: "display:inline" } %>
+    </li>
+  <% end %>
+</ul>
+
+<hr>
+
 <h3>新規アイデア</h3>
+
+<p>
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %> |
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %>
+</p>
 
 <% if @created_here_ideas.present? %>
   <ul>
@@ -87,23 +105,3 @@
 <% else %>
   <p>まだありません</p>
 <% end %>
-
-<hr>
-
-<h2>イベント（時系列）</h2>
-
-<p><%= link_to "イベント追加", new_story_story_event_path(@story) %></p>
-
-<ul>
-  <% @story_events.each do |event| %>
-    <li>
-      <strong><%= link_to event.title, story_story_event_path(@story, event) %></strong><br>
-      <%= simple_format(truncate(event.body.to_s, length: 120)) %>
-
-      <%= button_to "↑", move_up_story_story_event_path(@story, event),
-            method: :patch, form: { style: "display:inline" } %>
-      <%= button_to "↓", move_down_story_story_event_path(@story, event),
-            method: :patch, form: { style: "display:inline" } %>
-    </li>
-  <% end %>
-</ul>

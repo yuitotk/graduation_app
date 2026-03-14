@@ -1,5 +1,5 @@
 <p>
-  <%= link_to "イベントへ戻る", story_path(@story) %> |
+  <%= link_to "イベントへ戻る", story_path(@story) %> 
 </p>
 
 <h1><%= @story_event.title %></h1>
@@ -8,9 +8,19 @@
   <%= simple_format(@story_event.body) %>
 </div>
 
+<h4>イベントの登場要素</h4>
+<% if @story_event.story_elements.any? %>
+  <ul>
+    <% @story_event.story_elements.each do |el| %>
+      <li><%= story_element_label(el) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>未設定</p>
+<% end %>
+
 <p>
-  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %> |
-  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %>
+  <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
 </p>
 
 <hr>
@@ -63,6 +73,11 @@
 
 <h3>新規アイデア</h3>
 
+<p>
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %> |
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %>
+</p>
+
 <% if @created_here_ideas.present? %>
   <ul>
     <% @created_here_ideas.each do |idea| %>
@@ -86,20 +101,3 @@
 <% else %>
   <p>まだありません</p>
 <% end %>
-
-<hr>
-
-<h2>イベントの登場要素</h2>
-<% if @story_event.story_elements.any? %>
-  <ul>
-    <% @story_event.story_elements.each do |el| %>
-      <li><%= story_element_label(el) %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>未設定</p>
-<% end %>
-
-<p>
-  <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
-</p>

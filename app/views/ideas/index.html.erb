@@ -1,11 +1,15 @@
 <h1>アイデア一覧（ホーム）</h1>
 
-<%= link_to "投稿へ", new_idea_path %>
-
-<p><%= link_to "AI作成", random_words_pick_path %></p>
 <p><%= link_to "ストーリー一覧", stories_path %></p>
 
 <hr>
+
+<p>
+  <%= link_to "新規作成", new_idea_path %>
+  |
+  <%= link_to "AI作成", random_words_pick_path %>
+</p>
+
 
 <% if @ideas.any? %>
   <% @ideas.each do |idea| %>
