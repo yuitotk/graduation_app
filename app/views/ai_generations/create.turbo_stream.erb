@@ -3,17 +3,30 @@
     <%= @error %>
   <% end %>
 
+  <%= turbo_stream.update "reroll_notice" do %>
+  <% end %>
+
   <%= turbo_stream.update "ai_result" do %>
   <% end %>
 <% else %>
   <%= turbo_stream.update "ai_error" do %>
   <% end %>
 
+  <%= turbo_stream.update "reroll_notice" do %>
+    <p style="margin-bottom: 12px; color: red;">
+      ※再抽選、同じ単語で再作成すると、今の作成結果と編集内容は消えます
+    </p>
+  <% end %>
+
+  <%= turbo_stream.update "generate_button" do %>
+    <%= submit_tag "同じ単語で再作成", data: { disable_with: "生成中..." } %>
+  <% end %>
+
   <%= turbo_stream.update "ai_result" do %>
     <%= form_with url: save_ai_generations_path, method: :post do %>
       <div style="margin-bottom: 12px;">
-        <%= label_tag :memo, "メモ（すぐ編集できます）" %><br>
-        <%= text_area_tag :memo, @text, rows: 12, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
+        <strong style="font-size: 22px;"><%= label_tag :memo, "作成結果メモ（すぐ編集できます）" %></strong><br>
+        <%= text_area_tag :memo, @text, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
       </div>
 
       <%= hidden_field_tag :word1, @word1 %>

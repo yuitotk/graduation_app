@@ -43,23 +43,15 @@ class AiGenerationsController < ApplicationController
   end
   # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
-  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/MethodLength
+  # rubocop:disable Metrics/AbcSize
   def save
     text  = params[:memo].to_s
     word1 = params[:word1].to_s
     word2 = params[:word2].to_s
-    word1_pos = normalize_part_of_speech(params[:word1_pos], default: "noun")
-    word2_pos = normalize_part_of_speech(params[:word2_pos], default: "verb")
-
-    memo = text
-    if word1.present? && word2.present?
-      memo = "元ワード: #{word1}(#{part_of_speech_label(word1_pos)}) / " \
-             "#{word2}(#{part_of_speech_label(word2_pos)})\n\n#{text}"
-    end
 
     idea = current_user.ideas.build(
       title: "#{word1}×#{word2}".presence || "AI生成アイデア",
-      memo: memo
+      memo: text
     )
 
     if idea.save
@@ -78,7 +70,7 @@ class AiGenerationsController < ApplicationController
                     alert: "保存に失敗しました"
     end
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/MethodLength
+  # rubocop:enable Metrics/AbcSize
 
   private
 

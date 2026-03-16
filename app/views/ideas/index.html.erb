@@ -10,21 +10,39 @@
   <%= link_to "AI作成", random_words_pick_path %>
 </p>
 
-
 <% if @ideas.any? %>
   <% @ideas.each do |idea| %>
     <%= link_to idea_path(idea), class: "text-decoration-none text-dark d-block" do %>
-      <div style="margin-bottom: 16px;">
+      <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #999; border-radius: 16px; background: #f8f8f8;">
         <h2><%= idea.title %></h2>
 
         <% if idea.idea_image&.image? %>
           <div style="margin: 8px 0;">
-            <%= image_tag idea.idea_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display:block;" %>
+            <%= image_tag idea.idea_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
+          </div>
+        <% else %>
+          <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #999; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+            画像なし
           </div>
         <% end %>
 
-        <p><%= simple_format(idea.memo) %></p>
-        <small><%= l idea.created_at, format: :short %></small>
+        <% display_memo =
+             if idea.memo.to_s.start_with?("元ワード:")
+               idea.memo.to_s.lines[1..].join.lstrip
+             else
+               idea.memo
+             end %>
+
+        <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          <%= truncate(display_memo, length: 78) %>
+        </p>
+
+        <p style="margin: 8px 0 0 0; font-size: 14px;">
+          作成日: <%= l idea.created_at, format: :short %>
+          <span style="display: inline-block; margin-left: 24px;">
+            更新日（メモ編集のみ）: <%= l idea.updated_at, format: :short %>
+          </span>
+        </p>
       </div>
     <% end %>
   <% end %>

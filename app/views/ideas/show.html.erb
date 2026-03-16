@@ -61,7 +61,15 @@
 
 <p><%= simple_format(@idea.memo) %></p>
 
-<%= link_to "編集", edit_idea_path(@idea) %>
+<p>
+  <%= link_to "編集", edit_idea_path(@idea) %>
+  <span style="display: inline-block; margin-left: 24px;">
+    作成日: <%= l @idea.created_at, format: :short %>
+  </span>
+  <span style="display: inline-block; margin-left: 24px;">
+    更新日（メモ編集のみ）: <%= l @idea.updated_at, format: :short %>
+  </span>
+</p>
 
 <hr>
 
@@ -70,9 +78,9 @@
 <h3>どこへ移動する？（まず3つから選ぶ）</h3>
 
 <ul>
-  <li><%= link_to "キャラ（要素）詳細ページへ", idea_path(@idea, tab: "elements") %></li>
   <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories") %></li>
   <li><%= link_to "イベント詳細（メモ一覧）ページへ", idea_path(@idea, tab: "events") %></li>
+  <li><%= link_to "キャラ（要素）詳細ページへ", idea_path(@idea, tab: "elements") %></li>
 </ul>
 
 <% if tab.present? %>
