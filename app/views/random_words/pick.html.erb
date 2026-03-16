@@ -1,26 +1,31 @@
+<%= link_to "戻る", params[:return_to].presence || ideas_path %>
+
 <h1>ランダム辞書ワード</h1>
 
 <% if @words.any? %>
 
   <div id="ai_error" style="color: red;"></div>
-  <div id="ai_result"></div>
 
   <%= form_with url: ai_generations_path, method: :post, data: { turbo_stream: true } do |f| %>
 
-    <p>
-      <%= @words[0].word %>
+    <p style="margin-bottom: 30px;">
+      <span style="display: inline-block; margin-right: 15px;"><%= @words[0].word %></span>
       <%= hidden_field_tag :word1, @words[0].word %>
-      <%= select_tag :word1_pos,
-            options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word1_pos) %>
+      <span style="display: inline-block; margin-right: 15px;">
+        <%= select_tag :word1_pos,
+              options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word1_pos) %>
+      </span>
       <%= check_box_tag :lock_word1, "1", params[:lock_word1] == "1" %>
       固定
     </p>
 
-    <p>
-      <%= @words[1].word %>
+    <p style="margin-bottom: 30px;">
+      <span style="display: inline-block; margin-right: 15px;"><%= @words[1].word %></span>
       <%= hidden_field_tag :word2, @words[1].word %>
-      <%= select_tag :word2_pos,
-            options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word2_pos) %>
+      <span style="display: inline-block; margin-right: 15px;">
+        <%= select_tag :word2_pos,
+              options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word2_pos) %>
+      </span>
       <%= check_box_tag :lock_word2, "1", params[:lock_word2] == "1" %>
       固定
     </p>
@@ -29,12 +34,19 @@
     <%= hidden_field_tag :placeable_type, params[:placeable_type] %>
     <%= hidden_field_tag :placeable_id, params[:placeable_id] %>
 
-    <%= f.submit "AIで生成する", data: { disable_with: "生成中..." } %>
+    <div id="reroll_notice" style="margin-bottom: 12px;"></div>
 
-    <%= f.submit "再抽選",
-          formaction: random_words_pick_path,
-          formmethod: :get %>
+    <div style="margin-bottom: 30px;">
+      <%= f.submit "再抽選",
+            formaction: random_words_pick_path,
+            formmethod: :get %>
+    </div>
 
+    <div id="generate_button" style="margin-top: 0;">
+      <%= f.submit "AIで生成する", data: { disable_with: "生成中..." } %>
+    </div>
+
+    <div id="ai_result" style="margin-top: 30px;"></div>
   <% end %>
 
 <% else %>
@@ -42,5 +54,3 @@
   <p><%= @message %></p>
 
 <% end %>
-
-<%= link_to "一覧へ戻る", ideas_path %>
