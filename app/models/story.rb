@@ -7,5 +7,7 @@ class Story < ApplicationRecord
   has_many :idea_placements, as: :placeable, dependent: :destroy
   has_many :placed_ideas, through: :idea_placements, source: :idea
 
-  validates :title, presence: true
+  TITLE_MAX_LENGTH = 40
+
+  validates :title, presence: true, length: { maximum: TITLE_MAX_LENGTH }
 end
