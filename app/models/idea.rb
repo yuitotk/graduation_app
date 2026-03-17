@@ -15,6 +15,8 @@ class Idea < ApplicationRecord
   # ※任意：現在の移動先を取りたければ（使わなくてもOK）
   # has_one :placeable, through: :idea_placement, source: :placeable
 
-  validates :title, presence: true
+  TITLE_MAX_LENGTH = 40
+
+  validates :title, presence: true, length: { maximum: TITLE_MAX_LENGTH }
   validates :memo, presence: true
 end

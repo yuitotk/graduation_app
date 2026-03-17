@@ -1,4 +1,4 @@
-<%= form_with model: story do |f| %>
+<%= form_with model: story, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
   <% if story.errors.any? %>
     <ul>
       <% story.errors.full_messages.each do |msg| %>
@@ -7,15 +7,28 @@
     </ul>
   <% end %>
 
-  <div>
-    <%= f.label :title, "タイトル" %><br>
-    <%= f.text_field :title %>
+  <div style="margin-bottom: 30px;" data-controller="character-counter">
+    <%= f.label :title, "タイトル（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_field :title,
+          maxlength: Story::TITLE_MAX_LENGTH,
+          data: {
+            "character-counter-target": "input",
+            action: "input->character-counter#updateCount"
+          },
+          style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
+    <div
+      data-character-counter-target="output"
+      data-max-length="<%= Story::TITLE_MAX_LENGTH %>"
+      style="margin-top: 6px; font-size: 14px; color: #666;"
+    ></div>
   </div>
 
   <div>
-    <%= f.label :description, "説明" %><br>
-    <%= f.text_area :description, rows: 5 %>
+    <%= f.label :description, "説明", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_area :description, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
-  <%= f.submit %>
+  <div style="margin-top: 30px;">
+    <%= f.submit(story.persisted? ? "ストーリーを更新" : "ストーリーを作成") %>
+  </div>
 <% end %>

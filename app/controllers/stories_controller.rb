@@ -59,7 +59,7 @@ class StoriesController < ApplicationController
     @story.position = next_position_for(current_user)
 
     if @story.save
-      redirect_to story_path(@story), notice: t(".success")
+      redirect_to stories_path, notice: t(".success")
     else
       render :new, status: :unprocessable_entity
     end
