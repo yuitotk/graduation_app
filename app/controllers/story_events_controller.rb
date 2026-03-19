@@ -45,7 +45,7 @@ class StoryEventsController < ApplicationController
 
   def update
     if @story_event.update(story_event_params)
-      redirect_to story_path(@story), notice: t(".success")
+      redirect_to story_story_event_path(@story, @story_event), notice: t(".success")
     else
       @story_event.build_story_event_image if @story_event.story_event_image.nil?
       render :edit, status: :unprocessable_entity

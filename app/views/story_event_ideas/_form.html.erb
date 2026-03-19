@@ -58,6 +58,6 @@
   </div>
 
   <div style="margin-top: 24px;">
-    <%= f.submit "詳細メモを追加する" %>
+    <%= f.submit @story_event_idea.persisted? ? "詳細メモを更新する" : "詳細メモを追加する" %>
   </div>
 <% end %>

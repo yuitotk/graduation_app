@@ -31,7 +31,8 @@ class StoryEventIdeasController < ApplicationController
 
   def update
     if @story_event_idea.update(story_event_idea_params)
-      redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.updated")
+      redirect_to story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
+                  notice: t("flash.story_event_ideas.updated")
     else
       render :edit, status: :unprocessable_entity
     end

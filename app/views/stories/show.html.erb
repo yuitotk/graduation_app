@@ -46,6 +46,10 @@
             <div style="margin: 8px 0;">
               <%= image_tag event.story_event_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
             </div>
+          <% else %>
+            <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #999; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+              画像なし
+            </div>
           <% end %>
 
           <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
