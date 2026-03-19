@@ -135,6 +135,8 @@ class AiGenerationsController < ApplicationController
       StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
     when "StoryElement"
       StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
+    when "StoryEventIdea"
+      StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: id)
     end
   end
 
@@ -159,6 +161,8 @@ class AiGenerationsController < ApplicationController
       placeable
     when StoryEvent, StoryElement
       placeable.story
+    when StoryEventIdea
+      placeable.story_event.story
     end
   end
 

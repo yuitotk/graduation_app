@@ -6,7 +6,6 @@ class IdeaPlacementsController < ApplicationController
     idea = current_user.ideas.find(params[:idea_id])
     placeable = find_placeable!(params[:placeable_type], params[:placeable_id])
 
-    # ✅ 即移動：既存があれば更新（1アイデア=1移動先）
     placement = idea.idea_placement || idea.build_idea_placement
     placement.placeable = placeable
     placement.created_here = false
@@ -25,6 +24,8 @@ class IdeaPlacementsController < ApplicationController
       StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find(id)
     when "StoryElement"
       StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find(id)
+    when "StoryEventIdea"
+      StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find(id)
     else
       raise ActiveRecord::RecordNotFound
     end
@@ -35,9 +36,15 @@ class IdeaPlacementsController < ApplicationController
     when Story
       story_path(placeable)
     when StoryEvent
-      story_story_event_path(placeable.story, placeable) # イベント詳細（メモ一覧）
+      story_story_event_path(placeable.story, placeable)
     when StoryElement
-      story_story_element_path(placeable.story, placeable) # キャラ詳細
+      story_story_element_path(placeable.story, placeable)
+    when StoryEventIdea
+      story_story_event_story_event_idea_path(
+        placeable.story_event.story,
+        placeable.story_event,
+        placeable
+      )
     else
       ideas_path
     end

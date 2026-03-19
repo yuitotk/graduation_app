@@ -7,7 +7,6 @@ class IdeasController < ApplicationController
   before_action :sync_search_story_context_from_idea, only: %i[show edit update]
 
   def index
-    # ✅ ホーム＝「どこにも移動していないアイデア」だけ表示
     @ideas = current_user.ideas
                          .where.missing(:idea_placement)
                          .order(created_at: :desc)
@@ -21,13 +20,16 @@ class IdeasController < ApplicationController
 
     @story_events = StoryEvent.where(story_id: story_ids).order(created_at: :desc)
     @story_elements = StoryElement.includes(:story).where(story_id: story_ids).to_a
+    @story_event_ideas = StoryEventIdea.includes(story_event: :story)
+                                       .joins(story_event: :story)
+                                       .where(stories: { user_id: current_user.id })
+                                       .order(created_at: :desc)
   end
 
   def new
     @idea = current_user.ideas.new
     @idea.build_idea_image if @idea.idea_image.nil?
 
-    # ストーリー/イベント/要素から来た new は placement を持たせる（created_here: true）
     if params[:placeable_type].present? && params[:placeable_id].present?
       @idea.build_idea_placement(
         placeable_type: params[:placeable_type],
@@ -47,7 +49,6 @@ class IdeasController < ApplicationController
     pt  = params.dig(:idea, :idea_placement_attributes, :placeable_type).presence
     pid = params.dig(:idea, :idea_placement_attributes, :placeable_id).presence
 
-    # ✅ ストーリー/イベント/要素からの作成だけ placement を確定させる
     if pt.present? && pid.present?
       placement = @idea.idea_placement || @idea.build_idea_placement
       placement.placeable_type = pt
@@ -102,6 +103,7 @@ class IdeasController < ApplicationController
     end
   end
 
+  # rubocop:disable Metrics/AbcSize
   def destroy
     redirect_path =
       case @idea.idea_placement&.placeable
@@ -111,6 +113,12 @@ class IdeasController < ApplicationController
         story_story_event_path(@idea.idea_placement.placeable.story, @idea.idea_placement.placeable)
       when StoryElement
         story_story_element_path(@idea.idea_placement.placeable.story, @idea.idea_placement.placeable)
+      when StoryEventIdea
+        story_story_event_story_event_idea_path(
+          @idea.idea_placement.placeable.story_event.story,
+          @idea.idea_placement.placeable.story_event,
+          @idea.idea_placement.placeable
+        )
       else
         ideas_path
       end
@@ -118,10 +126,10 @@ class IdeasController < ApplicationController
     @idea.destroy!
     redirect_to redirect_path, notice: "アイデアを削除しました"
   end
+  # rubocop:enable Metrics/AbcSize
 
   private
 
-  # ✅ ideas/new で placeable が来ている場合、ヘッダー用の story context を入れる
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def sync_search_story_context_from_placeable
     pt = params[:placeable_type].to_s
@@ -133,15 +141,22 @@ class IdeasController < ApplicationController
       when "Story"
         current_user.stories.find_by(id: pid)
       when "StoryEvent"
-        StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: pid)&.story
+        StoryEvent.joins(:story)
+                  .where(stories: { user_id: current_user.id })
+                  .find_by(id: pid)&.story
       when "StoryElement"
-        StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: pid)&.story
+        StoryElement.joins(:story)
+                    .where(stories: { user_id: current_user.id })
+                    .find_by(id: pid)&.story
+      when "StoryEventIdea"
+        StoryEventIdea.joins(story_event: :story)
+                      .where(stories: { user_id: current_user.id })
+                      .find_by(id: pid)&.story_event&.story
       end
 
     return if story.blank?
 
     session[:search_story_id] = story.id
-    # 初回はON寄せ。すでにfalseなら尊重する
     session[:search_in_story] = true if session[:search_in_story].nil?
   end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -150,9 +165,7 @@ class IdeasController < ApplicationController
     @idea = current_user.ideas.find(params[:id])
   end
 
-  # ✅ アイデア詳細/編集は「ホームかストーリー配下か」で session を確定させる
-  # - ホームアイデア(placementなし): 絶対にチェックを出さないため session を消す
-  # - placementあり: そのストーリーIDを session に入れる（ON/OFFはユーザー操作を尊重）
+  # rubocop:disable Metrics/AbcSize
   def sync_search_story_context_from_idea
     placement = @idea.idea_placement
 
@@ -168,6 +181,8 @@ class IdeasController < ApplicationController
         placement.placeable
       when StoryEvent, StoryElement
         placement.placeable.story
+      when StoryEventIdea
+        placement.placeable.story_event.story
       end
 
     return if story.blank?
@@ -175,8 +190,8 @@ class IdeasController < ApplicationController
     session[:search_story_id] = story.id
     session[:search_in_story] = true if session[:search_in_story].nil?
   end
+  # rubocop:enable Metrics/AbcSize
 
-  # ✅ story_element_ids: [] を許可
   def idea_params
     params.require(:idea).permit(
       :title, :memo,
@@ -198,6 +213,7 @@ class IdeasController < ApplicationController
     return Story.find(params[:story_id]) if params[:story_id].present?
     return StoryEvent.find(params[:story_event_id]).story if params[:story_event_id].present?
     return StoryElement.find(params[:story_element_id]).story if params[:story_element_id].present?
+    return StoryEventIdea.find(params[:story_event_idea_id]).story_event.story if params[:story_event_idea_id].present?
 
     if params[:placeable_type].present? && params[:placeable_id].present?
       placeable = find_placeable_for_current_user(params[:placeable_type], params[:placeable_id])
@@ -243,6 +259,8 @@ class IdeasController < ApplicationController
       StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
     when "StoryElement"
       StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
+    when "StoryEventIdea"
+      StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: id)
     end
   end
 
@@ -252,6 +270,8 @@ class IdeasController < ApplicationController
       placeable
     when StoryEvent, StoryElement
       placeable.story
+    when StoryEventIdea
+      placeable.story_event.story
     end
   end
 end

@@ -15,6 +15,13 @@
     when StoryElement
       back_label = "要素詳細に戻る"
       back_path  = story_story_element_path(placement.placeable.story, placement.placeable)
+    when StoryEventIdea
+      back_label = "詳細メモ詳細に戻る"
+      back_path  = story_story_event_story_event_idea_path(
+        placement.placeable.story_event.story,
+        placement.placeable.story_event,
+        placement.placeable
+      )
     end
   end
 
@@ -75,16 +82,17 @@
 
 <% tab = params[:tab].presence || @tab %>
 
-<h3>このアイデアどこへ移動する？（まず3つから選ぶ）</h3>
+<h3>このアイデアどこへ移動する？（まず4つから選ぶ）</h3>
 
 <ul>
   <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories") %></li>
   <li><%= link_to "イベント詳細（メモ一覧）ページへ", idea_path(@idea, tab: "events") %></li>
+  <li><%= link_to "詳細メモ詳細ページへ", idea_path(@idea, tab: "event_ideas") %></li>
   <li><%= link_to "キャラ（要素）詳細ページへ", idea_path(@idea, tab: "elements") %></li>
 </ul>
 
 <% if tab.present? %>
-  <p><%= link_to "← 3択に戻る", idea_path(@idea) %></p>
+  <p><%= link_to "← 4択に戻る", idea_path(@idea) %></p>
 <% end %>
 
 <% if tab == "elements" %>
@@ -132,6 +140,34 @@
                       params: { placeable_type: "Story", placeable_id: story.id } %>
         |
         <%= link_to "詳細を見る", story_path(story) %>
+      </li>
+    <% end %>
+  </ul>
+
+<% elsif tab == "event_ideas" %>
+  <hr>
+  <h3>詳細メモを選ぶ</h3>
+
+  <ul>
+    <% (@story_event_ideas || []).each do |event_idea| %>
+      <li>
+        <strong>
+          <%= event_idea.story_event&.story&.title %> /
+          <%= event_idea.story_event&.title %> /
+          <%= event_idea.title %>
+        </strong>
+        |
+        <%= button_to "ここへ移動",
+                      idea_idea_placement_path(@idea),
+                      method: :post,
+                      params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id } %>
+        |
+        <%= link_to "詳細を見る",
+                    story_story_event_story_event_idea_path(
+                      event_idea.story_event.story,
+                      event_idea.story_event,
+                      event_idea
+                    ) %>
       </li>
     <% end %>
   </ul>
