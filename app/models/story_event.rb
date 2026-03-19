@@ -6,6 +6,9 @@ class StoryEvent < ApplicationRecord
   has_many :story_event_elements, dependent: :destroy
   has_many :story_elements, through: :story_event_elements
 
+  has_one :story_event_image, dependent: :destroy
+  accepts_nested_attributes_for :story_event_image, update_only: true
+
   # ✅ 追加（このイベントに「移動してきたアイデア」をぶら下げる）
   has_many :idea_placements, as: :placeable, dependent: :destroy
   has_many :placed_ideas, through: :idea_placements, source: :idea

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_09_041951) do
+ActiveRecord::Schema[7.0].define(version: 2026_03_18_044828) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -122,6 +122,14 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_09_041951) do
     t.index ["story_event_id"], name: "index_story_event_ideas_on_story_event_id"
   end
 
+  create_table "story_event_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "story_event_id", null: false
+    t.string "image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["story_event_id"], name: "index_story_event_images_on_story_event_id", unique: true
+  end
+
   create_table "story_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "story_id", null: false
     t.string "title", null: false
@@ -131,6 +139,14 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_09_041951) do
     t.datetime "updated_at", null: false
     t.index ["story_id", "position"], name: "index_story_events_on_story_id_and_position"
     t.index ["story_id"], name: "index_story_events_on_story_id"
+  end
+
+  create_table "story_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "story_id", null: false
+    t.string "image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["story_id"], name: "index_story_images_on_story_id", unique: true
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -160,5 +176,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_09_041951) do
   add_foreign_key "story_event_idea_elements", "story_event_ideas"
   add_foreign_key "story_event_ideas", "ideas"
   add_foreign_key "story_event_ideas", "story_events"
+  add_foreign_key "story_event_images", "story_events"
   add_foreign_key "story_events", "stories"
+  add_foreign_key "story_images", "stories"
 end

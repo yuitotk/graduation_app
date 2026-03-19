@@ -23,17 +23,22 @@ class StoryEventsController < ApplicationController
 
   def new
     @story_event = @story.story_events.new
+    @story_event.build_story_event_image if @story_event.story_event_image.nil?
   end
 
-  def edit; end
+  def edit
+    @story_event.build_story_event_image if @story_event.story_event_image.nil?
+  end
 
   def create
     @story_event = @story.story_events.new(story_event_params)
+    @story_event.build_story_event_image if @story_event.story_event_image.nil?
     @story_event.position = next_position_for(@story)
 
     if @story_event.save
       redirect_to story_path(@story), notice: t(".success")
     else
+      @story_event.build_story_event_image if @story_event.story_event_image.nil?
       render :new, status: :unprocessable_entity
     end
   end
@@ -42,6 +47,7 @@ class StoryEventsController < ApplicationController
     if @story_event.update(story_event_params)
       redirect_to story_path(@story), notice: t(".success")
     else
+      @story_event.build_story_event_image if @story_event.story_event_image.nil?
       render :edit, status: :unprocessable_entity
     end
   end
@@ -98,6 +104,7 @@ class StoryEventsController < ApplicationController
   def story_event_params
     params.require(:story_event).permit(
       :title, :body,
+      story_event_image_attributes: %i[id image image_cache remove_image],
       story_element_ids: []
     )
   end

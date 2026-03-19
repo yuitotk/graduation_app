@@ -1,0 +1,32 @@
+<p>
+  <%= link_to "イベントへ戻る", story_story_event_path(@story, @story_event) %>
+</p>
+
+<h1><%= @story_event_idea.title %></h1>
+
+<h4>詳細メモの登場要素</h4>
+<% if @story_event_idea.story_elements.any? %>
+  <ul>
+    <% @story_event_idea.story_elements.each do |el| %>
+      <li><%= story_element_label(el) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>未設定</p>
+<% end %>
+
+<% if @story_event_idea.image.present? %>
+  <h4>画像</h4>
+  <div>
+    <%= image_tag @story_event_idea.image.url, style: "max-width: 100%; height: auto;" %>
+  </div>
+<% end %>
+
+<h4>説明</h4>
+<div>
+  <%= simple_format(@story_event_idea.memo) %>
+</div>
+
+<p>
+  <%= link_to "編集", edit_story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea) %>
+</p>
