@@ -1,4 +1,4 @@
-<%= form_with model: story, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
+<%= form_with model: story, html: { multipart: true }, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
   <% if story.errors.any? %>
     <ul>
       <% story.errors.full_messages.each do |msg| %>
@@ -27,6 +27,21 @@
     <%= f.label :description, "説明", style: "font-size: 24px; font-weight: bold;" %><br>
     <%= f.text_area :description, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
+
+  <%= f.fields_for :story_image do |imgf| %>
+    <%= imgf.hidden_field :id if imgf.object&.persisted? %>
+
+    <div style="margin-top: 16px;">
+      <%= imgf.label :image, "画像（任意）" %><br>
+      <%= imgf.file_field :image %>
+
+      <% if story.story_image&.image? %>
+        <div style="margin-top: 8px;">
+          <%= image_tag story.story_image.image.url, style: "max-width: 320px; height: auto;" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 
   <div style="margin-top: 30px;">
     <%= f.submit(story.persisted? ? "ストーリーを更新" : "ストーリーを作成") %>

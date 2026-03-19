@@ -2,7 +2,9 @@
 class StoryEventIdeasController < ApplicationController
   before_action :require_login
   before_action :set_story_and_event
-  before_action :set_story_event_idea, only: %i[edit update destroy move_up move_down]
+  before_action :set_story_event_idea, only: %i[show edit update destroy move_up move_down]
+
+  def show; end
 
   def new
     @story_event_idea = @story_event.story_event_ideas.new
@@ -18,6 +20,8 @@ class StoryEventIdeasController < ApplicationController
 
   def create
     @story_event_idea = @story_event.story_event_ideas.new(story_event_idea_params)
+    @story_event_idea.position = next_position_for(@story_event)
+
     if @story_event_idea.save
       redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.created")
     else
@@ -87,5 +91,9 @@ class StoryEventIdeasController < ApplicationController
         idea.update!(position: i + 1)
       end
     end
+  end
+
+  def next_position_for(story_event)
+    (story_event.story_event_ideas.maximum(:position) || 0) + 10
   end
 end

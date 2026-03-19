@@ -2,9 +2,9 @@
 <h1>ストーリー編集</h1>
 <%= render "form", story: @story %>
 
-<p style="margin-top: 50px; color: red; font-weight: bold;">※削除すると中のイベント / 詳細メモ / 要素も消えます。</p>
+<p style="margin-top: 50px; color: red; font-weight: bold;">※削除すると中のイベント / 詳細メモ / 要素 / 関連アイデアも消えます。</p>
 <p>
   <%= link_to "このストーリーを削除",
               story_path(@story),
-              data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？（中のイベント/詳細メモ/要素も消えます）" } %>
+              data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？（中のイベント/詳細メモ/要素/関連アイデアも消えます）" } %>
 </p>

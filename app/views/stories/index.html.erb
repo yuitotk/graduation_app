@@ -11,6 +11,12 @@
         <div style="padding: 16px; border: 2px solid #999; border-radius: 16px; background: #f8f8f8;">
           <h2><%= story.title %></h2>
 
+          <% if story.story_image&.image? %>
+            <div style="margin: 8px 0;">
+              <%= image_tag story.story_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
+            </div>
+          <% end %>
+
           <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
             <%= truncate(story.description.to_s, length: 78) %>
           </p>

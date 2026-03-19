@@ -50,17 +50,22 @@ class StoriesController < ApplicationController
 
   def new
     @story = current_user.stories.new
+    @story.build_story_image if @story.story_image.nil?
   end
 
-  def edit; end
+  def edit
+    @story.build_story_image if @story.story_image.nil?
+  end
 
   def create
     @story = current_user.stories.new(story_params)
+    @story.build_story_image if @story.story_image.nil?
     @story.position = next_position_for(current_user)
 
     if @story.save
       redirect_to stories_path, notice: t(".success")
     else
+      @story.build_story_image if @story.story_image.nil?
       render :new, status: :unprocessable_entity
     end
   end
@@ -69,6 +74,7 @@ class StoriesController < ApplicationController
     if @story.update(story_params)
       redirect_to story_path(@story), notice: t(".success")
     else
+      @story.build_story_image if @story.story_image.nil?
       render :edit, status: :unprocessable_entity
     end
   end
@@ -122,7 +128,10 @@ class StoriesController < ApplicationController
   end
 
   def story_params
-    params.require(:story).permit(:title, :description)
+    params.require(:story).permit(
+      :title, :description,
+      story_image_attributes: %i[id image image_cache remove_image]
+    )
   end
 
   def swap_positions(first_record, second_record)

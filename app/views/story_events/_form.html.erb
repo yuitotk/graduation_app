@@ -1,4 +1,4 @@
-<%= form_with model: [@story, @story_event] do |f| %>
+<%= form_with model: [@story, @story_event], html: { multipart: true }, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
   <% if @story_event.errors.any? %>
     <ul>
       <% @story_event.errors.full_messages.each do |msg| %>
@@ -7,31 +7,61 @@
     </ul>
   <% end %>
 
-  <div>
-    <%= f.label :title, "タイトル" %><br>
-    <%= f.text_field :title %>
+  <div style="margin-bottom: 30px;" data-controller="character-counter">
+    <%= f.label :title, "タイトル（40文字を超えた分は入力できません）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_field :title,
+          maxlength: 40,
+          data: {
+            "character-counter-target": "input",
+            action: "input->character-counter#updateCount"
+          },
+          style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
+    <div
+      data-character-counter-target="output"
+      data-max-length="40"
+      style="margin-top: 6px; font-size: 14px; color: #666;"
+    ></div>
   </div>
 
-  <div>
-    <%= f.label :body, "説明" %><br>
-    <%= f.text_area :body, rows: 5 %>
+  <div style="margin-bottom: 30px;">
+    <%= f.label :body, "説明", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_area :body, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
-  <div>
-    <%= f.label :story_element_ids, "登場要素" %><br>
+  <%= f.fields_for :story_event_image do |imgf| %>
+    <%= imgf.hidden_field :id if imgf.object&.persisted? %>
 
-    <% if @story.story_elements.any? %>
-      <%= f.collection_check_boxes :story_element_ids, @story.story_elements, :id,
-                                   ->(el) { story_element_label(el) } do |b| %>
-        <div>
-          <%= b.check_box %>
-          <%= b.label %>
+    <div style="margin-bottom: 30px;">
+      <%= imgf.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold;" %><br>
+      <%= imgf.file_field :image %>
+
+      <% if @story_event.story_event_image&.image? %>
+        <div style="margin-top: 8px;">
+          <%= image_tag @story_event.story_event_image.image.url, style: "max-width: 320px; height: auto;" %>
         </div>
       <% end %>
+    </div>
+  <% end %>
+
+  <div style="margin-bottom: 30px;">
+    <%= f.label :story_element_ids, "登場要素", style: "font-size: 24px; font-weight: bold;" %><br>
+
+    <% if @story.story_elements.any? %>
+      <div style="margin-top: 12px;">
+        <%= f.collection_check_boxes :story_element_ids, @story.story_elements, :id,
+                                     ->(el) { story_element_label(el) } do |b| %>
+          <div>
+            <%= b.check_box %>
+            <%= b.label %>
+          </div>
+        <% end %>
+      </div>
     <% else %>
       <p>登場要素がまだありません（先に要素を作成してください）</p>
     <% end %>
   </div>
 
-  <%= f.submit %>
+  <div style="margin-top: 24px;">
+    <%= f.submit "イベントを更新する" %>
+  </div>
 <% end %>

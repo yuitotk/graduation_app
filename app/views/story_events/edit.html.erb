@@ -1,7 +1,14 @@
+<%= link_to "戻る", story_story_event_path(@story, @story_event) %>
 <h1>イベント編集</h1>
 <%= render "form" %>
-<%= button_to "削除",
-      story_story_event_path(@story, @story_event),
-      method: :delete,
-      data: { turbo_confirm: "本当に削除しますか？" } %>
-<%= link_to "戻る", story_story_event_path(@story, @story_event) %>
+
+<div style="margin-top: 16px;">
+  <p style="color: red; margin-bottom: 8px;">
+    ※削除すると中の詳細メモ・関連アイデアも消えます。
+  </p>
+
+  <%= button_to "削除",
+        story_story_event_path(@story, @story_event),
+        method: :delete,
+        data: { turbo_confirm: "本当に削除しますか？（中の/詳細メモ/関連アイデアも消えます）" } %>
+</div>
