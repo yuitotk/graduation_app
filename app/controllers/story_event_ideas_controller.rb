@@ -4,12 +4,35 @@ class StoryEventIdeasController < ApplicationController
   before_action :set_story_and_event
   before_action :set_story_event_idea, only: %i[show edit update destroy move_up move_down]
 
-  def show; end
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def show
+    ideas = current_user.ideas
+                        .joins(:idea_placement)
+                        .where(idea_placements: { placeable_type: "StoryEventIdea", placeable_id: @story_event_idea.id })
+                        .includes(:idea_placement)
+                        .distinct
+
+    @created_here_ideas = ideas.select do |idea|
+      placement = idea.idea_placement
+      placement.present? &&
+        placement.placeable_type == "StoryEventIdea" &&
+        placement.placeable_id == @story_event_idea.id &&
+        placement.created_here?
+    end
+
+    @moved_ideas = ideas.select do |idea|
+      placement = idea.idea_placement
+      placement.present? &&
+        placement.placeable_type == "StoryEventIdea" &&
+        placement.placeable_id == @story_event_idea.id &&
+        !placement.created_here?
+    end
+  end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def new
     @story_event_idea = @story_event.story_event_ideas.new
 
-    # ✅ idea詳細から飛んできた場合に紐付けを初期セット（安全に）
     return if params[:idea_id].blank?
 
     idea = current_user.ideas.find_by(id: params[:idea_id])
@@ -81,7 +104,7 @@ class StoryEventIdeasController < ApplicationController
   def story_event_idea_params
     params.require(:story_event_idea).permit(
       :title, :memo, :image, :position,
-      :idea_id, # ✅ 追加（これがないと紐付けできない）
+      :idea_id,
       story_element_ids: []
     )
   end
