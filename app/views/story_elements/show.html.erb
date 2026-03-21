@@ -2,9 +2,15 @@
 
 <h1>要素詳細</h1>
 
-<p><strong>種別：</strong><%= @story_element.kind %></p>
+<p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0;"><strong>名前：</strong><%= @story_element.name %></p>
+<p><strong>種別：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[@story_element.kind] || @story_element.kind %></p>
 <p><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
-<p><strong>名前：</strong><%= @story_element.name %></p>
+
+<% if @story_element.story_element_image&.image? %>
+  <div style="margin: 12px 0;">
+    <%= image_tag @story_element.story_element_image.image.url, style: "max-width: 100%; height: auto;" %>
+  </div>
+<% end %>
 
 <h2>メモ</h2>
 

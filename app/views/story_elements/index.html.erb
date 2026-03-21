@@ -2,15 +2,26 @@
 
 <h1>要素一覧</h1>
 
-<%= link_to "＋要素追加", new_story_story_element_path(@story) %>
+<%= link_to "要素追加", new_story_story_element_path(@story) %>
 
-<ul>
-  <% @story_elements.each do |e| %>
-    <li>
-      <%= link_to "#{e.marker.present? ? "#{e.marker} " : ""}#{e.kind} / #{e.name}",
-                  story_story_element_path(@story, e) %>
-      <%= link_to "編集", edit_story_story_element_path(@story, e) %>
-      <%# 削除は編集画面だけにしたいので、ここでは出さない %>
-    </li>
-  <% end %>
-</ul>
+<% grouped_elements = @story_elements.group_by(&:kind) %>
+
+<% [
+  ["character", "キャラクター"],
+  ["item", "アイテム"],
+  ["setting", "設定"]
+].each do |kind, title| %>
+  <% next if grouped_elements[kind].blank? %>
+
+  <h2><%= title %></h2>
+
+  <ul>
+    <% grouped_elements[kind].each do |e| %>
+      <li>
+        <%= link_to "#{e.marker.present? ? "#{e.marker}　" : ""}#{e.name}",
+                    story_story_element_path(@story, e) %>
+        <%# 削除は編集画面だけにしたいので、ここでは出さない %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

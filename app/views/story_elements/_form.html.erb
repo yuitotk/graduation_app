@@ -1,4 +1,5 @@
-<%= form_with model: [@story, @story_element] do |f| %>
+<%= form_with model: [@story, @story_element],
+              data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
   <% if @story_element.errors.any? %>
     <ul>
       <% @story_element.errors.full_messages.each do |msg| %>
@@ -7,25 +8,68 @@
     </ul>
   <% end %>
 
-  <div>
-    <%= f.label :kind %>
-    <%= f.select :kind, StoryElement.kinds.keys.map { |k| [k, k] }, include_blank: true %>
+  <div style="margin-bottom: 20px;">
+    <%= f.label :kind, "分類", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.select :kind,
+                 [["キャラクター", "character"], ["アイテム", "item"], ["設定", "setting"]],
+                 { include_blank: true },
+                 { style: "width: 100%; max-width: 220px; box-sizing: border-box;" } %>
   </div>
 
-  <div>
-    <%= f.label :marker %>
-    <%= f.text_field :marker, placeholder: "例：🃏 🗡️ 🔰 🤴🏻" %>
+  <div style="margin-bottom: 20px;" data-controller="character-counter">
+    <%= f.label :marker, "マーカー（4文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_field :marker,
+                     maxlength: 4,
+                     data: {
+                       "character-counter-target": "input",
+                       action: "input->character-counter#updateCount"
+                     },
+                     placeholder: "例：🃏 🗡️ 🔰 🤴🏻",
+                     style: "width: 100%; max-width: 220px; box-sizing: border-box;" %>
+    <div
+      data-character-counter-target="output"
+      data-max-length="4"
+      style="margin-top: 6px; font-size: 14px; color: #666;"
+    ></div>
   </div>
 
-  <div>
-    <%= f.label :name %>
-    <%= f.text_field :name %>
+  <div style="margin-bottom: 30px;" data-controller="character-counter">
+    <%= f.label :name, "名前（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_field :name,
+                     maxlength: 40,
+                     data: {
+                       "character-counter-target": "input",
+                       action: "input->character-counter#updateCount"
+                     },
+                     style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
+    <div
+      data-character-counter-target="output"
+      data-max-length="40"
+      style="margin-top: 6px; font-size: 14px; color: #666;"
+    ></div>
   </div>
 
-  <div>
-    <%= f.label :memo %>
-    <%= f.text_area :memo %>
+  <div style="margin-bottom: 30px;">
+    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.text_area :memo, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
-  <%= f.submit %>
+  <%= f.fields_for :story_element_image do |imgf| %>
+    <%= imgf.hidden_field :id if imgf.object&.persisted? %>
+
+    <div style="margin-bottom: 30px;">
+      <%= imgf.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold;" %><br>
+      <%= imgf.file_field :image %>
+
+      <% if @story_element.story_element_image&.image? %>
+        <div style="margin-top: 8px;">
+          <%= image_tag @story_element.story_element_image.image.url, style: "max-width: 320px; height: auto;" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div style="margin-top: 24px;">
+    <%= f.submit "要素を保存する" %>
+  </div>
 <% end %>

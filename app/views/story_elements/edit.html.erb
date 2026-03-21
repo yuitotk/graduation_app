@@ -1,12 +1,16 @@
+<%= link_to "戻る", story_story_element_path(@story, @story_element) %>
+
 <h1>要素編集</h1>
 
 <%= render "form" %>
 
-<hr>
+<p style="color: red; font-weight: bold; margin-top: 24px; margin-bottom: 8px;">
+  削除すると、この要素内のアイデアは消えます。<br>
+  また、このストーリー内でこの要素を選択しているアイデア、イベントなどからも外れます。
+</p>
 
-<%= button_to "削除",
-      story_story_element_path(@story, @story_element),
-      method: :delete,
-      data: { turbo_confirm: "削除しますか？" } %>
-
-<%= link_to "戻る", story_story_element_path(@story, @story_element) %>
+<p>
+  <%= link_to "削除",
+        story_story_element_path(@story, @story_element),
+        data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？要素内アイデアと要素選択したアイデアなどからも外れます" } %>
+</p>

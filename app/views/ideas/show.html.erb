@@ -52,7 +52,9 @@
     <strong>登場要素：</strong>
     <ul style="margin: 8px 0;">
       <% elements.each do |el| %>
-        <% label = [el.marker.presence, el.name.presence, el.kind.presence].compact.join(" ") %>
+        <% kind_label = { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[el.kind] || el.kind %>
+        <% main_label = [el.marker.presence, el.name.presence].compact.join(" ") %>
+        <% label = kind_label.present? ? "#{main_label}（#{kind_label}）" : main_label %>
         <% next if label.blank? %>
         <li><%= label %></li>
       <% end %>
