@@ -26,12 +26,17 @@ class StoryElementsController < ApplicationController
 
   def new
     @story_element = @story.story_elements.new
+    @story_element.build_story_element_image if @story_element.story_element_image.nil?
   end
 
-  def edit; end
+  def edit
+    @story_element.build_story_element_image if @story_element.story_element_image.nil?
+  end
 
   def create
     @story_element = @story.story_elements.new(story_element_params)
+    @story_element.build_story_element_image if @story_element.story_element_image.nil?
+
     if @story_element.save
       redirect_to story_story_elements_path(@story), notice: t(".success")
     else
@@ -43,6 +48,7 @@ class StoryElementsController < ApplicationController
     if @story_element.update(story_element_params)
       redirect_to story_story_elements_path(@story), notice: t(".success")
     else
+      @story_element.build_story_element_image if @story_element.story_element_image.nil?
       render :edit, status: :unprocessable_entity
     end
   end
@@ -69,6 +75,9 @@ class StoryElementsController < ApplicationController
   end
 
   def story_element_params
-    params.require(:story_element).permit(:kind, :name, :memo, :marker)
+    params.require(:story_element).permit(
+      :kind, :name, :memo, :marker,
+      story_element_image_attributes: %i[id image image_cache remove_image]
+    )
   end
 end

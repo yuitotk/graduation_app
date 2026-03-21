@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_18_044828) do
+ActiveRecord::Schema[7.0].define(version: 2026_03_20_040355) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -76,6 +76,14 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_18_044828) do
     t.datetime "updated_at", null: false
     t.integer "position"
     t.index ["user_id"], name: "index_stories_on_user_id"
+  end
+
+  create_table "story_element_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "story_element_id", null: false
+    t.string "image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["story_element_id"], name: "index_story_element_images_on_story_element_id"
   end
 
   create_table "story_elements", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -169,6 +177,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_18_044828) do
   add_foreign_key "ideas", "users"
   add_foreign_key "inquiries", "users"
   add_foreign_key "stories", "users"
+  add_foreign_key "story_element_images", "story_elements"
   add_foreign_key "story_elements", "stories"
   add_foreign_key "story_event_elements", "story_elements"
   add_foreign_key "story_event_elements", "story_events"

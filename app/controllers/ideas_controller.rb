@@ -239,8 +239,9 @@ class IdeasController < ApplicationController
     elements.map do |element|
       marker = element.marker.presence
       name   = element.name.presence
-      kind   = element.kind.presence
-      label  = [marker, name, kind].compact.join(" ")
+      kind   = { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[element.kind] || element.kind
+      main_label = [marker, name].compact.join(" ")
+      label  = kind.present? ? "#{main_label}（#{kind}）" : main_label
       value  = element.id.to_s
       [label, value]
     end
