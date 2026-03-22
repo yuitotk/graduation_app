@@ -12,11 +12,28 @@
 
 <h4>イベントの登場要素</h4>
 <% if @story_event.story_elements.any? %>
-  <ul>
-    <% @story_event.story_elements.each do |el| %>
-      <li><%= story_element_label(el) %></li>
+  <% grouped_elements = @story_event.story_elements.group_by(&:kind) %>
+
+  <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+    <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
+      <% elements = grouped_elements[kind] || [] %>
+      <% next if elements.blank? %>
+
+      <details style="margin-bottom: 16px;">
+        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+          <%= kind_label %>（<%= elements.size %>）
+        </summary>
+
+        <div style="padding: 12px 8px 0 8px;">
+          <% elements.each do |el| %>
+            <div style="margin-bottom: 8px;">
+              <%= story_element_short_label(el) %>
+            </div>
+          <% end %>
+        </div>
+      </details>
     <% end %>
-  </ul>
+  </div>
 <% else %>
   <p>未設定</p>
 <% end %>
@@ -28,6 +45,12 @@
 
 <p>
   <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
+  <span style="display: inline-block; margin-left: 24px;">
+    作成日: <%= l @story_event.created_at.in_time_zone("Tokyo"), format: :short %>
+  </span>
+  <span style="display: inline-block; margin-left: 24px;">
+    更新日（文字修正のみ）: <%= l (@story_event.text_updated_at || @story_event.created_at).in_time_zone("Tokyo"), format: :short %>
+  </span>
 </p>
 
 <hr>

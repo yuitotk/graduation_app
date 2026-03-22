@@ -11,6 +11,7 @@ class StoryEventIdeasController < ApplicationController
                         .where(idea_placements: { placeable_type: "StoryEventIdea", placeable_id: @story_event_idea.id })
                         .includes(:idea_placement)
                         .distinct
+                        .order(created_at: :desc)
 
     @created_here_ideas = ideas.select do |idea|
       placement = idea.idea_placement

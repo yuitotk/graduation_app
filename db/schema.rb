@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_20_040355) do
+ActiveRecord::Schema[7.0].define(version: 2026_03_22_045247) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -75,6 +75,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_20_040355) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "position"
+    t.datetime "text_updated_at"
     t.index ["user_id"], name: "index_stories_on_user_id"
   end
 
@@ -94,6 +95,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_20_040355) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "marker"
+    t.datetime "text_updated_at"
     t.index ["story_id"], name: "index_story_elements_on_story_id"
   end
 
@@ -126,6 +128,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_20_040355) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "idea_id"
+    t.datetime "text_updated_at"
     t.index ["idea_id"], name: "index_story_event_ideas_on_idea_id"
     t.index ["story_event_id"], name: "index_story_event_ideas_on_story_event_id"
   end
@@ -145,6 +148,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_20_040355) do
     t.integer "position", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "text_updated_at"
     t.index ["story_id", "position"], name: "index_story_events_on_story_id_and_position"
     t.index ["story_id"], name: "index_story_events_on_story_id"
   end

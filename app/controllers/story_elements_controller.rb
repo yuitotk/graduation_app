@@ -46,7 +46,7 @@ class StoryElementsController < ApplicationController
 
   def update
     if @story_element.update(story_element_params)
-      redirect_to story_story_elements_path(@story), notice: t(".success")
+      redirect_to story_story_element_path(@story, @story_element), notice: t(".success")
     else
       @story_element.build_story_element_image if @story_element.story_element_image.nil?
       render :edit, status: :unprocessable_entity
