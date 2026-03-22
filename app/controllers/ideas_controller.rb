@@ -38,7 +38,7 @@ class IdeasController < ApplicationController
       )
     end
 
-    set_marker_options
+    set_available_story_elements
   end
 
   # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
@@ -63,7 +63,7 @@ class IdeasController < ApplicationController
       redirect_to(safe_path(params[:return_to]) || ideas_path, notice: "アイデアを作成しました")
     else
       @idea.build_idea_image if @idea.idea_image.nil?
-      set_marker_options
+      set_available_story_elements
       render :new, status: :unprocessable_entity
     end
   end
@@ -73,9 +73,9 @@ class IdeasController < ApplicationController
     @idea.build_idea_image if @idea.idea_image.nil?
 
     if @idea.idea_placement.present?
-      set_marker_options
+      set_available_story_elements
     else
-      @marker_options = []
+      @available_story_elements = []
     end
   end
 
@@ -94,9 +94,9 @@ class IdeasController < ApplicationController
       @idea.build_idea_image if @idea.idea_image.nil?
 
       if @idea.idea_placement.present?
-        set_marker_options
+        set_available_story_elements
       else
-        @marker_options = []
+        @available_story_elements = []
       end
 
       render :edit, status: :unprocessable_entity
@@ -203,9 +203,9 @@ class IdeasController < ApplicationController
     )
   end
 
-  def set_marker_options
+  def set_available_story_elements
     story = resolve_story_for_marker
-    @marker_options = marker_options_for(story)
+    @available_story_elements = available_story_elements_for(story)
   end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -230,21 +230,12 @@ class IdeasController < ApplicationController
   end
   # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
-  def marker_options_for(story)
+  def available_story_elements_for(story)
     return [] if story.nil?
 
     elements = story.story_elements
     elements = elements.order(:position) if elements.respond_to?(:klass) && elements.klass.column_names.include?("position")
-
-    elements.map do |element|
-      marker = element.marker.presence
-      name   = element.name.presence
-      kind   = { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[element.kind] || element.kind
-      main_label = [marker, name].compact.join(" ")
-      label  = kind.present? ? "#{main_label}（#{kind}）" : main_label
-      value  = element.id.to_s
-      [label, value]
-    end
+    elements
   end
 
   def safe_path(value)

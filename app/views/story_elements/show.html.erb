@@ -22,6 +22,12 @@
 
 <p>
   <%= link_to "編集", edit_story_story_element_path(@story, @story_element) %>
+  <span style="display: inline-block; margin-left: 24px;">
+    作成日: <%= l @story_element.created_at.in_time_zone("Tokyo"), format: :short %>
+  </span>
+  <span style="display: inline-block; margin-left: 24px;">
+    更新日（文字修正のみ）: <%= l (@story_element.text_updated_at || @story_element.created_at).in_time_zone("Tokyo"), format: :short %>
+  </span>
 </p>
 
 <hr>

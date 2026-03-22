@@ -1,4 +1,9 @@
-<%= form_with model: [@story, @story_event], html: { multipart: true }, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
+<%= form_with model: [@story, @story_event],
+              html: { multipart: true },
+              data: {
+                controller: "prevent-enter-submit element-selector",
+                action: "keydown->prevent-enter-submit#check change->element-selector#refresh"
+              } do |f| %>
   <% if @story_event.errors.any? %>
     <ul>
       <% @story_event.errors.full_messages.each do |msg| %>
@@ -47,12 +52,62 @@
     <%= f.label :story_element_ids, "登場要素", style: "font-size: 24px; font-weight: bold;" %><br>
 
     <% if @story.story_elements.any? %>
-      <div style="margin-top: 12px;">
-        <%= f.collection_check_boxes :story_element_ids, @story.story_elements, :id,
-                                     ->(el) { story_element_label(el) } do |b| %>
-          <div>
-            <%= b.check_box %>
-            <%= b.label %>
+      <% grouped_elements = @story.story_elements.group_by(&:kind) %>
+
+      <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+          選択中の要素
+        </div>
+
+        <p data-element-selector-target="emptyMessage" style="margin: 0;">
+          まだ選択されていません
+        </p>
+
+        <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px;"></div>
+        <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px;"></div>
+        <div data-element-selector-target="summary" data-kind="setting" hidden></div>
+      </div>
+
+      <div style="margin-top: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+          要素を選択する
+        </div>
+
+        <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
+          <% elements = grouped_elements[kind] || [] %>
+          <% next if elements.blank? %>
+
+          <div style="margin-bottom: 16px;">
+            <button type="button"
+                    data-action="click->element-selector#toggle"
+                    data-kind="<%= kind %>"
+                    data-label="<%= "#{kind_label}（#{elements.size}）" %>"
+                    aria-expanded="true"
+                    style="width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+              ▼ <%= kind_label %>（<%= elements.size %>）
+            </button>
+
+            <div data-element-selector-target="group"
+                 data-kind="<%= kind %>"
+                 style="padding: 12px 8px 0 8px;">
+              <%= f.collection_check_boxes :story_element_ids, elements, :id, ->(el) { story_element_short_label(el) } do |b| %>
+                <% element = b.object %>
+                <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                  <% checkbox_id = "#{f.object_name}_story_element_ids_#{element.id}" %>
+
+                  <%= b.check_box id: checkbox_id,
+                        data: {
+                          "element-selector-target": "checkbox",
+                          kind: element.kind,
+                          label: story_element_short_label(element)
+                        } %>
+
+                  <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0;">
+                    <%= story_element_short_label(element) %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
           </div>
         <% end %>
       </div>
@@ -62,6 +117,6 @@
   </div>
 
   <div style="margin-top: 24px;">
-    <%= f.submit "イベントを更新する" %>
+    <%= f.submit "イベントを保存する" %>
   </div>
 <% end %>

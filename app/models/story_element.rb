@@ -12,7 +12,6 @@ class StoryElement < ApplicationRecord
   has_many :idea_placement_elements, dependent: :destroy
   has_many :linked_idea_placements, through: :idea_placement_elements, source: :idea_placement
 
-  # ✅ 追加（このキャラ/要素に「移動してきたアイデア」をぶら下げる）
   has_many :idea_placements, as: :placeable, dependent: :destroy
   has_many :placed_ideas, through: :idea_placements, source: :idea
 
@@ -22,4 +21,16 @@ class StoryElement < ApplicationRecord
 
   validates :kind, presence: true
   validates :name, presence: true
+
+  before_save :set_text_updated_at, if: :should_update_text_updated_at?
+
+  private
+
+  def should_update_text_updated_at?
+    new_record? || will_save_change_to_marker? || will_save_change_to_name? || will_save_change_to_memo?
+  end
+
+  def set_text_updated_at
+    self.text_updated_at = Time.current
+  end
 end

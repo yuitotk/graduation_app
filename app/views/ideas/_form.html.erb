@@ -1,4 +1,10 @@
-<%= form_with(model: idea, local: true, html: { multipart: true }, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" }) do |f| %>
+<%= form_with(model: idea,
+              local: true,
+              html: { multipart: true },
+              data: {
+                controller: "prevent-enter-submit element-selector",
+                action: "keydown->prevent-enter-submit#check change->element-selector#refresh"
+              }) do |f| %>
   <% if idea.errors.any? %>
     <div class="alert alert-danger">
       <ul class="mb-0">
@@ -46,7 +52,7 @@
   <% end %>
 
   <%# ✅ ストーリー文脈がある時だけ表示 %>
-  <% if idea.idea_placement.present? || @marker_options.present? || params[:placeable_type].present? %>
+  <% if idea.idea_placement.present? || @available_story_elements.present? || params[:placeable_type].present? %>
     <%= f.fields_for :idea_placement do |pf| %>
       <%= pf.hidden_field :id if pf.object&.persisted? %>
 
@@ -54,32 +60,70 @@
       <%= pf.hidden_field :placeable_id,   value: (pf.object&.placeable_id   || params[:placeable_id]) %>
 
       <div style="margin-top: 16px;">
-        <div><strong>このアイデアの登場要素（複数選択OK）</strong></div>
+        <div style="font-size: 24px; font-weight: bold;">このアイデアの登場要素</div>
 
-        <% if @marker_options.present? %>
+        <% if @available_story_elements.present? %>
+          <% grouped_elements = @available_story_elements.group_by(&:kind) %>
+
           <%= hidden_field_tag "idea[idea_placement_attributes][story_element_ids][]", "" %>
 
-          <% selected_ids =
-              if pf.object&.story_elements.present?
-                pf.object.story_elements.pluck(:id).map(&:to_s)
-              else
-                []
-              end
-          %>
-
-          <% @marker_options.each_with_index do |(label, value), i| %>
-            <div>
-              <label for="idea_marker_<%= i %>">
-                <%= check_box_tag(
-                      "idea[idea_placement_attributes][story_element_ids][]",
-                      value,
-                      selected_ids.include?(value.to_s),
-                      id: "idea_marker_#{i}"
-                    ) %>
-                <%= label %>
-              </label>
+          <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+              選択中の要素
             </div>
-          <% end %>
+
+            <p data-element-selector-target="emptyMessage" style="margin: 0;">
+              まだ選択されていません
+            </p>
+
+            <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px;"></div>
+            <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px;"></div>
+            <div data-element-selector-target="summary" data-kind="setting" hidden></div>
+          </div>
+
+          <div style="margin-top: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+              要素を選択する
+            </div>
+
+            <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
+              <% elements = grouped_elements[kind] || [] %>
+              <% next if elements.blank? %>
+
+              <div style="margin-bottom: 16px;">
+                <button type="button"
+                        data-action="click->element-selector#toggle"
+                        data-kind="<%= kind %>"
+                        data-label="<%= "#{kind_label}（#{elements.size}）" %>"
+                        aria-expanded="true"
+                        style="width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+                  ▼ <%= kind_label %>（<%= elements.size %>）
+                </button>
+
+                <div data-element-selector-target="group"
+                     data-kind="<%= kind %>"
+                     style="padding: 12px 8px 0 8px;">
+                  <%= pf.collection_check_boxes :story_element_ids, elements, :id, ->(el) { story_element_short_label(el) } do |b| %>
+                    <% element = b.object %>
+                    <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                      <% checkbox_id = "#{pf.object_name}_story_element_ids_#{element.id}" %>
+
+                      <%= b.check_box id: checkbox_id,
+                            data: {
+                              "element-selector-target": "checkbox",
+                              kind: element.kind,
+                              label: story_element_short_label(element)
+                            } %>
+
+                      <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0;">
+                        <%= story_element_short_label(element) %>
+                      </label>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
         <% else %>
           <div>
             （このアイデアはストーリー文脈が特定できないため、要素一覧を表示できません）
