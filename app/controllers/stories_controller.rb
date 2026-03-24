@@ -29,11 +29,26 @@ class StoriesController < ApplicationController
   end
 
   # ✅ 整合性チェック（要素で絞り込み）
+  # rubocop:disable Metrics/MethodLength
   def consistency
-    @elements = @story.story_elements.order(:kind, :name, :id)
+    kind_order = {
+      "character" => 0,
+      "item" => 1,
+      "setting" => 2
+    }
+
+    @elements =
+      @story.story_elements.sort_by do |element|
+        [
+          kind_order[element.kind] || 99,
+          japanese_name?(element.name) ? 0 : 1,
+          sortable_element_name(element.name),
+          element.id
+        ]
+      end
 
     @selected_element =
-      @elements.find_by(id: params[:story_element_id])
+      @elements.find { |element| element.id == params[:consistency_story_element_id].to_i }
 
     @events =
       if @selected_element
@@ -47,6 +62,7 @@ class StoriesController < ApplicationController
         []
       end
   end
+  # rubocop:enable Metrics/MethodLength
 
   def new
     @story = current_user.stories.new
@@ -144,6 +160,14 @@ class StoriesController < ApplicationController
 
   def next_position_for(user)
     (user.stories.maximum(:position) || 0) + 10
+  end
+
+  def japanese_name?(name)
+    name.to_s.match?(/\A[ぁ-んァ-ヶ一-龥ー々]+\z/)
+  end
+
+  def sortable_element_name(name)
+    name.to_s.downcase.tr("ァ-ヶ", "ぁ-ゖ")
   end
 end
 # rubocop:enable Metrics/ClassLength

@@ -1,94 +1,205 @@
-<h1>整合性チェック</h1>
-
 <p><%= link_to "イベント一覧へ戻る", story_path(@story) %></p>
 
+<h1>整合性チェック</h1>
+<h4>イベントと詳細メモのみ検索対象です。アイデアは含まれません。</h4>
+<h4>詳細メモで要素を選択していても、イベント自体にその要素が設定されていない場合は表示されません。</h4>
+
 <%= form_with url: consistency_story_path(@story), method: :get, local: true do %>
-  <div>
-    <%= label_tag :story_element_id, "要素を選ぶ" %><br>
+  <div style="max-width: 420px; width: 100%;">
+    <%= label_tag :consistency_story_element_id, "要素を選ぶ" %><br>
 
-    <%= select_tag :story_element_id,
+    <%= select_tag :consistency_story_element_id,
       options_for_select(
-        @elements.map { |e| [[e.try(:marker), e.name].compact.join(" "), e.id] },
-        params[:story_element_id]
-      ),
-      include_blank: "選択してください" %>
+        @elements.map do |e|
+          kind_label =
+            case e.kind
+            when "character"
+              "キャラ"
+            when "item"
+              "アイテム"
+            when "setting"
+              "設定"
+            else
+              e.kind
+            end
 
-    <%= submit_tag "表示" %>
+          option_label = "[#{kind_label}]#{e.try(:marker)}　#{e.name}"
+          [truncate(option_label, length: 40), e.id]
+        end,
+        params[:consistency_story_element_id]
+      ),
+      include_blank: "選択してください",
+      style: "width: 100%; box-sizing: border-box;" %>
+
+    <div style="margin-top: 8px;">
+      <%= submit_tag "表示" %>
+    </div>
   </div>
 <% end %>
 
 <hr>
 
 <% if @selected_element %>
-  <% selected_label = [@selected_element.try(:marker), @selected_element.name].compact.join(" ") %>
+  <% selected_kind_label =
+       case @selected_element.kind
+       when "character"
+         "キャラ"
+       when "item"
+         "アイテム"
+       when "setting"
+         "設定"
+       else
+         @selected_element.kind
+       end %>
 
-  <p>選択中：<strong><%= selected_label %></strong></p>
+  <% selected_label = "[#{selected_kind_label}]#{@selected_element.try(:marker)}　#{@selected_element.name}" %>
 
   <% element_memo = @selected_element.try(:memo) ||
                     @selected_element.try(:description) ||
                     @selected_element.try(:body) ||
                     @selected_element.try(:content) %>
 
+  <% selected_element_image_url =
+       if @selected_element.respond_to?(:image) && @selected_element.image.present?
+         @selected_element.image.url
+       elsif @selected_element.respond_to?(:story_element_image) && @selected_element.story_element_image&.image.present?
+         @selected_element.story_element_image.image.url
+       end %>
+
+  <% total_event_detail_memos =
+       @events.sum do |event|
+         event.story_event_ideas
+              .joins(:story_elements)
+              .where(story_elements: { id: @selected_element.id })
+              .distinct
+              .count
+       end %>
+
   <% if element_memo.present? %>
-    <div style="margin: 8px 0;">
-      <div><strong>要素メモ（<%= selected_label %>）</strong></div>
-      <%= simple_format(element_memo.to_s) %>
-    </div>
-    <hr>
+    <%= link_to story_story_element_path(@story, @selected_element),
+                style: "display: block; text-decoration: none; color: inherit;" do %>
+      <div style="margin: 16px 0; padding: 16px; border: 1px solid #d8d8d8; border-left: 6px solid #999; border-radius: 12px; background: #f3f3f3;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">選択中の要素メモ</div>
+        <div style="margin-bottom: 8px;"><strong><%= selected_label %></strong></div>
+
+        <div style="margin-bottom: 12px;">
+          <% if selected_element_image_url.present? %>
+            <%= image_tag selected_element_image_url,
+                          style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+          <% else %>
+            <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+              画像なし
+            </div>
+          <% end %>
+        </div>
+
+        <%= simple_format(element_memo.to_s) %>
+      </div>
+    <% end %>
   <% end %>
+
+  <div style="margin: 24px 0 12px 0;">
+    <div style="font-size: 22px; font-weight: bold; margin-bottom: 8px;">検索結果</div>
+    <p style="margin: 0 0 6px 0;">該当イベント数：<strong><%= @events.size %>件</strong></p>
+    <p style="margin: 0;">該当詳細メモ数：<strong><%= total_event_detail_memos %>件</strong></p>
+  </div>
 
   <% if @events.blank? %>
     <p>この要素はどのイベントにも登場していません。</p>
   <% else %>
-    <% @events.each do |event| %>
-      <div style="margin: 16px 0;">
-        <div><strong><%= event.title %></strong></div>
+    <div style="margin: 16px 0;">
+      <% @events.each do |event| %>
+        <% event_detail_memos = event.story_event_ideas
+                                   .joins(:story_elements)
+                                   .where(story_elements: { id: @selected_element.id })
+                                   .distinct
+                                   .order(:position) %>
 
-        <%# ✅ イベント説明（本文） %>
-        <% if event.body.present? %>
-          <div style="margin: 6px 0;">
-            <%= simple_format(truncate(event.body.to_s, length: 160)) %>
+        <% event_image_url =
+             if event.respond_to?(:image) && event.image.present?
+               event.image.url
+             elsif event.respond_to?(:story_event_image) && event.story_event_image&.image.present?
+               event.story_event_image.image.url
+             end %>
+
+        <div style="margin: 0 0 20px 0; padding: 16px; border: 1px solid #ccc; border-radius: 12px; background: #fff;">
+          <div style="font-size: 24px; font-weight: bold; margin-bottom: 12px;">
+            <%= event.title %>
           </div>
-        <% end %>
 
-        <%# ✅ このイベントの詳細メモのうち「選択要素がチェックされているメモだけ」 %>
-        <% ideas = event.story_event_ideas
-                       .joins(:story_elements)
-                       .where(story_elements: { id: @selected_element.id })
-                       .distinct
-                       .order(:position) %>
-
-        <% if ideas.any? %>
-          <div style="margin-top: 8px;">
-            <div><strong>詳細メモ（<%= selected_label %>）</strong></div>
-
-            <% ideas.each do |idea| %>
-              <% memo = idea.try(:memo) || idea.try(:body) || idea.try(:content) || idea.try(:description) %>
-
-              <% if idea.respond_to?(:title) && idea.title.present? %>
-                <div><strong><%= idea.title %></strong></div>
-              <% end %>
-
-              <div style="margin: 6px 0;">
-                <%= simple_format(truncate(memo.to_s, length: 160)) %>
+          <div style="margin-bottom: 16px;">
+            <% if event_image_url.present? %>
+              <%= image_tag event_image_url,
+                            style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+            <% else %>
+              <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+                画像なし
               </div>
-              <hr>
             <% end %>
           </div>
-        <% else %>
-          <div style="margin-top: 8px;">詳細メモ（<%= selected_label %>）：なし</div>
-        <% end %>
 
-        <div style="margin-top: 8px;">
-          登場要素：<%= event.story_elements.map(&:name).join(" / ") %>
-        </div>
+          <div style="font-weight: bold; margin-bottom: 6px;">イベント本文</div>
+          <% if event.body.present? %>
+            <div style="margin-bottom: 16px;">
+              <%= simple_format(truncate(event.body.to_s, length: 160)) %>
+            </div>
+          <% else %>
+            <div style="margin-bottom: 16px;">本文なし</div>
+          <% end %>
 
-        <div style="margin-top: 8px;">
-          <%= link_to "イベント詳細へ", story_story_event_path(@story, event) %>
+          <div style="margin: 30px 0 30px 0;">
+            <%= link_to "イベント詳細へ", story_story_event_path(@story, event) %>
+          </div>
+
+          <div style="font-weight: bold; margin-bottom: 8px;">詳細メモ</div>
+          <% if event_detail_memos.any? %>
+            <% event_detail_memos.each do |event_detail_memo| %>
+              <% memo = event_detail_memo.try(:memo) ||
+                        event_detail_memo.try(:body) ||
+                        event_detail_memo.try(:content) ||
+                        event_detail_memo.try(:description) %>
+
+              <% event_detail_memo_image_url =
+                   if event_detail_memo.respond_to?(:image) && event_detail_memo.image.present?
+                     event_detail_memo.image.url
+                   elsif event_detail_memo.respond_to?(:idea_image) && event_detail_memo.idea_image&.image.present?
+                     event_detail_memo.idea_image.image.url
+                   end %>
+
+              <%= link_to story_story_event_story_event_idea_path(@story, event, event_detail_memo),
+                          style: "display: block; text-decoration: none; color: inherit;" do %>
+                <div style="margin-bottom: 12px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;">
+                  <% if event_detail_memo.title.present? %>
+                    <div style="font-weight: bold; margin-bottom: 6px;"><%= event_detail_memo.title %></div>
+                  <% end %>
+
+                  <div style="margin-bottom: 12px;">
+                    <% if event_detail_memo_image_url.present? %>
+                      <%= image_tag event_detail_memo_image_url,
+                                    style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+                    <% else %>
+                      <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+                        画像なし
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <% if memo.present? %>
+                    <div>
+                      <%= simple_format(truncate(memo.to_s, length: 160)) %>
+                    </div>
+                  <% else %>
+                    <div>本文なし</div>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div style="margin-bottom: 16px;">該当する詳細メモはありません。</div>
+          <% end %>
         </div>
-      </div>
-      <hr>
-    <% end %>
+      <% end %>
+    </div>
   <% end %>
 <% else %>
   <p>要素を選ぶと、登場イベントの時系列が表示されます。</p>
