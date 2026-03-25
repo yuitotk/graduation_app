@@ -14,6 +14,7 @@
         flex-wrap: wrap;
         gap: 8px;
         align-items: center;
+        overflow-x: hidden;
       }
 
       .header-search-input {
@@ -40,11 +41,15 @@
       .header-search-element-filter {
         display: block !important;
         width: 100%;
+        max-width: 100%;
         margin-left: 0 !important;
+        overflow: hidden;
       }
 
       #story_element_select {
-        width: 300px;
+        width: 100% !important;
+        max-width: 100%;
+        min-width: 0;
         box-sizing: border-box;
       }
 
@@ -103,13 +108,12 @@
 
     <hr>
 
-    <!-- 検索UI -->
     <%= form_with url: search_path, method: :get, local: true,
                   class: "header-search-form",
                   data: { controller: "search-autocomplete" } do %>
 
       <%= text_field_tag :q, params[:q],
-                         placeholder: "検索",
+                         placeholder: "アイデア検索（メモ内）",
                          class: "header-search-input",
                          style: "width: 220px;",
                          data: { "search-autocomplete-target": "input",
@@ -129,6 +133,7 @@
                ["すべて", "all"],
                ["ストーリー内", "story"],
                ["イベント内", "event"],
+               ["詳細メモ内", "story_event_idea"],
                ["要素内", "element"]
              ]
            else
@@ -137,6 +142,7 @@
                ["ホーム未所属", "home"],
                ["ストーリー内", "story"],
                ["イベント内", "event"],
+               ["詳細メモ内", "story_event_idea"],
                ["要素内", "element"]
              ]
            end %>
@@ -183,7 +189,7 @@
              (controller_name == "stories" && action_name == "consistency") ||
              (controller_name == "story_events" && action_name == "show") ||
              (controller_name == "story_events" && %w[new edit].include?(action_name)) ||
-             (controller_name == "story_event_ideas" && %w[new edit].include?(action_name)) ||
+             (controller_name == "story_event_ideas" && %w[show new edit].include?(action_name)) ||
              (controller_name == "story_elements" && action_name == "show") ||
              (controller_name == "story_elements" && action_name == "index") ||
              (controller_name == "story_elements" && %w[new edit].include?(action_name)) ||
@@ -215,13 +221,22 @@
       <% end %>
 
       <% if header_story.present? && allow_within_story_toggle %>
+        <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
+        <% kind_order = { "character" => 0, "item" => 1, "setting" => 2 } %>
+
         <% story_element_options =
              [["（要素で絞り込み：なし）", ""]] +
              header_story.story_elements
-                        .order(:kind, :name, :id)
+                        .sort_by { |e|
+                          name = e.name.to_s.strip
+                          normalized_name = name.tr("ァ-ヶ", "ぁ-ゖ")
+                          starts_with_latin = normalized_name.match?(/\A[A-Za-z]/) ? 1 : 0
+                          [kind_order[e.kind.to_s] || 99, starts_with_latin, normalized_name, e.id]
+                        }
                         .map { |e|
-                          label = [e.marker.presence, e.name.presence, e.kind.presence].compact.join(" ")
-                          [label, e.id]
+                          full_label = "[#{kind_labels[e.kind.to_s] || e.kind}]#{e.marker}　#{e.name}"
+                          mobile_label = truncate(full_label, length: 40)
+                          [mobile_label, e.id, { "data-full-label": full_label, "data-mobile-label": mobile_label }]
                         } %>
 
         <span id="story_element_filter_wrapper"
@@ -256,52 +271,69 @@
         const setupSearchHeader = () => {
           const checkbox = document.getElementById("within_story_checkbox");
           const select = document.getElementById("search_scope_select");
-          if (!checkbox || !select) return;
+          const storyElementSelect = document.getElementById("story_element_select");
+          if (!select) return;
 
           const elementWrap = document.getElementById("story_element_filter_wrapper");
-          const elementSelect = document.getElementById("story_element_select");
 
-          if (checkbox.dataset.bound === "1") return;
-          checkbox.dataset.bound = "1";
+          const applyStoryElementOptionLabels = () => {
+            if (!storyElementSelect) return;
 
-          const ensureHomeOption = () => {
-            const exists = Array.from(select.options).some((o) => o.value === "home");
-            if (exists) return;
+            const isMobile = window.innerWidth <= 767;
+            Array.from(storyElementSelect.options).forEach((option) => {
+              const fullLabel = option.dataset.fullLabel;
+              const mobileLabel = option.dataset.mobileLabel;
+              if (!fullLabel || !mobileLabel) return;
 
-            const opt = document.createElement("option");
-            opt.value = "home";
-            opt.textContent = "ホーム未所属";
-
-            const allOpt = Array.from(select.options).find((o) => o.value === "all");
-            if (allOpt && allOpt.nextSibling) {
-              select.insertBefore(opt, allOpt.nextSibling);
-            } else {
-              select.appendChild(opt);
-            }
-          };
-
-          const removeHomeOption = () => {
-            Array.from(select.options).forEach((o) => {
-              if (o.value === "home") o.remove();
+              option.text = isMobile ? mobileLabel : fullLabel;
             });
           };
 
-          const sync = () => {
-            if (checkbox.checked) {
-              if (select.value === "home") select.value = "all";
-              removeHomeOption();
+          if (checkbox && checkbox.dataset.bound !== "1") {
+            checkbox.dataset.bound = "1";
 
-              if (elementWrap) elementWrap.style.display = "inline-block";
-            } else {
-              ensureHomeOption();
+            const ensureHomeOption = () => {
+              const exists = Array.from(select.options).some((o) => o.value === "home");
+              if (exists) return;
 
-              if (elementSelect) elementSelect.value = "";
-              if (elementWrap) elementWrap.style.display = "none";
-            }
-          };
+              const opt = document.createElement("option");
+              opt.value = "home";
+              opt.textContent = "ホーム未所属";
 
-          checkbox.addEventListener("change", sync);
-          sync();
+              const allOpt = Array.from(select.options).find((o) => o.value === "all");
+              if (allOpt && allOpt.nextSibling) {
+                select.insertBefore(opt, allOpt.nextSibling);
+              } else {
+                select.appendChild(opt);
+              }
+            };
+
+            const removeHomeOption = () => {
+              Array.from(select.options).forEach((o) => {
+                if (o.value === "home") o.remove();
+              });
+            };
+
+            const sync = () => {
+              if (checkbox.checked) {
+                if (select.value === "home") select.value = "all";
+                removeHomeOption();
+
+                if (elementWrap) elementWrap.style.display = "inline-block";
+              } else {
+                ensureHomeOption();
+
+                if (storyElementSelect) storyElementSelect.value = "";
+                if (elementWrap) elementWrap.style.display = "none";
+              }
+            };
+
+            checkbox.addEventListener("change", sync);
+            sync();
+          }
+
+          applyStoryElementOptionLabels();
+          window.addEventListener("resize", applyStoryElementOptionLabels);
         };
 
         document.addEventListener("DOMContentLoaded", setupSearchHeader);

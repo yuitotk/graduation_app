@@ -2,9 +2,7 @@
 <h1>検索結果</h1>
 
 <p>
-  <%= link_to "ホームに戻る", ideas_path %>
-  |
-  <%= link_to "ストーリー一覧に戻る", stories_path %>
+  <%= link_to "ストーリー一覧へ", stories_path %>
 </p>
 <hr>
 
@@ -16,7 +14,7 @@
   <li>検索ワード：<%= q.presence || "（未入力）" %></li>
   <li>
     範囲：
-    <%= ({ "all" => "すべて", "home" => "ホーム未所属", "story" => "ストーリー内", "event" => "イベント内", "element" => "要素内" }[scope] || "すべて") %>
+    <%= ({ "all" => "すべて", "home" => "ホーム未所属", "story" => "ストーリー内", "event" => "イベント内", "story_event_idea" => "詳細メモ内", "element" => "要素内" }[scope] || "すべて") %>
   </li>
   <li>
     検索対象：
@@ -28,9 +26,10 @@
   </li>
 
   <li>
-    マーカー：
+    要素：
     <% if @selected_story_element.present? %>
-      <%= @selected_story_element.marker %> <%= @selected_story_element.name %> / <%= @selected_story_element.kind %>
+      <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
+      [<%= kind_labels[@selected_story_element.kind.to_s] || @selected_story_element.kind %>]<%= @selected_story_element.marker %>　<%= @selected_story_element.name %>
     <% else %>
       （なし）
     <% end %>
@@ -52,9 +51,49 @@
        right = [i + k.length + 40, s.length].min
        "…#{s[left...right]}…"
      else
-       s.length > 80 ? "#{s[0, 80]}…" : s
+       s.length > 160 ? "#{s[0, 160]}…" : s
      end
    end %>
+
+<% idea_image_url_for = lambda do |idea|
+     if idea.respond_to?(:image) && idea.image.present?
+       idea.image.url
+     elsif idea.respond_to?(:idea_image) && idea.idea_image&.image.present?
+       idea.idea_image.image.url
+     end
+   end %>
+
+<% render_idea_card = lambda do |idea|
+     idea_image_url = idea_image_url_for.call(idea)
+%>
+  <%= link_to idea_path(idea),
+              style: "display: block; text-decoration: none; color: inherit;" do %>
+    <div style="margin: 0 0 12px 0; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;">
+      <% if idea.title.present? %>
+        <div style="font-weight: bold; margin-bottom: 6px;"><%= idea.title %></div>
+      <% end %>
+
+      <div style="margin-bottom: 12px;">
+        <% if idea_image_url.present? %>
+          <%= image_tag idea_image_url,
+                        style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+        <% else %>
+          <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+            画像なし
+          </div>
+        <% end %>
+      </div>
+
+      <% if idea.memo.present? %>
+        <div>
+          <%= simple_format(snippet_for.call(idea.memo, q)) %>
+        </div>
+      <% else %>
+        <div>本文なし</div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
 
 <% if q.blank? && @story_element_id.blank? %>
   <p>検索ワードを入力して検索してください。</p>
@@ -66,11 +105,12 @@
       <li>ホーム未所属: <%= home_total.call(results[:home] || {}) %> 件</li>
       <li>ストーリー内: <%= pair_total.call(results[:story] || {}) %> 件</li>
       <li>イベント内: <%= pair_total.call(results[:event] || {}) %> 件</li>
+      <li>詳細メモ内: <%= pair_total.call(results[:story_event_idea] || {}) %> 件</li>
       <li>要素内: <%= pair_total.call(results[:element] || {}) %> 件</li>
     </ul>
   <% else %>
     <% label =
-         { "home" => "ホーム未所属", "story" => "ストーリー内", "event" => "イベント内", "element" => "要素内" }[scope] || "すべて" %>
+         { "home" => "ホーム未所属", "story" => "ストーリー内", "event" => "イベント内", "story_event_idea" => "詳細メモ内", "element" => "要素内" }[scope] || "すべて" %>
 
     <% count =
          if scope == "home"
@@ -96,45 +136,33 @@
         <% if created_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>
-          <ul>
+          <div style="margin: 16px 0;">
             <% created_rel.limit(50).each do |idea| %>
-              <li style="margin-bottom: 10px;">
-                <strong><%= idea.title %></strong><br>
-                <small><%= snippet_for.call(idea.memo, q) %></small><br>
-                <%= link_to "詳細", idea_path(idea) %>
-              </li>
+              <% render_idea_card.call(idea) %>
             <% end %>
-          </ul>
+          </div>
         <% end %>
       <% else %>
         <h3>新規作成</h3>
         <% if created_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>
-          <ul>
+          <div style="margin: 16px 0;">
             <% created_rel.limit(50).each do |idea| %>
-              <li style="margin-bottom: 10px;">
-                <strong><%= idea.title %></strong><br>
-                <small><%= snippet_for.call(idea.memo, q) %></small><br>
-                <%= link_to "詳細", idea_path(idea) %>
-              </li>
+              <% render_idea_card.call(idea) %>
             <% end %>
-          </ul>
+          </div>
         <% end %>
 
         <h3>移動</h3>
         <% if moved_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>
-          <ul>
+          <div style="margin: 16px 0;">
             <% moved_rel.limit(50).each do |idea| %>
-              <li style="margin-bottom: 10px;">
-                <strong><%= idea.title %></strong><br>
-                <small><%= snippet_for.call(idea.memo, q) %></small><br>
-                <%= link_to "詳細", idea_path(idea) %>
-              </li>
+              <% render_idea_card.call(idea) %>
             <% end %>
-          </ul>
+          </div>
         <% end %>
       <% end %>
     </section>
@@ -144,6 +172,7 @@
     <% render_category.call("ホーム未所属", :home, is_home: true) %>
     <% render_category.call("ストーリー内", :story) %>
     <% render_category.call("イベント内", :event) %>
+    <% render_category.call("詳細メモ内", :story_event_idea) %>
     <% render_category.call("要素内", :element) %>
   <% elsif scope == "home" %>
     <% render_category.call("ホーム未所属", :home, is_home: true) %>
@@ -151,6 +180,8 @@
     <% render_category.call("ストーリー内", :story) %>
   <% elsif scope == "event" %>
     <% render_category.call("イベント内", :event) %>
+  <% elsif scope == "story_event_idea" %>
+    <% render_category.call("詳細メモ内", :story_event_idea) %>
   <% elsif scope == "element" %>
     <% render_category.call("要素内", :element) %>
   <% end %>

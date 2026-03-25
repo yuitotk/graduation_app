@@ -121,7 +121,7 @@ class SearchController < ApplicationController
     s = scope_param.to_s
     return "all" if s.blank?
 
-    valid = %w[all home story event element]
+    valid = %w[all home story event element story_event_idea]
     return "all" unless valid.include?(s)
 
     s
