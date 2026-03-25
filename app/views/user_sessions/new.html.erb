@@ -1,19 +1,21 @@
 <h1>ログイン</h1>
 
 <%= form_with url: login_path, local: true do |f| %>
-  <div>
+  <div style="margin-bottom: 16px;">
     <%= f.label :email, "メールアドレス" %><br>
-    <%= f.email_field :email %>
+    <%= f.email_field :email, maxlength: 150, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
-  <div>
-    <%= f.label :password, "パスワード" %><br>
-    <%= f.password_field :password %>
+  <div style="margin-bottom: 40px;">
+    <%= f.label :password, "パスワード（8文字以上72文字以下で入力してください）" %><br>
+    <%= f.password_field :password, minlength: 8, maxlength: 72, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
-  <div>
-    <%= f.submit "ログイン" %>
+  <div style="margin-bottom: 4em;">
+    <%= f.submit "ログイン", style: "padding: 10px 20px;" %>
   </div>
 <% end %>
 
-<%= link_to "パスワードを忘れた方はこちら", new_password_reset_path %>
+<p>
+  <%= link_to "パスワードを忘れた方はこちら", new_password_reset_path %>
+</p>

@@ -1,14 +1,36 @@
 <h1>お問い合わせ確認</h1>
 
-<p>名前：<%= @inquiry.name %></p>
-<p>メール：<%= @inquiry.email %></p>
-<p>本文：<%= simple_format(@inquiry.body) %></p>
+<div style="margin-bottom: 16px;">
+  <strong>名前</strong>
+  <div style="width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; background-color: #f8f8f8;">
+    <%= @inquiry.name %>
+  </div>
+</div>
+
+<div style="margin-bottom: 16px;">
+  <strong>メール</strong>
+  <div style="width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; background-color: #f8f8f8;">
+    <%= @inquiry.email %>
+  </div>
+</div>
+
+<div style="margin-bottom: 16px;">
+  <strong>本文</strong>
+  <div style="width: 100%; max-width: 720px; min-height: 420px; padding: 12px; box-sizing: border-box; border: 1px solid #ccc; background-color: #f8f8f8; white-space: pre-wrap;">
+    <%= @inquiry.body %>
+  </div>
+</div>
 
 <%= form_with model: @inquiry, url: inquiries_path, method: :post, data: { turbo: false } do |f| %>
   <%= f.hidden_field :name %>
   <%= f.hidden_field :email %>
   <%= f.hidden_field :body %>
-  <%= f.submit "送信する" %>
-<% end %>
 
-<p><a href="javascript:history.back()">戻る</a></p>
+  <p style="margin-bottom: 6em;">
+    <a href="javascript:history.back()">入力画面へ</a>
+  </p>
+
+  <div style="margin-bottom: 16px;">
+    <%= f.submit "送信する", style: "padding: 10px 20px;" %>
+  </div>
+<% end %>
