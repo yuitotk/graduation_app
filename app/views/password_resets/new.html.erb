@@ -1,12 +1,12 @@
 <h1>パスワード再設定</h1>
 
 <%= form_with url: password_resets_path do |f| %>
-  <div>
+  <div style="margin-bottom: 3em;">
     <%= f.label :email, "メールアドレス" %><br>
-    <%= f.email_field :email, required: true %>
+    <%= f.email_field :email, required: true, maxlength: 150, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
   <div>
-    <%= f.submit "送信" %>
+    <%= f.submit "送信", style: "padding: 10px 20px;" %>
   </div>
 <% end %>

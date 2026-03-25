@@ -9,20 +9,20 @@
 <% end %>
 
 <%= form_with model: @inquiry, url: confirm_inquiries_path, method: :post, data: { turbo: false } do |f| %>
-  <div>
+  <div style="margin-bottom: 16px;">
     <%= f.label :name, "名前" %><br>
-    <%= f.text_field :name %>
+    <%= f.text_field :name, maxlength: 50, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
-  <div>
+  <div style="margin-bottom: 16px;">
     <%= f.label :email, "メール" %><br>
-    <%= f.email_field :email %>
+    <%= f.email_field :email, maxlength: 150, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
-  <div>
+  <div style="margin-bottom: 16px;">
     <%= f.label :body, "本文" %><br>
-    <%= f.text_area :body, rows: 8 %>
+    <%= f.text_area :body, rows: 28, maxlength: 2000, style: "width: 100%; max-width: 720px; padding: 12px; box-sizing: border-box;" %>
   </div>
 
-  <%= f.submit "確認へ" %>
+  <%= f.submit "確認へ", style: "padding: 10px 20px;" %>
 <% end %>
