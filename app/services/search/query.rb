@@ -1,7 +1,7 @@
-# app/services/search/query.rb
 module Search
+  # rubocop:disable Metrics/ClassLength
   class Query
-    VALID_SCOPES = %w[all home story event element].freeze
+    VALID_SCOPES = %w[all home story event element story_event_idea].freeze
 
     # rubocop:disable Naming/MethodParameterName
     def initialize(q:, scope:, story_id:, story_element_id:, user:)
@@ -17,16 +17,18 @@ module Search
       return {} if @q.blank? && @story_element_id.blank?
 
       case @scope
-      when "home"    then { home: build_home }
-      when "story"   then { story: build_story }
-      when "event"   then { event: build_event }
-      when "element" then { element: build_element }
+      when "home"             then { home: build_home }
+      when "story"            then { story: build_story }
+      when "event"            then { event: build_event }
+      when "element"          then { element: build_element }
+      when "story_event_idea" then { story_event_idea: build_story_event_idea }
       else
         {
           home: build_home,
           story: build_story,
           event: build_event,
-          element: build_element
+          element: build_element,
+          story_event_idea: build_story_event_idea
         }
       end
     end
@@ -123,8 +125,26 @@ module Search
       split_created_moved(rel)
     end
 
+    def build_story_event_idea
+      rel =
+        apply_text_search(base_ideas)
+        .joins(:idea_placement)
+        .where(idea_placements: { placeable_type: "StoryEventIdea" })
+
+      if @story_id.present?
+        rel = rel.joins("INNER JOIN story_event_ideas ON story_event_ideas.id = idea_placements.placeable_id")
+                 .joins("INNER JOIN story_events ON story_events.id = story_event_ideas.story_event_id")
+                 .where(story_events: { story_id: @story_id })
+      end
+
+      rel = apply_story_element_filter(rel)
+      rel = rel.order(created_at: :desc)
+      split_created_moved(rel)
+    end
+
     def empty_pair
       { created_here: Idea.none, moved: Idea.none }
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

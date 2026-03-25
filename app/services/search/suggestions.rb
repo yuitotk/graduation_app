@@ -1,7 +1,7 @@
-# app/services/search/suggestions.rb
 module Search
+  # rubocop:disable Metrics/ClassLength
   class Suggestions
-    VALID_SCOPES = %w[all home story event element].freeze
+    VALID_SCOPES = %w[all home story event element story_event_idea].freeze
     LIMIT = 10
 
     # rubocop:disable Naming/MethodParameterName
@@ -15,22 +15,24 @@ module Search
     # rubocop:enable Naming/MethodParameterName
 
     # 候補は title のみ
-    # 返り値: { home: [...], story: [...], event: [...], element: [...] }
+    # 返り値: { home: [...], story: [...], event: [...], element: [...], story_event_idea: [...] }
     # scopeが特定なら、そのカテゴリだけ返す
     def call
       return {} if @q.blank?
 
       case @scope
-      when "home"    then { home: build_home }
-      when "story"   then { story: build_story }
-      when "event"   then { event: build_event }
-      when "element" then { element: build_element }
+      when "home"             then { home: build_home }
+      when "story"            then { story: build_story }
+      when "event"            then { event: build_event }
+      when "element"          then { element: build_element }
+      when "story_event_idea" then { story_event_idea: build_story_event_idea }
       else
         {
           home: build_home,
           story: build_story,
           event: build_event,
-          element: build_element
+          element: build_element,
+          story_event_idea: build_story_event_idea
         }
       end
     end
@@ -48,7 +50,6 @@ module Search
       Idea.where(user_id: @user.id)
     end
 
-    # 候補：titleのみ
     def apply_title_search(rel)
       like = "%#{ActiveRecord::Base.sanitize_sql_like(@q)}%"
       rel.where("ideas.title LIKE :q", q: like)
@@ -62,7 +63,6 @@ module Search
          .distinct
     end
 
-    # MySQL対応：title重複を潰しつつ、最新順で返す
     def select_titles(rel)
       rel.group("ideas.title")
          .order(Arel.sql("MAX(ideas.created_at) DESC"))
@@ -70,8 +70,6 @@ module Search
          .pluck("ideas.title")
     end
 
-    # ホーム未所属：idea_placement が無い
-    # ※「この作品内」ON（= story_id指定）のときはホームは対象外なので空
     def build_home
       return [] if @story_id.present?
       return [] if @story_element_id.present?
@@ -83,7 +81,6 @@ module Search
       select_titles(rel)
     end
 
-    # ストーリー内：placeable_type=Story
     def build_story
       rel =
         apply_title_search(base_ideas)
@@ -95,8 +92,6 @@ module Search
       select_titles(rel)
     end
 
-    # イベント内：placeable_type=StoryEvent
-    # 「この作品内」ONなら story_events.story_id で絞る
     def build_event
       rel =
         apply_title_search(base_ideas)
@@ -112,8 +107,6 @@ module Search
       select_titles(rel)
     end
 
-    # 要素内：placeable_type=StoryElement
-    # 「この作品内」ONなら story_elements.story_id で絞る
     def build_element
       rel =
         apply_title_search(base_ideas)
@@ -128,5 +121,22 @@ module Search
       rel = apply_story_element_filter(rel)
       select_titles(rel)
     end
+
+    def build_story_event_idea
+      rel =
+        apply_title_search(base_ideas)
+        .joins(:idea_placement)
+        .where(idea_placements: { placeable_type: "StoryEventIdea" })
+
+      if @story_id.present?
+        rel = rel.joins("INNER JOIN story_event_ideas ON story_event_ideas.id = idea_placements.placeable_id")
+                 .joins("INNER JOIN story_events ON story_events.id = story_event_ideas.story_event_id")
+                 .where(story_events: { story_id: @story_id })
+      end
+
+      rel = apply_story_element_filter(rel)
+      select_titles(rel)
+    end
   end
+  # rubocop:enable Metrics/ClassLength
 end
