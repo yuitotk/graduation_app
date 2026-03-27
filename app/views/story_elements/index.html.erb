@@ -1,3 +1,5 @@
+<%= render "shared/breadcrumbs", items: @breadcrumbs %>
+
 <%= link_to "ストーリー詳細へ戻る", story_path(@story) %>
 
 <h1>要素一覧</h1>
@@ -20,7 +22,6 @@
       <li>
         <%= link_to "#{e.marker.present? ? "#{e.marker}　" : ""}#{e.name}",
                     story_story_element_path(@story, e) %>
-        <%# 削除は編集画面だけにしたいので、ここでは出さない %>
       </li>
     <% end %>
   </ul>

@@ -3,6 +3,7 @@ class StoryElementsController < ApplicationController
   before_action :set_story
   before_action :set_story_element, only: %i[show edit update destroy]
   before_action :sync_search_story_session, only: %i[index show new edit]
+  before_action :set_breadcrumbs, only: %i[index show new edit]
 
   def index
     @story_elements = @story.story_elements.order(:id)
@@ -40,6 +41,10 @@ class StoryElementsController < ApplicationController
     if @story_element.save
       redirect_to story_story_elements_path(@story), notice: t(".success")
     else
+      @breadcrumbs = [
+        { name: @story.title, path: story_path(@story) },
+        { name: "要素一覧", path: nil }
+      ]
       render :new, status: :unprocessable_entity
     end
   end
@@ -49,6 +54,11 @@ class StoryElementsController < ApplicationController
       redirect_to story_story_element_path(@story, @story_element), notice: t(".success")
     else
       @story_element.build_story_element_image if @story_element.story_element_image.nil?
+      @breadcrumbs = [
+        { name: @story.title, path: story_path(@story) },
+        { name: "要素一覧", path: story_story_elements_path(@story) },
+        { name: @story_element.name, path: nil }
+      ]
       render :edit, status: :unprocessable_entity
     end
   end
@@ -66,6 +76,25 @@ class StoryElementsController < ApplicationController
 
   def set_story_element
     @story_element = @story.story_elements.find(params[:id])
+  end
+
+  def set_breadcrumbs
+    @breadcrumbs =
+      case action_name
+      when "index", "new"
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: "要素一覧", path: nil }
+        ]
+      when "show", "edit"
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: "要素一覧", path: story_story_elements_path(@story) },
+          { name: @story_element.name, path: nil }
+        ]
+      else
+        []
+      end
   end
 
   # ✅ ストーリー配下に入ったら「この作品」を session に固定

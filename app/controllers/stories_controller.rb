@@ -3,6 +3,7 @@ class StoriesController < ApplicationController
   before_action :require_login
   before_action :set_story, only: %i[show edit update destroy consistency]
   before_action :sync_search_story_session, only: %i[show consistency]
+  before_action :set_breadcrumbs, only: %i[show edit consistency]
 
   def index
     @stories = current_user.stories.order(:position, created_at: :desc)
@@ -15,15 +16,13 @@ class StoriesController < ApplicationController
 
     base =
       @story.placed_ideas
-            .includes(idea_placement: :story_elements) # ✅ 複数マーカー表示用
+            .includes(idea_placement: :story_elements)
             .joins(:idea_placement)
             .order(created_at: :desc)
 
-    # このストーリー内で「ここで新規作成」されたアイデア（created_here: true）
     @created_here_ideas =
       base.where(idea_placements: { created_here: true })
 
-    # 「ここに移動したアイデア」（created_here: false）
     @moved_ideas =
       base.where(idea_placements: { created_here: false })
   end
@@ -134,6 +133,23 @@ class StoriesController < ApplicationController
 
   def set_story
     @story = current_user.stories.find(params[:id])
+  end
+
+  def set_breadcrumbs
+    @breadcrumbs =
+      case action_name
+      when "show", "edit"
+        [
+          { name: @story.title, path: nil }
+        ]
+      when "consistency"
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: "整合性チェック", path: nil }
+        ]
+      else
+        []
+      end
   end
 
   # ✅ ストーリー配下に入ったら「この作品」を session に固定

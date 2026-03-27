@@ -1,5 +1,7 @@
+# rubocop:disable Metrics/ClassLength
 class RandomWordsController < ApplicationController
   before_action :require_login
+  before_action :set_breadcrumbs, only: %i[pick]
 
   def pick
     return render_not_enough_words if RandomWord.noun.count < 1 || RandomWord.verb.count < 1
@@ -10,6 +12,74 @@ class RandomWordsController < ApplicationController
   end
 
   private
+
+  def set_breadcrumbs
+    placeable = find_placeable_for_current_user(params[:placeable_type], params[:placeable_id])
+    @breadcrumbs = breadcrumb_items_for_placeable(placeable)
+  end
+
+  def breadcrumb_items_for_placeable(placeable)
+    case placeable
+    when Story
+      story_breadcrumbs(placeable)
+    when StoryEvent
+      story_event_breadcrumbs(placeable)
+    when StoryEventIdea
+      story_event_idea_breadcrumbs(placeable)
+    when StoryElement
+      story_element_breadcrumbs(placeable)
+    else
+      []
+    end
+  end
+
+  def story_breadcrumbs(story)
+    [
+      { name: story.title, path: nil }
+    ]
+  end
+
+  def story_event_breadcrumbs(story_event)
+    story = story_event.story
+    [
+      { name: story.title, path: story_path(story) },
+      { name: story_event.title, path: nil }
+    ]
+  end
+
+  def story_event_idea_breadcrumbs(story_event_idea)
+    story_event = story_event_idea.story_event
+    story = story_event.story
+
+    [
+      { name: story.title, path: story_path(story) },
+      { name: story_event.title, path: story_story_event_path(story, story_event) },
+      { name: story_event_idea.title, path: nil }
+    ]
+  end
+
+  def story_element_breadcrumbs(story_element)
+    story = story_element.story
+
+    [
+      { name: story.title, path: story_path(story) },
+      { name: "要素一覧", path: story_story_elements_path(story) },
+      { name: story_element.name, path: nil }
+    ]
+  end
+
+  def find_placeable_for_current_user(type, id)
+    case type.to_s
+    when "Story"
+      current_user.stories.find_by(id: id)
+    when "StoryEvent"
+      StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
+    when "StoryElement"
+      StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
+    when "StoryEventIdea"
+      StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: id)
+    end
+  end
 
   def render_not_enough_words
     @message = "名詞と動詞の辞書ワードがそれぞれ1件以上必要です。seedを追加してください。"
@@ -62,3 +132,4 @@ class RandomWordsController < ApplicationController
     %w[noun verb].include?(value) ? value : "noun"
   end
 end
+# rubocop:enable Metrics/ClassLength

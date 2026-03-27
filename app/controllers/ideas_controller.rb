@@ -5,6 +5,8 @@ class IdeasController < ApplicationController
   before_action :sync_search_story_context_from_placeable, only: %i[new create]
   before_action :set_idea, only: %i[show edit update destroy]
   before_action :sync_search_story_context_from_idea, only: %i[show edit update]
+  before_action :set_breadcrumbs_for_new, only: %i[new]
+  before_action :set_breadcrumbs_for_existing_idea, only: %i[show edit]
 
   def index
     @ideas = current_user.ideas
@@ -41,7 +43,7 @@ class IdeasController < ApplicationController
     set_available_story_elements
   end
 
-  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def create
     @idea = current_user.ideas.new(idea_params)
     @idea.build_idea_image if @idea.idea_image.nil?
@@ -64,10 +66,12 @@ class IdeasController < ApplicationController
     else
       @idea.build_idea_image if @idea.idea_image.nil?
       set_available_story_elements
+      placeable = find_placeable_for_current_user(pt || params[:placeable_type], pid || params[:placeable_id])
+      assign_breadcrumbs_from_placeable(placeable)
       render :new, status: :unprocessable_entity
     end
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/PerceivedComplexity
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def edit
     @idea.build_idea_image if @idea.idea_image.nil?
@@ -79,6 +83,7 @@ class IdeasController < ApplicationController
     end
   end
 
+  # rubocop:disable Metrics/AbcSize
   def update
     filtered_params = idea_params
     filtered_params = filtered_params.except(:idea_placement_attributes) if @idea.idea_placement.blank?
@@ -99,9 +104,11 @@ class IdeasController < ApplicationController
         @available_story_elements = []
       end
 
+      set_breadcrumbs_for_existing_idea
       render :edit, status: :unprocessable_entity
     end
   end
+  # rubocop:enable Metrics/AbcSize
 
   # rubocop:disable Metrics/AbcSize
   def destroy
@@ -129,6 +136,70 @@ class IdeasController < ApplicationController
   # rubocop:enable Metrics/AbcSize
 
   private
+
+  def set_breadcrumbs_for_new
+    placeable = find_placeable_for_current_user(params[:placeable_type], params[:placeable_id])
+    assign_breadcrumbs_from_placeable(placeable)
+  end
+
+  def set_breadcrumbs_for_existing_idea
+    placeable = @idea.idea_placement&.placeable
+    assign_breadcrumbs_from_placeable(placeable)
+  end
+
+  def assign_breadcrumbs_from_placeable(placeable)
+    @breadcrumbs = breadcrumb_items_for_placeable(placeable)
+  end
+
+  def breadcrumb_items_for_placeable(placeable)
+    case placeable
+    when Story
+      story_breadcrumbs(placeable)
+    when StoryEvent
+      story_event_breadcrumbs(placeable)
+    when StoryEventIdea
+      story_event_idea_breadcrumbs(placeable)
+    when StoryElement
+      story_element_breadcrumbs(placeable)
+    else
+      []
+    end
+  end
+
+  def story_breadcrumbs(story)
+    [
+      { name: story.title, path: nil }
+    ]
+  end
+
+  def story_event_breadcrumbs(story_event)
+    story = story_event.story
+    [
+      { name: story.title, path: story_path(story) },
+      { name: story_event.title, path: nil }
+    ]
+  end
+
+  def story_event_idea_breadcrumbs(story_event_idea)
+    story_event = story_event_idea.story_event
+    story = story_event.story
+
+    [
+      { name: story.title, path: story_path(story) },
+      { name: story_event.title, path: story_story_event_path(story, story_event) },
+      { name: story_event_idea.title, path: nil }
+    ]
+  end
+
+  def story_element_breadcrumbs(story_element)
+    story = story_element.story
+
+    [
+      { name: story.title, path: story_path(story) },
+      { name: "要素一覧", path: story_story_elements_path(story) },
+      { name: story_element.name, path: nil }
+    ]
+  end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def sync_search_story_context_from_placeable

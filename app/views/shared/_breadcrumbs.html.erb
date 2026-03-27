@@ -1,0 +1,92 @@
+<% return if items.blank? %>
+
+<nav class="breadcrumbs" aria-label="パンくず">
+  <ol class="breadcrumbs__list">
+    <% items.each_with_index do |item, index| %>
+      <% last_item = index == items.size - 1 %>
+
+      <li class="breadcrumbs__item">
+        <% if last_item %>
+          <span
+            class="breadcrumbs__current"
+            aria-current="page"
+            title="<%= item[:name] %>"
+          >
+            <%= item[:name] %>
+          </span>
+        <% else %>
+          <%= link_to item[:name], item[:path], class: "breadcrumbs__link", title: item[:name] %>
+        <% end %>
+
+        <% unless last_item %>
+          <span class="breadcrumbs__separator" aria-hidden="true">＞</span>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs {
+    margin: 8px 0 10px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .breadcrumbs__item {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .breadcrumbs__link,
+  .breadcrumbs__current {
+    display: inline-block;
+    max-width: 18ch;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+  }
+
+  .breadcrumbs__link {
+    color: #0d6efd;
+    text-decoration: none;
+  }
+
+  .breadcrumbs__link:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumbs__current {
+    color: #555;
+  }
+
+  .breadcrumbs__separator {
+    margin: 0 2px;
+    color: #888;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    .breadcrumbs {
+      font-size: 11px;
+    }
+
+    .breadcrumbs__link,
+    .breadcrumbs__current {
+      max-width: 12ch;
+    }
+  }
+</style>

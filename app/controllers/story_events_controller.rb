@@ -1,9 +1,11 @@
+# rubocop:disable Metrics/ClassLength
 # app/controllers/story_events_controller.rb
 class StoryEventsController < ApplicationController
   before_action :require_login
   before_action :set_story
   before_action :set_story_event, only: %i[show edit update destroy move_up move_down]
   before_action :sync_search_story_session, only: %i[show new edit]
+  before_action :set_breadcrumbs, only: %i[show new edit]
 
   def show
     @current_story = @story
@@ -39,6 +41,9 @@ class StoryEventsController < ApplicationController
       redirect_to story_path(@story), notice: t(".success")
     else
       @story_event.build_story_event_image if @story_event.story_event_image.nil?
+      @breadcrumbs = [
+        { name: @story.title, path: nil }
+      ]
       render :new, status: :unprocessable_entity
     end
   end
@@ -48,6 +53,10 @@ class StoryEventsController < ApplicationController
       redirect_to story_story_event_path(@story, @story_event), notice: t(".success")
     else
       @story_event.build_story_event_image if @story_event.story_event_image.nil?
+      @breadcrumbs = [
+        { name: @story.title, path: story_path(@story) },
+        { name: @story_event.title, path: nil }
+      ]
       render :edit, status: :unprocessable_entity
     end
   end
@@ -95,6 +104,23 @@ class StoryEventsController < ApplicationController
                          .find(params[:id])
   end
 
+  def set_breadcrumbs
+    @breadcrumbs =
+      case action_name
+      when "show", "edit"
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: @story_event.title, path: nil }
+        ]
+      when "new"
+        [
+          { name: @story.title, path: nil }
+        ]
+      else
+        []
+      end
+  end
+
   # ✅ ストーリー配下に入ったら「この作品」を session に固定
   def sync_search_story_session
     session[:search_story_id] = @story.id
@@ -121,3 +147,4 @@ class StoryEventsController < ApplicationController
     (story.story_events.maximum(:position) || 0) + 10
   end
 end
+# rubocop:enable Metrics/ClassLength

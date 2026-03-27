@@ -1,3 +1,5 @@
+<%= render "shared/breadcrumbs", items: @breadcrumbs %>
+
 <p><%= link_to "戻る", story_path(@story) %></p>
 <h1>ストーリー編集</h1>
 <%= render "form", story: @story %>

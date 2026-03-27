@@ -1,17 +1,25 @@
 <h1>パスワード再設定</h1>
 
 <%= form_with model: @user, url: password_reset_path(@token), method: :patch do |f| %>
-  <div>
-    <%= f.label :password, "新しいパスワード" %><br>
-    <%= f.password_field :password, required: true %>
+  <div style="margin-bottom: 16px;">
+    <%= f.label :password, "新しいパスワード（8文字以上72文字以下で入力してください）" %><br>
+    <%= f.password_field :password,
+                         required: true,
+                         minlength: 8,
+                         maxlength: 72,
+                         style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
-  <div>
+  <div style="margin-bottom: 40px;">
     <%= f.label :password_confirmation, "新しいパスワード（確認）" %><br>
-    <%= f.password_field :password_confirmation, required: true %>
+    <%= f.password_field :password_confirmation,
+                         required: true,
+                         minlength: 8,
+                         maxlength: 72,
+                         style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
-  <div>
-    <%= f.submit "更新する" %>
+  <div style="margin-bottom: 4em;">
+    <%= f.submit "更新する", style: "padding: 10px 20px;" %>
   </div>
 <% end %>
