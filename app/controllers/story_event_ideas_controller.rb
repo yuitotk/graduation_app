@@ -1,8 +1,10 @@
+# rubocop:disable Metrics/ClassLength
 # app/controllers/story_event_ideas_controller.rb
 class StoryEventIdeasController < ApplicationController
   before_action :require_login
   before_action :set_story_and_event
   before_action :set_story_event_idea, only: %i[show edit update destroy move_up move_down]
+  before_action :set_breadcrumbs, only: %i[show new edit]
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def show
@@ -49,6 +51,10 @@ class StoryEventIdeasController < ApplicationController
     if @story_event_idea.save
       redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.created")
     else
+      @breadcrumbs = [
+        { name: @story.title, path: story_path(@story) },
+        { name: @story_event.title, path: nil }
+      ]
       render :new, status: :unprocessable_entity
     end
   end
@@ -58,6 +64,11 @@ class StoryEventIdeasController < ApplicationController
       redirect_to story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
                   notice: t("flash.story_event_ideas.updated")
     else
+      @breadcrumbs = [
+        { name: @story.title, path: story_path(@story) },
+        { name: @story_event.title, path: story_story_event_path(@story, @story_event) },
+        { name: @story_event_idea.title, path: nil }
+      ]
       render :edit, status: :unprocessable_entity
     end
   end
@@ -102,9 +113,28 @@ class StoryEventIdeasController < ApplicationController
                                     .find(params[:id])
   end
 
+  def set_breadcrumbs
+    @breadcrumbs =
+      case action_name
+      when "show", "edit"
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: @story_event.title, path: story_story_event_path(@story, @story_event) },
+          { name: @story_event_idea.title, path: nil }
+        ]
+      when "new"
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: @story_event.title, path: nil }
+        ]
+      else
+        []
+      end
+  end
+
   def story_event_idea_params
     params.require(:story_event_idea).permit(
-      :title, :memo, :image, :position,
+      :title, :memo, :image, :remove_image, :position,
       :idea_id,
       story_element_ids: []
     )
@@ -122,3 +152,4 @@ class StoryEventIdeasController < ApplicationController
     (story_event.story_event_ideas.maximum(:position) || 0) + 10
   end
 end
+# rubocop:enable Metrics/ClassLength

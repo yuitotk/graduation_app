@@ -40,6 +40,13 @@
       <div style="margin-top: 8px;">
         <%= image_tag @story_event_idea.image.url, style: "max-width: 320px; height: auto;" %>
       </div>
+
+      <div style="margin-top: 8px;">
+        <label>
+          <%= f.check_box :remove_image %>
+          画像を消す（詳細メモの更新により反映されます。）
+        </label>
+      </div>
     <% end %>
   </div>
 

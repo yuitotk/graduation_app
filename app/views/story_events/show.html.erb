@@ -1,5 +1,7 @@
+<%= render "shared/breadcrumbs", items: @breadcrumbs %>
+
 <p>
-  <%= link_to "ストーリー詳細へ戻る", story_path(@story) %> 
+  <%= link_to "ストーリー詳細へ戻る", story_path(@story) %>
 </p>
 
 <h1><%= @story_event.title %></h1>
