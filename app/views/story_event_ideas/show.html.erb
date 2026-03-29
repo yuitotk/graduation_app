@@ -4,6 +4,10 @@
   <%= link_to "イベント詳細へ戻る", story_story_event_path(@story, @story_event) %>
 </p>
 
+<h1>詳細メモ詳細ページ</h1>
+
+<hr>
+
 <h1><%= @story_event_idea.title %></h1>
 
 <h4>詳細メモの登場要素</h4>
@@ -36,8 +40,8 @@
 
 <% if @story_event_idea.image.present? %>
   <h4>画像</h4>
-  <div>
-    <%= image_tag @story_event_idea.image.url, style: "max-width: 100%; height: auto;" %>
+  <div style="margin-top: 16px;">
+    <%= image_tag @story_event_idea.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
   </div>
 <% end %>
 

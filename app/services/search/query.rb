@@ -55,8 +55,8 @@ module Search
 
     def split_created_moved(rel)
       {
-        created_here: rel.where(idea_placements: { created_here: true }),
-        moved: rel.where(idea_placements: { created_here: false })
+        created_here: rel.where(idea_placements: { created_here: true }).order("ideas.created_at DESC, ideas.id DESC"),
+        moved: rel.where(idea_placements: { created_here: false }).order("idea_placements.moved_at DESC, ideas.id DESC")
       }
     end
 
@@ -65,7 +65,6 @@ module Search
 
       rel.joins(idea_placement: :idea_placement_elements)
          .where(idea_placement_elements: { story_element_id: @story_element_id })
-         .distinct
     end
 
     def build_home
@@ -88,7 +87,6 @@ module Search
 
       rel = rel.where(idea_placements: { placeable_id: @story_id }) if @story_id.present?
       rel = apply_story_element_filter(rel)
-      rel = rel.order(created_at: :desc)
 
       split_created_moved(rel)
     end
@@ -105,7 +103,6 @@ module Search
       end
 
       rel = apply_story_element_filter(rel)
-      rel = rel.order(created_at: :desc)
       split_created_moved(rel)
     end
 
@@ -121,7 +118,6 @@ module Search
       end
 
       rel = apply_story_element_filter(rel)
-      rel = rel.order(created_at: :desc)
       split_created_moved(rel)
     end
 
@@ -138,7 +134,6 @@ module Search
       end
 
       rel = apply_story_element_filter(rel)
-      rel = rel.order(created_at: :desc)
       split_created_moved(rel)
     end
 

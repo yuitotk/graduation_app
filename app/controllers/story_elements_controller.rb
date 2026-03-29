@@ -22,7 +22,7 @@ class StoryElementsController < ApplicationController
       @story_element.placed_ideas
                     .joins(:idea_placement)
                     .where(idea_placements: { created_here: false })
-                    .order(created_at: :desc)
+                    .order("idea_placements.moved_at DESC")
   end
 
   def new

@@ -1,5 +1,40 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
+<style>
+  .move-text-sp {
+    display: none;
+  }
+
+  .move-breadcrumb-sep {
+    white-space: pre;
+  }
+
+  .move-destination-label {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  @media (max-width: 767px) {
+    .move-text-pc {
+      display: none;
+    }
+
+    .move-text-sp {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .move-text-pc {
+      display: inline;
+    }
+
+    .move-text-sp {
+      display: none;
+    }
+  }
+</style>
+
 <% placement = @idea.idea_placement %>
 
 <%
@@ -31,9 +66,128 @@
     back_label = "ホームに戻る"
     back_path  = ideas_path
   end
+
+  page_context_title =
+    case placement&.placeable
+    when Story
+      "ストーリー内アイデア"
+    when StoryEvent
+      "イベント内アイデア"
+    when StoryElement
+      "要素内アイデア"
+    when StoryEventIdea
+      "詳細メモ内アイデア"
+    else
+      "ホーム内アイデア"
+    end
+
+  current_story =
+    case placement&.placeable
+    when Story
+      placement.placeable
+    when StoryEvent
+      placement.placeable.story
+    when StoryElement
+      placement.placeable.story
+    when StoryEventIdea
+      placement.placeable.story_event.story
+    end
+
+  normalize_for_sort = lambda do |text|
+    text.to_s.unicode_normalize(:nfkc).tr("ァ-ン", "ぁ-ん").downcase
+  end
+
+  truncate_for_pc = lambda do |text|
+    text = text.to_s
+    text.length > 18 ? "#{text.first(18)}..." : text
+  end
+
+  truncate_for_mobile = lambda do |text|
+    text = text.to_s
+    text.length > 12 ? "#{text.first(12)}..." : text
+  end
+
+  responsive_text = lambda do |text|
+    safe_join([
+      content_tag(:span, truncate_for_pc.call(text), class: "move-text-pc"),
+      content_tag(:span, truncate_for_mobile.call(text), class: "move-text-sp")
+    ])
+  end
+
+  breadcrumb_label = lambda do |parts|
+    compact_parts = parts.compact
+    nodes = []
+
+    compact_parts.each_with_index do |part, idx|
+      nodes << responsive_text.call(part)
+      nodes << content_tag(:span, " ＞ ", class: "move-breadcrumb-sep") unless idx == compact_parts.size - 1
+    end
+
+    safe_join(nodes)
+  end
+
+  summary_label = lambda do |story, count|
+    safe_join([
+      responsive_text.call(story&.title),
+      content_tag(:span, "（#{count}）")
+    ])
+  end
+
+  story_sort_key = lambda do |story|
+    normalized_title = normalize_for_sort.call(story&.title)
+
+    group =
+      if normalized_title.match?(/\A[ぁ-ん]/)
+        0
+      elsif normalized_title.match?(/\A[a-z]/)
+        1
+      else
+        2
+      end
+
+    [group, normalized_title, story&.id.to_i]
+  end
+
+  element_name_sort_key = lambda do |element|
+    normalized_name = normalize_for_sort.call(element&.name)
+
+    group =
+      if normalized_name.match?(/\A[ぁ-ん]/)
+        0
+      elsif normalized_name.match?(/\A[a-z]/)
+        1
+      else
+        2
+      end
+
+    [group, normalized_name, element&.id.to_i]
+  end
+
+  event_sort_key = lambda do |event|
+    [
+      story_sort_key.call(event&.story),
+      event&.position.to_i,
+      event&.created_at,
+      event&.id.to_i
+    ]
+  end
+
+  event_idea_sort_key = lambda do |event_idea|
+    [
+      story_sort_key.call(event_idea&.story_event&.story),
+      event_idea&.story_event&.position.to_i,
+      event_idea&.position.to_i,
+      event_idea&.created_at,
+      event_idea&.id.to_i
+    ]
+  end
 %>
 
 <p><%= link_to back_label, back_path %></p>
+
+<h1><%= page_context_title %></h1>
+
+<hr>
 
 <h1><%= @idea.title %></h1>
 
@@ -78,8 +232,8 @@
 <% end %>
 
 <% if @idea.idea_image&.image? %>
-  <div>
-    <%= image_tag @idea.idea_image.image.url, style: "max-width: 100%; height: auto;" %>
+  <div style="margin-top: 16px;">
+    <%= image_tag @idea.idea_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
   </div>
 <% end %>
 
@@ -99,13 +253,13 @@
 
 <% tab = params[:tab].presence || @tab %>
 
-<h3>このアイデアどこへ移動する？（まず4つから選ぶ）</h3>
+<h2>このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
 <ul>
   <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories") %></li>
-  <li><%= link_to "イベント詳細（メモ一覧）ページへ", idea_path(@idea, tab: "events") %></li>
+  <li><%= link_to "イベント詳細ページへ", idea_path(@idea, tab: "events") %></li>
   <li><%= link_to "詳細メモ詳細ページへ", idea_path(@idea, tab: "event_ideas") %></li>
-  <li><%= link_to "キャラ（要素）詳細ページへ", idea_path(@idea, tab: "elements") %></li>
+  <li><%= link_to "要素詳細ページへ", idea_path(@idea, tab: "elements") %></li>
 </ul>
 
 <% if tab.present? %>
@@ -114,97 +268,356 @@
 
 <% if tab == "elements" %>
   <hr>
-  <h3>要素を選ぶ（種類＋マーカー表示）</h3>
+  <h2>移動先の要素を選ぶ（文字順）</h2>
 
   <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
-  <% grouped = (@story_elements || []).group_by(&:kind) %>
+  <% kind_order = { "character" => 0, "item" => 1, "setting" => 2 } %>
+  <% element_display_label = lambda do |el|
+       kind_label = kind_labels[el.kind] || el.kind
+       marker_text = el.marker.to_s
 
-  <% %w[character item setting].each do |kind| %>
-    <% next if grouped[kind].blank? %>
+       safe_join([
+         content_tag(
+           :span,
+           "[#{kind_label}]#{marker_text}　#{truncate_for_pc.call(el.name)}（#{truncate_for_pc.call(el.story&.title)}）",
+           class: "move-text-pc"
+         ),
+         content_tag(
+           :span,
+           "[#{kind_label}]#{marker_text}　#{truncate_for_mobile.call(el.name)}（#{truncate_for_mobile.call(el.story&.title)}）",
+           class: "move-text-sp"
+         )
+       ])
+     end %>
+  <% sorted_elements = (@story_elements || []).sort_by { |e| [story_sort_key.call(e.story), kind_order[e.kind] || 99, element_name_sort_key.call(e)] } %>
 
-    <h4><%= kind_labels[kind] %></h4>
+  <% current_elements = [] %>
+  <% other_elements = [] %>
+
+  <% sorted_elements.each do |el| %>
+    <% if current_story.present? && el.story&.id == current_story.id %>
+      <% current_elements << el %>
+    <% else %>
+      <% other_elements << el %>
+    <% end %>
+  <% end %>
+
+  <% if current_story.present? && current_elements.any? %>
+    <h3>今いるストーリーの要素</h3>
+
+    <details open style="margin-bottom: 16px;">
+      <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <%= summary_label.call(current_story, current_elements.size) %>
+      </summary>
+
+      <ul style="padding: 12px 8px 0 24px; margin: 0;">
+        <% current_elements.each do |el| %>
+          <li style="margin-bottom: 12px;">
+            <div class="move-destination-label">
+              <strong><%= element_display_label.call(el) %></strong>
+            </div>
+            <div style="margin-top: 4px;">
+              <%= link_to "詳細を見る", story_story_element_path(el.story, el) %>
+            </div>
+            <div style="margin-top: 4px;">
+              <%= button_to "ここへ移動",
+                            idea_idea_placement_path(@idea),
+                            method: :post,
+                            params: { placeable_type: "StoryElement", placeable_id: el.id },
+                            form: { style: "display: inline;" } %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </details>
+  <% end %>
+
+  <% if other_elements.any? %>
+    <% if current_story.present? %>
+      <h3>別のストーリーの要素</h3>
+    <% end %>
+
+    <% other_elements_grouped = other_elements.group_by(&:story) %>
+
+    <% other_elements_grouped.sort_by { |story, _grouped_elements| story_sort_key.call(story) }.each do |story, grouped_elements| %>
+      <details style="margin-bottom: 16px;">
+        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+          <%= summary_label.call(story, grouped_elements.size) %>
+        </summary>
+
+        <ul style="padding: 12px 8px 0 24px; margin: 0;">
+          <% grouped_elements.sort_by { |el| [kind_order[el.kind] || 99, element_name_sort_key.call(el)] }.each do |el| %>
+            <li style="margin-bottom: 12px;">
+              <div class="move-destination-label">
+                <strong><%= element_display_label.call(el) %></strong>
+              </div>
+              <div style="margin-top: 4px;">
+                <%= link_to "詳細を見る", story_story_element_path(el.story, el) %>
+              </div>
+              <div style="margin-top: 4px;">
+                <%= button_to "ここへ移動",
+                              idea_idea_placement_path(@idea),
+                              method: :post,
+                              params: { placeable_type: "StoryElement", placeable_id: el.id },
+                              form: { style: "display: inline;" } %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </details>
+    <% end %>
+  <% end %>
+
+<% elsif tab == "stories" %>
+  <hr>
+  <h2>移動先のストーリーを選ぶ（文字順）</h2>
+
+  <% sorted_stories = (@stories || []).sort_by { |story| story_sort_key.call(story) } %>
+
+  <% current_stories = [] %>
+  <% other_stories = [] %>
+
+  <% sorted_stories.each do |story| %>
+    <% if current_story.present? && story.id == current_story.id %>
+      <% current_stories << story %>
+    <% else %>
+      <% other_stories << story %>
+    <% end %>
+  <% end %>
+
+  <% if current_story.present? && current_stories.any? %>
+    <h3>今いるストーリー</h3>
 
     <ul>
-      <% grouped[kind].sort_by { |e| [e.story&.title.to_s, e.name.to_s] }.each do |el| %>
-        <% name_with_marker = [el.marker.presence, el.name].compact.join("　") %>
-
-        <li>
-          <strong><%= name_with_marker %></strong>（<%= el.story&.title %>）
-          |
-          <%= button_to "ここへ移動",
-                        idea_idea_placement_path(@idea),
-                        method: :post,
-                        params: { placeable_type: "StoryElement", placeable_id: el.id } %>
-          |
-          <%= link_to "詳細を見る", story_story_element_path(el.story, el) %>
+      <% current_stories.each do |story| %>
+        <li style="margin-bottom: 12px;">
+          <div class="move-destination-label">
+            <strong><%= responsive_text.call(story.title) %></strong>
+          </div>
+          <div style="margin-top: 4px;">
+            <%= link_to "詳細を見る", story_path(story) %>
+          </div>
+          <div style="margin-top: 4px;">
+            <%= button_to "ここへ移動",
+                          idea_idea_placement_path(@idea),
+                          method: :post,
+                          params: { placeable_type: "Story", placeable_id: story.id },
+                          form: { style: "display: inline;" } %>
+          </div>
         </li>
       <% end %>
     </ul>
   <% end %>
 
-<% elsif tab == "stories" %>
-  <hr>
-  <h3>ストーリーを選ぶ</h3>
-
-  <ul>
-    <% (@stories || []).each do |story| %>
-      <li>
-        <strong><%= story.title %></strong>
-        |
-        <%= button_to "ここへ移動",
-                      idea_idea_placement_path(@idea),
-                      method: :post,
-                      params: { placeable_type: "Story", placeable_id: story.id } %>
-        |
-        <%= link_to "詳細を見る", story_path(story) %>
-      </li>
+  <% if other_stories.any? %>
+    <% if current_story.present? %>
+      <h3>別のストーリー</h3>
     <% end %>
-  </ul>
+
+    <ul>
+      <% other_stories.each do |story| %>
+        <li style="margin-bottom: 12px;">
+          <div class="move-destination-label">
+            <strong><%= responsive_text.call(story.title) %></strong>
+          </div>
+          <div style="margin-top: 4px;">
+            <%= link_to "詳細を見る", story_path(story) %>
+          </div>
+          <div style="margin-top: 4px;">
+            <%= button_to "ここへ移動",
+                          idea_idea_placement_path(@idea),
+                          method: :post,
+                          params: { placeable_type: "Story", placeable_id: story.id },
+                          form: { style: "display: inline;" } %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 
 <% elsif tab == "event_ideas" %>
   <hr>
-  <h3>詳細メモを選ぶ</h3>
+  <h2>移動先の詳細メモを選ぶ（時系列順）</h2>
 
-  <ul>
-    <% (@story_event_ideas || []).each do |event_idea| %>
-      <li>
-        <strong>
-          <%= event_idea.story_event&.story&.title %> /
-          <%= event_idea.story_event&.title %> /
-          <%= event_idea.title %>
-        </strong>
-        |
-        <%= button_to "ここへ移動",
-                      idea_idea_placement_path(@idea),
-                      method: :post,
-                      params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id } %>
-        |
-        <%= link_to "詳細を見る",
-                    story_story_event_story_event_idea_path(
-                      event_idea.story_event.story,
-                      event_idea.story_event,
-                      event_idea
-                    ) %>
-      </li>
+  <% event_idea_display_label = lambda do |event_idea|
+       breadcrumb_label.call([
+         event_idea.story_event&.story&.title,
+         event_idea.story_event&.title,
+         event_idea.title
+       ])
+     end %>
+  <% sorted_event_ideas = (@story_event_ideas || []).sort_by { |event_idea| event_idea_sort_key.call(event_idea) } %>
+
+  <% current_event_ideas = [] %>
+  <% other_event_ideas = [] %>
+
+  <% sorted_event_ideas.each do |event_idea| %>
+    <% if current_story.present? && event_idea.story_event&.story&.id == current_story.id %>
+      <% current_event_ideas << event_idea %>
+    <% else %>
+      <% other_event_ideas << event_idea %>
     <% end %>
-  </ul>
+  <% end %>
+
+  <% if current_story.present? && current_event_ideas.any? %>
+    <h3>今いるストーリーの詳細メモ</h3>
+
+    <details open style="margin-bottom: 16px;">
+      <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <%= summary_label.call(current_story, current_event_ideas.size) %>
+      </summary>
+
+      <ul style="padding: 12px 8px 0 24px; margin: 0;">
+        <% current_event_ideas.each do |event_idea| %>
+          <li style="margin-bottom: 12px;">
+            <div class="move-destination-label">
+              <strong><%= event_idea_display_label.call(event_idea) %></strong>
+            </div>
+            <div style="margin-top: 4px;">
+              <%= link_to "詳細を見る",
+                          story_story_event_story_event_idea_path(
+                            event_idea.story_event.story,
+                            event_idea.story_event,
+                            event_idea
+                          ) %>
+            </div>
+            <div style="margin-top: 4px;">
+              <%= button_to "ここへ移動",
+                            idea_idea_placement_path(@idea),
+                            method: :post,
+                            params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id },
+                            form: { style: "display: inline;" } %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </details>
+  <% end %>
+
+  <% if other_event_ideas.any? %>
+    <% if current_story.present? %>
+      <h3>別のストーリーの詳細メモ</h3>
+    <% end %>
+
+    <% other_event_ideas_grouped = other_event_ideas.group_by { |event_idea| event_idea.story_event&.story } %>
+
+    <% other_event_ideas_grouped.sort_by { |story, _grouped_event_ideas| story_sort_key.call(story) }.each do |story, grouped_event_ideas| %>
+      <details style="margin-bottom: 16px;">
+        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+          <%= summary_label.call(story, grouped_event_ideas.size) %>
+        </summary>
+
+        <ul style="padding: 12px 8px 0 24px; margin: 0;">
+          <% grouped_event_ideas.sort_by { |event_idea| [event_idea.story_event&.position.to_i, event_idea.position.to_i, event_idea.created_at, event_idea.id.to_i] }.each do |event_idea| %>
+            <li style="margin-bottom: 12px;">
+              <div class="move-destination-label">
+                <strong><%= event_idea_display_label.call(event_idea) %></strong>
+              </div>
+              <div style="margin-top: 4px;">
+                <%= link_to "詳細を見る",
+                            story_story_event_story_event_idea_path(
+                              event_idea.story_event.story,
+                              event_idea.story_event,
+                              event_idea
+                            ) %>
+              </div>
+              <div style="margin-top: 4px;">
+                <%= button_to "ここへ移動",
+                              idea_idea_placement_path(@idea),
+                              method: :post,
+                              params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id },
+                              form: { style: "display: inline;" } %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </details>
+    <% end %>
+  <% end %>
 
 <% elsif tab == "events" %>
   <hr>
-  <h3>イベントを選ぶ（イベント詳細＝メモ一覧へ）</h3>
+  <h2>移動先のイベントを選ぶ（時系列順）</h2>
 
-  <ul>
-    <% (@story_events || []).each do |event| %>
-      <li>
-        <strong><%= event.story&.title %> / <%= event.title %></strong>
-        |
-        <%= button_to "ここへ移動",
-                      idea_idea_placement_path(@idea),
-                      method: :post,
-                      params: { placeable_type: "StoryEvent", placeable_id: event.id } %>
-        |
-        <%= link_to "詳細を見る", story_story_event_path(event.story, event) %>
-      </li>
+  <% event_display_label = lambda do |event|
+       breadcrumb_label.call([event.story&.title, event.title])
+     end %>
+  <% sorted_events = (@story_events || []).sort_by { |event| event_sort_key.call(event) } %>
+
+  <% current_events = [] %>
+  <% other_events = [] %>
+
+  <% sorted_events.each do |event| %>
+    <% if current_story.present? && event.story&.id == current_story.id %>
+      <% current_events << event %>
+    <% else %>
+      <% other_events << event %>
     <% end %>
-  </ul>
+  <% end %>
+
+  <% if current_story.present? && current_events.any? %>
+    <h3>今いるストーリーのイベント</h3>
+
+    <details open style="margin-bottom: 16px;">
+      <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <%= summary_label.call(current_story, current_events.size) %>
+      </summary>
+
+      <ul style="padding: 12px 8px 0 24px; margin: 0;">
+        <% current_events.each do |event| %>
+          <li style="margin-bottom: 12px;">
+            <div class="move-destination-label">
+              <strong><%= event_display_label.call(event) %></strong>
+            </div>
+            <div style="margin-top: 4px;">
+              <%= link_to "詳細を見る", story_story_event_path(event.story, event) %>
+            </div>
+            <div style="margin-top: 4px;">
+              <%= button_to "ここへ移動",
+                            idea_idea_placement_path(@idea),
+                            method: :post,
+                            params: { placeable_type: "StoryEvent", placeable_id: event.id },
+                            form: { style: "display: inline;" } %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </details>
+  <% end %>
+
+  <% if other_events.any? %>
+    <% if current_story.present? %>
+      <h3>別ストーリーのイベント</h3>
+    <% end %>
+
+    <% other_events_grouped = other_events.group_by(&:story) %>
+
+    <% other_events_grouped.sort_by { |story, _grouped_events| story_sort_key.call(story) }.each do |story, grouped_events| %>
+      <details style="margin-bottom: 16px;">
+        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+          <%= summary_label.call(story, grouped_events.size) %>
+        </summary>
+
+        <ul style="padding: 12px 8px 0 24px; margin: 0;">
+          <% grouped_events.sort_by { |event| [event.position.to_i, event.created_at, event.id.to_i] }.each do |event| %>
+            <li style="margin-bottom: 12px;">
+              <div class="move-destination-label">
+                <strong><%= event_display_label.call(event) %></strong>
+              </div>
+              <div style="margin-top: 4px;">
+                <%= link_to "詳細を見る", story_story_event_path(event.story, event) %>
+              </div>
+              <div style="margin-top: 4px;">
+                <%= button_to "ここへ移動",
+                              idea_idea_placement_path(@idea),
+                              method: :post,
+                              params: { placeable_type: "StoryEvent", placeable_id: event.id },
+                              form: { style: "display: inline;" } %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </details>
+    <% end %>
+  <% end %>
 <% end %>

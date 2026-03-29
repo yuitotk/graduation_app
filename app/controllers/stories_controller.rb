@@ -18,13 +18,14 @@ class StoriesController < ApplicationController
       @story.placed_ideas
             .includes(idea_placement: :story_elements)
             .joins(:idea_placement)
-            .order(created_at: :desc)
 
     @created_here_ideas =
       base.where(idea_placements: { created_here: true })
+          .order(created_at: :desc)
 
     @moved_ideas =
       base.where(idea_placements: { created_here: false })
+          .order("idea_placements.moved_at DESC")
   end
 
   # ✅ 整合性チェック（要素で絞り込み）

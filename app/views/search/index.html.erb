@@ -85,7 +85,7 @@
       </div>
 
       <% if idea.memo.present? %>
-        <div>
+        <div style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; white-space: normal; line-height: 1.6; max-height: 4.8em;">
           <%= simple_format(snippet_for.call(idea.memo, q)) %>
         </div>
       <% else %>
@@ -130,7 +130,7 @@
        moved_rel   = pair[:moved] || Idea.none
   %>
     <section style="margin-bottom: 24px;">
-      <h2><%= title %></h2>
+      <h1><%= title %></h1>
 
       <% if is_home %>
         <% if created_rel.count == 0 %>
@@ -143,7 +143,7 @@
           </div>
         <% end %>
       <% else %>
-        <h3>新規作成</h3>
+        <h2>新規作成したアイデア</h2>
         <% if created_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>
@@ -154,7 +154,7 @@
           </div>
         <% end %>
 
-        <h3>移動</h3>
+        <h2>移動してきたアイデア</h2>
         <% if moved_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>

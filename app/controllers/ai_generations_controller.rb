@@ -181,7 +181,12 @@ class AiGenerationsController < ApplicationController
     placeable = find_placeable_for_current_user(type, id)
     return if placeable.nil?
 
-    idea.create_idea_placement!(placeable: placeable, created_here: created_here, marker: marker)
+    idea.create_idea_placement!(
+      placeable: placeable,
+      created_here: created_here,
+      marker: marker,
+      moved_at: Time.current
+    )
   end
 
   def find_placeable_for_current_user(type, id)

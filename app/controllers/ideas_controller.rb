@@ -56,6 +56,7 @@ class IdeasController < ApplicationController
       placement.placeable_type = pt
       placement.placeable_id   = pid
       placement.created_here   = true
+      placement.moved_at       = Time.current
 
       element_ids = params.dig(:idea, :idea_placement_attributes, :story_element_ids)
       placement.story_element_ids = Array(element_ids).compact_blank
