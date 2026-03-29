@@ -9,6 +9,7 @@ class IdeaPlacementsController < ApplicationController
     placement = idea.idea_placement || idea.build_idea_placement
     placement.placeable = placeable
     placement.created_here = false
+    placement.moved_at = Time.current
     placement.save!
 
     redirect_to redirect_target(placeable), notice: t("flash.idea_placements.moved")

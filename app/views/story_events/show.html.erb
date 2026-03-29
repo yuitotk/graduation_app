@@ -4,11 +4,15 @@
   <%= link_to "ストーリー詳細へ戻る", story_path(@story) %>
 </p>
 
+<h1>イベント詳細ページ</h1>
+
+<hr>
+
 <h1><%= @story_event.title %></h1>
 
 <% if @story_event.story_event_image&.image? %>
   <div style="margin-top: 16px;">
-    <%= image_tag @story_event.story_event_image.image.url, style: "max-width: 320px; height: auto;" %>
+    <%= image_tag @story_event.story_event_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
   </div>
 <% end %>
 

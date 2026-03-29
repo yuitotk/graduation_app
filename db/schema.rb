@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_03_22_045247) do
+ActiveRecord::Schema[7.0].define(version: 2026_03_29_020331) do
   create_table "idea_images", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "idea_id", null: false
     t.string "image"
@@ -37,6 +37,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_03_22_045247) do
     t.datetime "updated_at", null: false
     t.boolean "created_here", default: false, null: false
     t.string "marker"
+    t.datetime "moved_at", null: false
     t.index ["idea_id"], name: "index_idea_placements_on_idea_id", unique: true
     t.index ["placeable_type", "placeable_id"], name: "index_idea_placements_on_placeable"
   end

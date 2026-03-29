@@ -6,32 +6,27 @@ class StoryEventIdeasController < ApplicationController
   before_action :set_story_event_idea, only: %i[show edit update destroy move_up move_down]
   before_action :set_breadcrumbs, only: %i[show new edit]
 
-  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def show
-    ideas = current_user.ideas
-                        .joins(:idea_placement)
-                        .where(idea_placements: { placeable_type: "StoryEventIdea", placeable_id: @story_event_idea.id })
-                        .includes(:idea_placement)
-                        .distinct
-                        .order(created_at: :desc)
+    base =
+      current_user.ideas
+                  .joins(:idea_placement)
+                  .where(
+                    idea_placements: {
+                      placeable_type: "StoryEventIdea",
+                      placeable_id: @story_event_idea.id
+                    }
+                  )
+                  .includes(:idea_placement)
+                  .distinct
 
-    @created_here_ideas = ideas.select do |idea|
-      placement = idea.idea_placement
-      placement.present? &&
-        placement.placeable_type == "StoryEventIdea" &&
-        placement.placeable_id == @story_event_idea.id &&
-        placement.created_here?
-    end
+    @created_here_ideas =
+      base.where(idea_placements: { created_here: true })
+          .order(created_at: :desc)
 
-    @moved_ideas = ideas.select do |idea|
-      placement = idea.idea_placement
-      placement.present? &&
-        placement.placeable_type == "StoryEventIdea" &&
-        placement.placeable_id == @story_event_idea.id &&
-        !placement.created_here?
-    end
+    @moved_ideas =
+      base.where(idea_placements: { created_here: false })
+          .order("idea_placements.moved_at DESC")
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def new
     @story_event_idea = @story_event.story_event_ideas.new
