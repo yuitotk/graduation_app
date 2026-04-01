@@ -1,40 +1,46 @@
-<p><%= link_to "アイデア一覧（ホーム）へ", ideas_path %></p>
+<p><%= link_to "アイデア一覧（ホーム）へ", ideas_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
 <h1>ストーリー一覧</h1>
 
-<p><%= link_to "ストーリー作成", new_story_path %></p>
+<p style="margin: 0 0 20px 0;">
+  <%= link_to "ストーリー作成", new_story_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5b7db1; border-radius: 12px; background: #5b7db1; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+</p>
 
 <% if @stories.any? %>
   <% @stories.each do |story| %>
     <div style="margin-bottom: 20px;">
-      <%= link_to story_path(story), class: "text-decoration-none text-dark d-block" do %>
-        <div style="padding: 16px; border: 2px solid #999; border-radius: 16px; background: #f8f8f8;">
-          <h2><%= story.title %></h2>
+      <%= link_to story_path(story), style: "display: block; text-decoration: none; color: inherit;" do %>
+        <div style="padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
+          <h2 style="color: #f5f5f5; text-decoration: none;"><%= story.title %></h2>
 
           <% if story.story_image&.image? %>
             <div style="margin: 8px 0;">
               <%= image_tag story.story_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
             </div>
           <% else %>
-            <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #999; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+            <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #555555; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #2a2a2a; color: #f5f5f5;">
               画像なし
             </div>
           <% end %>
 
-          <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
+          <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0; color: #f5f5f5; text-decoration: none;">
             <%= truncate(story.description.to_s, length: 78) %>
           </p>
         </div>
       <% end %>
 
-      <div style="margin-top: 8px;">
+      <div style="margin-top: 8px; color: #f5f5f5;">
         <span style="display: inline-block; margin-right: 12px;">
-          <%= button_to "↑", move_up_story_path(story), method: :patch, form: { style: "display:inline" } %>
+          <%= button_to "↑", move_up_story_path(story), method: :patch,
+                        form: { style: "display:inline" },
+                        style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
           <span>上に移動</span>
         </span>
 
         <span style="display: inline-block;">
-          <%= button_to "↓", move_down_story_path(story), method: :patch, form: { style: "display:inline" } %>
+          <%= button_to "↓", move_down_story_path(story), method: :patch,
+                        form: { style: "display:inline" },
+                        style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
           <span>下に移動</span>
         </span>
       </div>

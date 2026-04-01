@@ -4,13 +4,14 @@
 <h1>イベント編集</h1>
 <%= render "form" %>
 
-<div style="margin-top: 16px;">
-  <p style="color: red; margin-bottom: 8px;">
+<div style="margin-top: 25px;">
+  <p style="color: #f87171; margin-bottom: 8px; font-weight: bold;">
     ※削除すると中の詳細メモ・関連アイデアも消えます。
   </p>
 
   <%= button_to "削除",
         story_story_event_path(@story, @story_event),
         method: :delete,
-        data: { turbo_confirm: "本当に削除しますか？（中の/詳細メモ/関連アイデアも消えます）" } %>
+        data: { turbo_confirm: "本当に削除しますか？（中の詳細メモ/関連アイデアも消えます）" },
+        style: "background: #dc2626; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;" %>
 </div>

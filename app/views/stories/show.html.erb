@@ -1,6 +1,6 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<p><%= link_to "ストーリー一覧へ", stories_path %></p>
+<p><%= link_to "ストーリー一覧へ", stories_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
 <h1>ストーリー詳細ページ</h1>
 
@@ -24,7 +24,7 @@
 <% end %>
 
 <p>
-  <%= link_to "ストーリー編集", edit_story_path(@story) %>
+  <%= link_to "ストーリー編集", edit_story_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @story.created_at.in_time_zone("Tokyo"), format: :short %>
   </span>
@@ -37,9 +37,9 @@
 
 <h2>要素</h2>
 
-<p><%= link_to "要素を管理する", story_story_elements_path(@story) %></p>
+<p><%= link_to "要素を管理する", story_story_elements_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
-<p><%= link_to "整合性チェック（要素時系列）", consistency_story_path(@story) %></p>
+<p><%= link_to "整合性チェック（要素時系列）", consistency_story_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
 <hr>
 
@@ -47,41 +47,48 @@
 
 <h4>このイベント欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
 
-<p><%= link_to "イベント追加", new_story_story_event_path(@story) %></p>
+<p>
+  <%= link_to "イベント追加", new_story_story_event_path(@story),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5b7db1; border-radius: 12px; background: #5b7db1; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+</p>
 
 <% if @story_events.any? %>
   <% @story_events.each do |event| %>
     <div style="margin-bottom: 20px;">
-      <%= link_to story_story_event_path(@story, event), class: "text-decoration-none text-dark d-block" do %>
-        <div style="padding: 16px; border: 2px solid #999; border-radius: 16px; background: #f8f8f8;">
-          <h3 style="margin-top: 0;"><%= event.title %></h3>
+      <%= link_to story_story_event_path(@story, event), style: "display: block; text-decoration: none; color: inherit;" do %>
+        <div style="padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
+          <h3 style="margin-top: 0; color: #f5f5f5; text-decoration: none;"><%= event.title %></h3>
 
           <% if event.story_event_image&.image? %>
             <div style="margin: 8px 0;">
               <%= image_tag event.story_event_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
             </div>
           <% else %>
-            <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #999; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+            <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #555555; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #2a2a2a; color: #f5f5f5;">
               画像なし
             </div>
           <% end %>
 
-          <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
+          <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0; color: #f5f5f5; text-decoration: none;">
             <%= truncate(event.body.to_s, length: 78) %>
           </p>
         </div>
       <% end %>
 
-      <div style="margin-top: 8px;">
+      <div style="margin-top: 8px; color: #f5f5f5;">
         <span style="display: inline-block; margin-right: 12px;">
           <%= button_to "↑", move_up_story_story_event_path(@story, event),
-                method: :patch, form: { style: "display:inline" } %>
+                method: :patch,
+                form: { style: "display:inline" },
+                style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
           <span>上に移動</span>
         </span>
 
         <span style="display: inline-block;">
           <%= button_to "↓", move_down_story_story_event_path(@story, event),
-                method: :patch, form: { style: "display:inline" } %>
+                method: :patch,
+                form: { style: "display:inline" },
+                style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
           <span>下に移動</span>
         </span>
       </div>
@@ -95,16 +102,18 @@
 
 <h3>新規アイデア</h3>
 
-<p>
-  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %> |
-  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id) %>
+<p style="margin: 0 0 16px 0;">
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @created_here_ideas.present? %>
   <ul>
     <% @created_here_ideas.each do |idea| %>
       <li>
-        <%= link_to idea.title, idea_path(idea) %>
+        <%= link_to idea.title, idea_path(idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
       </li>
     <% end %>
   </ul>
@@ -120,7 +129,7 @@
   <ul>
     <% @moved_ideas.each do |idea| %>
       <li>
-        <%= link_to idea.title, idea_path(idea) %>
+        <%= link_to idea.title, idea_path(idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
       </li>
     <% end %>
   </ul>

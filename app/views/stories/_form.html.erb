@@ -8,7 +8,7 @@
   <% end %>
 
   <div style="margin-bottom: 30px;" data-controller="character-counter">
-    <%= f.label :title, "タイトル（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :title, "タイトル（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.text_field :title,
           maxlength: Story::TITLE_MAX_LENGTH,
           data: {
@@ -19,12 +19,12 @@
     <div
       data-character-counter-target="output"
       data-max-length="<%= Story::TITLE_MAX_LENGTH %>"
-      style="margin-top: 6px; font-size: 14px; color: #666;"
+      style="margin-top: 6px; font-size: 14px; color: #cccccc;"
     ></div>
   </div>
 
   <div>
-    <%= f.label :description, "説明", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :description, "説明", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.text_area :description, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
@@ -32,7 +32,7 @@
     <%= imgf.hidden_field :id if imgf.object&.persisted? %>
 
     <div style="margin-top: 16px;">
-      <%= imgf.label :image, "画像（任意）" %><br>
+      <%= imgf.label :image, "画像（任意）", style: "color: #ffffff;" %><br>
       <%= imgf.file_field :image %>
 
       <% if story.story_image&.image? %>
@@ -40,7 +40,7 @@
           <%= image_tag story.story_image.image.url, style: "max-width: 320px; height: auto;" %>
         </div>
 
-        <div style="margin-top: 8px;">
+        <div style="margin-top: 8px; color: #ffffff;">
           <label>
             <%= imgf.check_box :remove_image %>
             画像を消す（ストーリーの更新により反映されます。）
@@ -51,6 +51,7 @@
   <% end %>
 
   <div style="margin-top: 30px;">
-    <%= f.submit(story.persisted? ? "ストーリーを更新" : "ストーリーを作成") %>
+    <%= f.submit(story.persisted? ? "ストーリーを更新" : "ストーリーを作成",
+          style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;") %>
   </div>
 <% end %>

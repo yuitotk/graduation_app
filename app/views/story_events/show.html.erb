@@ -1,7 +1,7 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
 <p>
-  <%= link_to "ストーリー詳細へ戻る", story_path(@story) %>
+  <%= link_to "ストーリー詳細へ戻る", story_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
 <h1>イベント詳細ページ</h1>
@@ -20,19 +20,19 @@
 <% if @story_event.story_elements.any? %>
   <% grouped_elements = @story_event.story_elements.group_by(&:kind) %>
 
-  <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+  <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e;">
     <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
       <% elements = grouped_elements[kind] || [] %>
       <% next if elements.blank? %>
 
       <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
           <%= kind_label %>（<%= elements.size %>）
         </summary>
 
         <div style="padding: 12px 8px 0 8px;">
           <% elements.each do |el| %>
-            <div style="margin-bottom: 8px;">
+            <div style="margin-bottom: 8px; color: #f5f5f5;">
               <%= story_element_short_label(el) %>
             </div>
           <% end %>
@@ -50,7 +50,7 @@
 </div>
 
 <p>
-  <%= link_to "編集", edit_story_story_event_path(@story, @story_event) %>
+  <%= link_to "編集", edit_story_story_event_path(@story, @story_event), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @story_event.created_at.in_time_zone("Tokyo"), format: :short %>
   </span>
@@ -66,14 +66,15 @@
 <h4>この詳細メモ欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
 
 <p>
-  <%= link_to "詳細メモを追加", new_story_story_event_story_event_idea_path(@story, @story_event) %>
+  <%= link_to "詳細メモを追加", new_story_story_event_story_event_idea_path(@story, @story_event),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5b7db1; border-radius: 12px; background: #5b7db1; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @story_event.story_event_ideas.any? %>
   <% @story_event.story_event_ideas.order(:position, :created_at).each do |idea| %>
     <%= link_to story_story_event_story_event_idea_path(@story, @story_event, idea),
-                style: "display: block; margin-bottom: 8px; border: 2px solid #999; border-radius: 20px; padding: 24px; background-color: #f3f3f3; color: inherit; text-decoration: none;" do %>
-      <h3 style="margin-top: 0; margin-bottom: 16px; text-decoration: underline;">
+                style: "display: block; margin-bottom: 8px; border: 2px solid #555555; border-radius: 20px; padding: 24px; background-color: #1e1e1e; color: inherit; text-decoration: none;" do %>
+      <h3 style="margin-top: 0; margin-bottom: 16px; color: #f5f5f5; text-decoration: none;">
         <%= idea.title %>
       </h3>
 
@@ -82,22 +83,23 @@
           <%= image_tag idea.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
         </div>
       <% else %>
-        <div style="width: 240px; height: 140px; margin: 8px 0 12px 0; border: 2px solid #999; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+        <div style="width: 240px; height: 140px; margin: 8px 0 12px 0; border: 2px solid #555555; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #2a2a2a; color: #f5f5f5;">
           画像なし
         </div>
       <% end %>
 
-      <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
+      <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0; color: #f5f5f5; text-decoration: none;">
         <%= truncate(idea.memo.to_s, length: 78) %>
       </p>
     <% end %>
 
-    <div style="margin-top: 0; margin-bottom: 24px; display: flex; gap: 16px; align-items: center;">
+    <div style="margin-top: 0; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; color: #f5f5f5;">
       <div style="display: flex; align-items: center; gap: 6px;">
         <%= button_to "↑",
                       move_up_story_story_event_story_event_idea_path(@story, @story_event, idea),
                       method: :patch,
-                      form: { style: "display: inline;" } %>
+                      form: { style: "display: inline;" },
+                      style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
         <span>上に移動</span>
       </div>
 
@@ -105,7 +107,8 @@
         <%= button_to "↓",
                       move_down_story_story_event_story_event_idea_path(@story, @story_event, idea),
                       method: :patch,
-                      form: { style: "display: inline;" } %>
+                      form: { style: "display: inline;" },
+                      style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
         <span>下に移動</span>
       </div>
     </div>
@@ -118,15 +121,17 @@
 
 <h3>新規アイデア</h3>
 
-<p>
-  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %> |
-  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id) %>
+<p style="margin: 0 0 16px 0;">
+  <%= link_to "新規作成", new_idea_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+  <%= link_to "AI作成", random_words_pick_path(return_to: request.fullpath, placeable_type: "StoryEvent", placeable_id: @story_event.id),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @created_here_ideas.present? %>
   <ul>
     <% @created_here_ideas.each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea) %></li>
+      <li><%= link_to idea.title, idea_path(idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
     <% end %>
   </ul>
 <% else %>
@@ -140,7 +145,7 @@
 <% if @moved_ideas.present? %>
   <ul>
     <% @moved_ideas.each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea) %></li>
+      <li><%= link_to idea.title, idea_path(idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
     <% end %>
   </ul>
 <% else %>

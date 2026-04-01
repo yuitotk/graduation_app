@@ -8,9 +8,10 @@
 
 <%= render "form" %>
 
-<p style="margin-top: 50px; color: red; font-weight: bold;">※削除すると中の/ 関連アイデアも消えます。</p>
+<p style="margin-top: 50px; color: #f87171; font-weight: bold;">※削除すると中の関連アイデアも消えます。</p>
 <p>
   <%= link_to "削除",
               story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
-              data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？中の/ 関連アイデアも消えます。" } %>
+              data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？関連アイデアも消えます。" },
+              style: "display: inline-block; background: #dc2626; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; text-decoration: none; cursor: pointer;" %>
 </p>

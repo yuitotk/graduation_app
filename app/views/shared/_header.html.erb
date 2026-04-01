@@ -83,7 +83,7 @@
     <% if logged_in? %>
       <%= button_to "ログアウト", logout_path, method: :delete,
                     form: { data: { turbo: false }, style: "display: inline-block; margin: 0;" },
-                    style: "padding: 8px 14px; border: 1px solid #333; border-radius: 6px; background: white; color: #333; cursor: pointer;" %>
+                    style: "padding: 8px 14px; border: 1px solid #c95a5a; border-radius: 6px; background: #c95a5a; color: #ffffff; cursor: pointer; font-weight: bold;" %>
     <% else %>
       <div style="display: flex; gap: 8px;">
         <%= link_to "ログイン", login_path,

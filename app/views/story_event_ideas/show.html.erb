@@ -1,7 +1,8 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
 <p>
-  <%= link_to "イベント詳細へ戻る", story_story_event_path(@story, @story_event) %>
+  <%= link_to "イベント詳細へ戻る", story_story_event_path(@story, @story_event),
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
 <h1>詳細メモ詳細ページ</h1>
@@ -14,19 +15,19 @@
 <% if @story_event_idea.story_elements.any? %>
   <% grouped_elements = @story_event_idea.story_elements.group_by(&:kind) %>
 
-  <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+  <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e;">
     <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
       <% elements = grouped_elements[kind] || [] %>
       <% next if elements.blank? %>
 
       <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
           <%= kind_label %>（<%= elements.size %>）
         </summary>
 
         <div style="padding: 12px 8px 0 8px;">
           <% elements.each do |el| %>
-            <div style="margin-bottom: 8px;">
+            <div style="margin-bottom: 8px; color: #f5f5f5;">
               <%= story_element_short_label(el) %>
             </div>
           <% end %>
@@ -51,7 +52,8 @@
 </div>
 
 <p>
-  <%= link_to "編集", edit_story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea) %>
+  <%= link_to "編集", edit_story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @story_event_idea.created_at.in_time_zone("Tokyo"), format: :short %>
   </span>
@@ -64,25 +66,28 @@
 
 <h3>新規アイデア</h3>
 
-<p>
+<p style="margin: 0 0 16px 0;">
   <%= link_to "新規作成",
               new_idea_path(
                 return_to: request.fullpath,
                 placeable_type: "StoryEventIdea",
                 placeable_id: @story_event_idea.id
-              ) %> |
+              ),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+
   <%= link_to "AI作成",
               random_words_pick_path(
                 return_to: request.fullpath,
                 placeable_type: "StoryEventIdea",
                 placeable_id: @story_event_idea.id
-              ) %>
+              ),
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @created_here_ideas.present? %>
   <ul>
     <% @created_here_ideas.each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea) %></li>
+      <li><%= link_to idea.title, idea_path(idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
     <% end %>
   </ul>
 <% else %>
@@ -96,7 +101,7 @@
 <% if @moved_ideas.present? %>
   <ul>
     <% @moved_ideas.each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea) %></li>
+      <li><%= link_to idea.title, idea_path(idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
     <% end %>
   </ul>
 <% else %>
