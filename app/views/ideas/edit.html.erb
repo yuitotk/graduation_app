@@ -16,5 +16,6 @@
 
 <div style="margin-top: 32px;">
   <%= link_to "削除", idea_path(@idea),
-        data: { turbo_method: :delete, turbo_confirm: "削除しますか？" } %>
+        data: { turbo_method: :delete, turbo_confirm: "削除しますか？" },
+        style: "display: inline-block; background: #dc2626; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; text-decoration: none; cursor: pointer;" %>
 </div>

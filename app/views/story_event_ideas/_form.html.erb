@@ -12,7 +12,7 @@
   <% end %>
 
   <div style="margin-bottom: 30px;" data-controller="character-counter">
-    <%= f.label :title, "タイトル（40文字を超えた分は入力できません）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :title, "タイトル（40文字を超えた分は入力できません）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.text_field :title,
           maxlength: 40,
           data: {
@@ -23,17 +23,17 @@
     <div
       data-character-counter-target="output"
       data-max-length="40"
-      style="margin-top: 6px; font-size: 14px; color: #666;"
+      style="margin-top: 6px; font-size: 14px; color: #cccccc;"
     ></div>
   </div>
 
   <div style="margin-bottom: 30px;">
-    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.text_area :memo, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
   <div style="margin-bottom: 30px;">
-    <%= f.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.file_field :image %>
 
     <% if @story_event_idea.image? %>
@@ -41,7 +41,7 @@
         <%= image_tag @story_event_idea.image.url, style: "max-width: 320px; height: auto;" %>
       </div>
 
-      <div style="margin-top: 8px;">
+      <div style="margin-top: 8px; color: #ffffff;">
         <label>
           <%= f.check_box :remove_image %>
           画像を消す（詳細メモの更新により反映されます。）
@@ -51,27 +51,27 @@
   </div>
 
   <div style="margin-bottom: 30px;">
-    <div style="font-size: 24px; font-weight: bold;">このメモの登場要素</div>
+    <div style="font-size: 24px; font-weight: bold; color: #ffffff;">このメモの登場要素</div>
 
     <% if @story.story_elements.any? %>
       <% grouped_elements = @story.story_elements.group_by(&:kind) %>
 
-      <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
-        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+      <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ffffff;">
           選択中の要素
         </div>
 
-        <p data-element-selector-target="emptyMessage" style="margin: 0;">
+        <p data-element-selector-target="emptyMessage" style="margin: 0; color: #cccccc;">
           まだ選択されていません
         </p>
 
-        <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px;"></div>
-        <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px;"></div>
-        <div data-element-selector-target="summary" data-kind="setting" hidden></div>
+        <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="setting" hidden style="color: #ffffff;"></div>
       </div>
 
-      <div style="margin-top: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
-        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+      <div style="margin-top: 16px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ffffff;">
           要素を選択する
         </div>
 
@@ -85,16 +85,16 @@
                     data-kind="<%= kind %>"
                     data-label="<%= "#{kind_label}（#{elements.size}）" %>"
                     aria-expanded="true"
-                    style="width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+                    style="width: 100%; text-align: left; background: #2a2a2a; color: #ffffff; border: 1px solid #666666; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
               ▼ <%= kind_label %>（<%= elements.size %>）
             </button>
 
             <div data-element-selector-target="group"
                  data-kind="<%= kind %>"
-                 style="padding: 12px 8px 0 8px;">
+                 style="padding: 12px 8px 0 8px; background: #1e1e1e; color: #ffffff;">
               <%= f.collection_check_boxes :story_element_ids, elements, :id, ->(el) { story_element_short_label(el) } do |b| %>
                 <% element = b.object %>
-                <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #ffffff;">
                   <% checkbox_id = "#{f.object_name}_story_element_ids_#{element.id}" %>
 
                   <%= b.check_box id: checkbox_id,
@@ -104,7 +104,7 @@
                           label: story_element_short_label(element)
                         } %>
 
-                  <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0;">
+                  <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
                     <%= story_element_short_label(element) %>
                   </label>
                 </div>
@@ -114,11 +114,12 @@
         <% end %>
       </div>
     <% else %>
-      <p>登場要素がまだありません（先に要素を作成してください）</p>
+      <p style="color: #cccccc;">登場要素がまだありません（先に要素を作成してください）</p>
     <% end %>
   </div>
 
   <div style="margin-top: 24px;">
-    <%= f.submit @story_event_idea.persisted? ? "詳細メモを更新する" : "詳細メモを追加する" %>
+    <%= f.submit @story_event_idea.persisted? ? "詳細メモを更新する" : "詳細メモを追加する",
+          style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;" %>
   </div>
 <% end %>

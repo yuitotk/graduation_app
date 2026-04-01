@@ -16,7 +16,7 @@
   <% end %>
 
   <div style="margin-bottom: 30px;" data-controller="character-counter">
-    <%= f.label :title, "タイトル（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :title, "タイトル（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.text_field :title,
           maxlength: Idea::TITLE_MAX_LENGTH,
           data: {
@@ -27,12 +27,12 @@
     <div
       data-character-counter-target="output"
       data-max-length="<%= Idea::TITLE_MAX_LENGTH %>"
-      style="margin-top: 6px; font-size: 14px; color: #666;"
+      style="margin-top: 6px; font-size: 14px; color: #cccccc;"
     ></div>
   </div>
 
   <div>
-    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold;" %><br>
+    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
     <%= f.text_area :memo, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
@@ -40,7 +40,7 @@
     <%= imgf.hidden_field :id if imgf.object&.persisted? %>
 
     <div style="margin-top: 16px;">
-      <%= imgf.label :image, "画像（任意）" %><br>
+      <%= imgf.label :image, "画像（任意）", style: "color: #ffffff;" %><br>
       <%= imgf.file_field :image %>
 
       <% if idea.idea_image&.image? %>
@@ -48,7 +48,7 @@
           <%= image_tag idea.idea_image.image.url, style: "max-width: 320px; height: auto;" %>
         </div>
 
-        <div style="margin-top: 8px;">
+        <div style="margin-top: 8px; color: #ffffff;">
           <label>
             <%= imgf.check_box :remove_image %>
             画像を消す（アイデアの更新により反映されます。）
@@ -58,7 +58,6 @@
     </div>
   <% end %>
 
-  <%# ✅ ストーリー文脈がある時だけ表示 %>
   <% if idea.idea_placement.present? || @available_story_elements.present? || params[:placeable_type].present? %>
     <%= f.fields_for :idea_placement do |pf| %>
       <%= pf.hidden_field :id if pf.object&.persisted? %>
@@ -67,29 +66,29 @@
       <%= pf.hidden_field :placeable_id,   value: (pf.object&.placeable_id   || params[:placeable_id]) %>
 
       <div style="margin-top: 16px;">
-        <div style="font-size: 24px; font-weight: bold;">このアイデアの登場要素</div>
+        <div style="font-size: 24px; font-weight: bold; color: #ffffff;">このアイデアの登場要素</div>
 
         <% if @available_story_elements.present? %>
           <% grouped_elements = @available_story_elements.group_by(&:kind) %>
 
           <%= hidden_field_tag "idea[idea_placement_attributes][story_element_ids][]", "" %>
 
-          <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+          <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ffffff;">
               選択中の要素
             </div>
 
-            <p data-element-selector-target="emptyMessage" style="margin: 0;">
+            <p data-element-selector-target="emptyMessage" style="margin: 0; color: #cccccc;">
               まだ選択されていません
             </p>
 
-            <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px;"></div>
-            <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px;"></div>
-            <div data-element-selector-target="summary" data-kind="setting" hidden></div>
+            <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+            <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+            <div data-element-selector-target="summary" data-kind="setting" hidden style="color: #ffffff;"></div>
           </div>
 
-          <div style="margin-top: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+          <div style="margin-top: 16px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ffffff;">
               要素を選択する
             </div>
 
@@ -103,16 +102,16 @@
                         data-kind="<%= kind %>"
                         data-label="<%= "#{kind_label}（#{elements.size}）" %>"
                         aria-expanded="true"
-                        style="width: 100%; text-align: left; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+                        style="width: 100%; text-align: left; background: #2a2a2a; color: #ffffff; border: 1px solid #666666; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
                   ▼ <%= kind_label %>（<%= elements.size %>）
                 </button>
 
                 <div data-element-selector-target="group"
                      data-kind="<%= kind %>"
-                     style="padding: 12px 8px 0 8px;">
+                     style="padding: 12px 8px 0 8px; background: #1e1e1e; color: #ffffff;">
                   <%= pf.collection_check_boxes :story_element_ids, elements, :id, ->(el) { story_element_short_label(el) } do |b| %>
                     <% element = b.object %>
-                    <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                    <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #ffffff;">
                       <% checkbox_id = "#{pf.object_name}_story_element_ids_#{element.id}" %>
 
                       <%= b.check_box id: checkbox_id,
@@ -122,7 +121,7 @@
                               label: story_element_short_label(element)
                             } %>
 
-                      <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0;">
+                      <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
                         <%= story_element_short_label(element) %>
                       </label>
                     </div>
@@ -132,7 +131,7 @@
             <% end %>
           </div>
         <% else %>
-          <div>
+          <div style="color: #cccccc;">
             （このストーリーに要素が作成されていないため、要素一覧を表示できません）
           </div>
         <% end %>
@@ -143,6 +142,7 @@
   <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
 
   <div style="margin-top: 30px;">
-    <%= f.submit(idea.persisted? ? "アイデアの更新" : "アイデアを作成") %>
+    <%= f.submit(idea.persisted? ? "アイデアの更新" : "アイデアを作成",
+          style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;") %>
   </div>
 <% end %>

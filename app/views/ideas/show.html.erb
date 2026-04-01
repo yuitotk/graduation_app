@@ -183,7 +183,7 @@
   end
 %>
 
-<p><%= link_to back_label, back_path %></p>
+<p><%= link_to back_label, back_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
 <h1><%= page_context_title %></h1>
 
@@ -205,13 +205,13 @@
   <div style="margin: 12px 0;">
     <strong>登場要素：</strong>
 
-    <div style="margin-top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 16px;">
+    <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e;">
       <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
         <% kind_elements = grouped_elements[kind] || [] %>
         <% next if kind_elements.blank? %>
 
         <details style="margin-bottom: 16px;">
-          <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+          <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
             <%= kind_label %>（<%= kind_elements.size %>）
           </summary>
 
@@ -220,7 +220,7 @@
               <% label = story_element_short_label(el) %>
               <% next if label.blank? %>
 
-              <div style="margin-bottom: 8px;">
+              <div style="margin-bottom: 8px; color: #f5f5f5;">
                 <%= label %>
               </div>
             <% end %>
@@ -240,7 +240,7 @@
 <p><%= simple_format(@idea.memo) %></p>
 
 <p>
-  <%= link_to "編集", edit_idea_path(@idea) %>
+  <%= link_to "編集", edit_idea_path(@idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @idea.created_at, format: :short %>
   </span>
@@ -256,14 +256,14 @@
 <h2>このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
 <ul>
-  <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories") %></li>
-  <li><%= link_to "イベント詳細ページへ", idea_path(@idea, tab: "events") %></li>
-  <li><%= link_to "詳細メモ詳細ページへ", idea_path(@idea, tab: "event_ideas") %></li>
-  <li><%= link_to "要素詳細ページへ", idea_path(@idea, tab: "elements") %></li>
+  <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "イベント詳細ページへ", idea_path(@idea, tab: "events"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "詳細メモ詳細ページへ", idea_path(@idea, tab: "event_ideas"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "要素詳細ページへ", idea_path(@idea, tab: "elements"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
 </ul>
 
 <% if tab.present? %>
-  <p><%= link_to "← 4択に戻る", idea_path(@idea) %></p>
+  <p><%= link_to "← 4択に戻る", idea_path(@idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 <% end %>
 
 <% if tab == "elements" %>
@@ -306,7 +306,7 @@
     <h3>今いるストーリーの要素</h3>
 
     <details open style="margin-bottom: 16px;">
-      <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+      <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
         <%= summary_label.call(current_story, current_elements.size) %>
       </summary>
 
@@ -317,14 +317,15 @@
               <strong><%= element_display_label.call(el) %></strong>
             </div>
             <div style="margin-top: 4px;">
-              <%= link_to "詳細を見る", story_story_element_path(el.story, el) %>
+              <%= link_to "詳細を見る", story_story_element_path(el.story, el), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
             </div>
             <div style="margin-top: 4px;">
               <%= button_to "ここへ移動",
                             idea_idea_placement_path(@idea),
                             method: :post,
                             params: { placeable_type: "StoryElement", placeable_id: el.id },
-                            form: { style: "display: inline;" } %>
+                            form: { style: "display: inline;" },
+                            style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
             </div>
           </li>
         <% end %>
@@ -341,7 +342,7 @@
 
     <% other_elements_grouped.sort_by { |story, _grouped_elements| story_sort_key.call(story) }.each do |story, grouped_elements| %>
       <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
           <%= summary_label.call(story, grouped_elements.size) %>
         </summary>
 
@@ -352,14 +353,15 @@
                 <strong><%= element_display_label.call(el) %></strong>
               </div>
               <div style="margin-top: 4px;">
-                <%= link_to "詳細を見る", story_story_element_path(el.story, el) %>
+                <%= link_to "詳細を見る", story_story_element_path(el.story, el), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
               </div>
               <div style="margin-top: 4px;">
                 <%= button_to "ここへ移動",
                               idea_idea_placement_path(@idea),
                               method: :post,
                               params: { placeable_type: "StoryElement", placeable_id: el.id },
-                              form: { style: "display: inline;" } %>
+                              form: { style: "display: inline;" },
+                              style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
               </div>
             </li>
           <% end %>
@@ -395,14 +397,15 @@
             <strong><%= responsive_text.call(story.title) %></strong>
           </div>
           <div style="margin-top: 4px;">
-            <%= link_to "詳細を見る", story_path(story) %>
+            <%= link_to "詳細を見る", story_path(story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
           </div>
           <div style="margin-top: 4px;">
             <%= button_to "ここへ移動",
                           idea_idea_placement_path(@idea),
                           method: :post,
                           params: { placeable_type: "Story", placeable_id: story.id },
-                          form: { style: "display: inline;" } %>
+                          form: { style: "display: inline;" },
+                          style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
           </div>
         </li>
       <% end %>
@@ -421,14 +424,15 @@
             <strong><%= responsive_text.call(story.title) %></strong>
           </div>
           <div style="margin-top: 4px;">
-            <%= link_to "詳細を見る", story_path(story) %>
+            <%= link_to "詳細を見る", story_path(story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
           </div>
           <div style="margin-top: 4px;">
             <%= button_to "ここへ移動",
                           idea_idea_placement_path(@idea),
                           method: :post,
                           params: { placeable_type: "Story", placeable_id: story.id },
-                          form: { style: "display: inline;" } %>
+                          form: { style: "display: inline;" },
+                          style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
           </div>
         </li>
       <% end %>
@@ -463,7 +467,7 @@
     <h3>今いるストーリーの詳細メモ</h3>
 
     <details open style="margin-bottom: 16px;">
-      <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+      <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
         <%= summary_label.call(current_story, current_event_ideas.size) %>
       </summary>
 
@@ -479,14 +483,16 @@
                             event_idea.story_event.story,
                             event_idea.story_event,
                             event_idea
-                          ) %>
+                          ),
+                          style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
             </div>
             <div style="margin-top: 4px;">
               <%= button_to "ここへ移動",
                             idea_idea_placement_path(@idea),
                             method: :post,
                             params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id },
-                            form: { style: "display: inline;" } %>
+                            form: { style: "display: inline;" },
+                            style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
             </div>
           </li>
         <% end %>
@@ -503,7 +509,7 @@
 
     <% other_event_ideas_grouped.sort_by { |story, _grouped_event_ideas| story_sort_key.call(story) }.each do |story, grouped_event_ideas| %>
       <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
           <%= summary_label.call(story, grouped_event_ideas.size) %>
         </summary>
 
@@ -519,14 +525,16 @@
                               event_idea.story_event.story,
                               event_idea.story_event,
                               event_idea
-                            ) %>
+                            ),
+                            style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
               </div>
               <div style="margin-top: 4px;">
                 <%= button_to "ここへ移動",
                               idea_idea_placement_path(@idea),
                               method: :post,
                               params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id },
-                              form: { style: "display: inline;" } %>
+                              form: { style: "display: inline;" },
+                              style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
               </div>
             </li>
           <% end %>
@@ -559,7 +567,7 @@
     <h3>今いるストーリーのイベント</h3>
 
     <details open style="margin-bottom: 16px;">
-      <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+      <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
         <%= summary_label.call(current_story, current_events.size) %>
       </summary>
 
@@ -570,14 +578,15 @@
               <strong><%= event_display_label.call(event) %></strong>
             </div>
             <div style="margin-top: 4px;">
-              <%= link_to "詳細を見る", story_story_event_path(event.story, event) %>
+              <%= link_to "詳細を見る", story_story_event_path(event.story, event), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
             </div>
             <div style="margin-top: 4px;">
               <%= button_to "ここへ移動",
                             idea_idea_placement_path(@idea),
                             method: :post,
                             params: { placeable_type: "StoryEvent", placeable_id: event.id },
-                            form: { style: "display: inline;" } %>
+                            form: { style: "display: inline;" },
+                            style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
             </div>
           </li>
         <% end %>
@@ -594,7 +603,7 @@
 
     <% other_events_grouped.sort_by { |story, _grouped_events| story_sort_key.call(story) }.each do |story, grouped_events| %>
       <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #f8f9fa; border: 1px solid #ccc; border-radius: 6px; padding: 10px 12px; font-weight: bold;">
+        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
           <%= summary_label.call(story, grouped_events.size) %>
         </summary>
 
@@ -605,14 +614,15 @@
                 <strong><%= event_display_label.call(event) %></strong>
               </div>
               <div style="margin-top: 4px;">
-                <%= link_to "詳細を見る", story_story_event_path(event.story, event) %>
+                <%= link_to "詳細を見る", story_story_event_path(event.story, event), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
               </div>
               <div style="margin-top: 4px;">
                 <%= button_to "ここへ移動",
                               idea_idea_placement_path(@idea),
                               method: :post,
                               params: { placeable_type: "StoryEvent", placeable_id: event.id },
-                              form: { style: "display: inline;" } %>
+                              form: { style: "display: inline;" },
+                              style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
               </div>
             </li>
           <% end %>

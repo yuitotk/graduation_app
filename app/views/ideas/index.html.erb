@@ -1,27 +1,42 @@
 <h1>アイデア一覧（ホーム）</h1>
 
-<p><%= link_to "ストーリー一覧", stories_path %></p>
+<p style="margin: 8px 0 8px 0; font-size: 17px;">
+  思いついたアイデアを保存し、あとから見返したり整理したりできます。
+</p>
+
+<p style="margin: 0 0 20px 0; font-size: 17px;">
+  まずはアイデア作成またはAI作成から始め、作品化したくなったら
+  <%= link_to "ストーリー制作する", stories_path, style: "color: #5b7db1; font-weight: bold; text-decoration: underline;" %>
+  から作成できます。
+</p>
 
 <hr>
 
-<p>
-  <%= link_to "新規作成", new_idea_path %>
-  |
-  <%= link_to "AI作成", random_words_pick_path %>
+<h2 style="margin: 20px 0 16px 0; font-size: 24px;">作成したアイデア一覧</h2>
+
+<p style="margin: 0 0 16px 0;">
+  <%= link_to "アイデアを作成する", new_idea_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+  <%= link_to "AIで作成する", random_words_pick_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+</p>
+
+<p style="margin: 0 0 20px 0; font-size: 15px;">
+  作品化したくなったら、
+  <%= link_to "ストーリー制作する", stories_path, style: "color: #5b7db1; font-weight: bold; text-decoration: underline;" %>
+  から作成しましょう。
 </p>
 
 <% if @ideas.any? %>
   <% @ideas.each do |idea| %>
-    <%= link_to idea_path(idea), class: "text-decoration-none text-dark d-block" do %>
-      <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #999; border-radius: 16px; background: #f8f8f8;">
-        <h2><%= idea.title %></h2>
+    <%= link_to idea_path(idea), style: "display: block; text-decoration: none; color: inherit;" do %>
+      <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
+        <h2 style="color: #f5f5f5; text-decoration: none;"><%= idea.title %></h2>
 
         <% if idea.idea_image&.image? %>
           <div style="margin: 8px 0;">
             <%= image_tag idea.idea_image.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
           </div>
         <% else %>
-          <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #999; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+          <div style="width: 240px; height: 140px; margin: 8px 0; border: 2px solid #555555; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #2a2a2a; color: #f5f5f5;">
             画像なし
           </div>
         <% end %>
@@ -33,11 +48,11 @@
                idea.memo
              end %>
 
-        <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+        <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: #f5f5f5; text-decoration: none;">
           <%= truncate(display_memo, length: 78) %>
         </p>
 
-        <p style="margin: 8px 0 0 0; font-size: 14px;">
+        <p style="margin: 8px 0 0 0; font-size: 14px; color: #dddddd; text-decoration: none;">
           作成日: <%= l idea.created_at, format: :short %>
           <span style="display: inline-block; margin-left: 24px;">
             更新日（文字編集のみ）: <%= l idea.updated_at, format: :short %>

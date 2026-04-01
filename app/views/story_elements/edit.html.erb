@@ -6,7 +6,7 @@
 
 <%= render "form" %>
 
-<p style="color: red; font-weight: bold; margin-top: 24px; margin-bottom: 8px;">
+<p style="color: #f87171; font-weight: bold; margin-top: 24px; margin-bottom: 8px;">
   削除すると、この要素内のアイデアは消えます。<br>
   また、このストーリー内でこの要素を選択しているアイデア、イベントなどからも外れます。
 </p>
@@ -14,5 +14,6 @@
 <p>
   <%= link_to "削除",
         story_story_element_path(@story, @story_element),
-        data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？要素内アイデアと要素選択したアイデアなどからも外れます" } %>
+        data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？要素内アイデアと要素選択したアイデアなどからも外れます" },
+        style: "display: inline-block; background: #dc2626; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; text-decoration: none; cursor: pointer;" %>
 </p>
