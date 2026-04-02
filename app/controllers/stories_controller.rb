@@ -144,14 +144,58 @@ class StoriesController < ApplicationController
           { name: @story.title, path: nil }
         ]
       when "consistency"
-        [
-          { name: @story.title, path: story_path(@story) },
-          { name: "整合性チェック", path: nil }
-        ]
+        consistency_breadcrumbs
       else
         []
       end
   end
+
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  def consistency_breadcrumbs
+    case params[:from]
+    when "story_event_idea"
+      if params[:story_event_id].present? && params[:story_event_idea_id].present?
+        story_event = @story.story_events.find(params[:story_event_id])
+        story_event_idea = story_event.story_event_ideas.find(params[:story_event_idea_id])
+
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: story_event.title, path: story_story_event_path(@story, story_event) },
+          {
+            name: story_event_idea.title,
+            path: story_story_event_story_event_idea_path(@story, story_event, story_event_idea)
+          },
+          { name: "整合性チェック", path: nil }
+        ]
+      else
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: "整合性チェック", path: nil }
+        ]
+      end
+    when "story_event"
+      if params[:story_event_id].present?
+        story_event = @story.story_events.find(params[:story_event_id])
+
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: story_event.title, path: story_story_event_path(@story, story_event) },
+          { name: "整合性チェック", path: nil }
+        ]
+      else
+        [
+          { name: @story.title, path: story_path(@story) },
+          { name: "整合性チェック", path: nil }
+        ]
+      end
+    else
+      [
+        { name: @story.title, path: story_path(@story) },
+        { name: "整合性チェック", path: nil }
+      ]
+    end
+  end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   # ✅ ストーリー配下に入ったら「この作品」を session に固定
   # これでヘッダーの「この作品内（◯◯）」が安定する

@@ -1,10 +1,24 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<%= link_to "ストーリー詳細へ戻る", story_path(@story) %>
+<% if params[:from] == "story_event_idea" && params[:story_event_id].present? && params[:story_event_idea_id].present? %>
+  <%= link_to "詳細メモ詳細へ戻る",
+              story_story_event_story_event_idea_path(@story, params[:story_event_id], params[:story_event_idea_id]),
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+<% elsif params[:from] == "story_event" && params[:story_event_id].present? %>
+  <%= link_to "イベント詳細へ戻る",
+              story_story_event_path(@story, params[:story_event_id]),
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+<% else %>
+  <%= link_to "ストーリー詳細へ戻る",
+              story_path(@story),
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+<% end %>
 
 <h1>要素一覧</h1>
 
-<%= link_to "要素追加", new_story_story_element_path(@story) %>
+<%= link_to "要素追加",
+            new_story_story_element_path(@story, breadcrumb_params),
+            style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 
 <% grouped_elements = @story_elements.group_by(&:kind) %>
 
@@ -21,7 +35,8 @@
     <% grouped_elements[kind].each do |e| %>
       <li>
         <%= link_to "#{e.marker.present? ? "#{e.marker}　" : ""}#{e.name}",
-                    story_story_element_path(@story, e) %>
+                    story_story_element_path(@story, e, breadcrumb_params),
+                    style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
       </li>
     <% end %>
   </ul>

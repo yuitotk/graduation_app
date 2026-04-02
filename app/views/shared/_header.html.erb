@@ -95,7 +95,7 @@
     <% end %>
   </div>
 
-  <hr>
+  <hr style="border: none; border-top: 1px solid #333333; margin: 20px 0;">
 
   <% if logged_in? %>
     <%= link_to "使い方・ヘルプ", help_path %> |
@@ -156,6 +156,32 @@
                      class: "header-search-scope",
                      data: { "search-autocomplete-target": "scope" } %>
 
+      <% current_story_element =
+           begin
+             if controller_name == "story_elements" && action_name == "show" && params[:id].present?
+               StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])
+             elsif controller_name == "ideas" && %w[show edit update].include?(action_name)
+               if params[:page_type].to_s == "story_element" && params[:page_id].present?
+                 StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:page_id])
+               elsif params[:placeable_type].to_s == "StoryElement" && params[:placeable_id].present?
+                 StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])
+               elsif params[:story_element_id].present? && params[:from].present?
+                 StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_element_id])
+               elsif defined?(@idea) && @idea.present?
+                 placement = @idea.idea_placement
+                 if placement&.placeable_type == "StoryElement"
+                   placement.placeable
+                 elsif placement.present? && placement.respond_to?(:story_elements) && placement.story_elements.exists?
+                   placement.story_elements.first
+                 end
+               end
+             elsif controller_name == "search" && action_name == "index" && params[:page_type].to_s == "story_element" && params[:page_id].present?
+               StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:page_id])
+             else
+               nil
+             end
+           end %>
+
       <% header_story =
            begin
              if controller_name == "stories" && %w[show consistency].include?(action_name) && params[:id].present?
@@ -164,8 +190,20 @@
                current_user.stories.find_by(id: params[:story_id])
              elsif controller_name == "story_events" && action_name == "show" && params[:id].present?
                StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
-             elsif controller_name == "story_elements" && action_name == "show" && params[:id].present?
-               StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
+             elsif controller_name == "story_event_ideas" && action_name == "show" && params[:id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story_event&.story
+             elsif controller_name == "story_elements" && %w[index show].include?(action_name)
+               if params[:story_id].present?
+                 current_user.stories.find_by(id: params[:story_id])
+               elsif params[:id].present?
+                 StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story
+               end
+             elsif controller_name == "ideas" && %w[show edit update].include?(action_name)
+               if current_story_element.present?
+                 current_story_element.story
+               elsif params[:story_id].present?
+                 current_user.stories.find_by(id: params[:story_id])
+               end
              elsif params[:placeable_type].present? && params[:placeable_id].present?
                case params[:placeable_type].to_s
                when "Story"
@@ -174,6 +212,8 @@
                  StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story
                when "StoryElement"
                  StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story
+               when "StoryEventIdea"
+                 StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story_event&.story
                end
              elsif controller_name == "search" && action_name == "index"
                params[:story_id].present? ? current_search_story : nil
@@ -205,6 +245,91 @@
           <% header_story = current_search_story %>
         <% end %>
       <% end %>
+
+      <% current_story_event =
+           begin
+             if controller_name == "story_events" && action_name == "show" && params[:id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])
+             elsif controller_name == "stories" && action_name == "consistency" && params[:story_event_id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_id])
+             elsif controller_name == "story_elements" && %w[index show].include?(action_name) && params[:story_event_id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_id])
+             elsif controller_name == "story_event_ideas" && %w[show new edit].include?(action_name)
+               if defined?(@story_event) && @story_event.present?
+                 @story_event
+               elsif params[:story_event_id].present?
+                 StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_id])
+               elsif action_name == "show" && params[:id].present?
+                 StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])&.story_event
+               end
+             elsif controller_name == "ideas" && %w[show edit update].include?(action_name) && params[:story_event_id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_id])
+             elsif controller_name == "search" && action_name == "index" && params[:story_event_id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_id])
+             elsif params[:placeable_type].to_s == "StoryEvent" && params[:placeable_id].present?
+               StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])
+             elsif params[:placeable_type].to_s == "StoryEventIdea" && params[:placeable_id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])&.story_event
+             else
+               nil
+             end
+           end %>
+
+      <% current_story_event_idea =
+           begin
+             if controller_name == "story_event_ideas" && action_name == "show" && params[:id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:id])
+             elsif controller_name == "stories" && action_name == "consistency" && params[:story_event_idea_id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_idea_id])
+             elsif controller_name == "story_elements" && %w[index show].include?(action_name) && params[:story_event_idea_id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_idea_id])
+             elsif controller_name == "ideas" && %w[show edit update].include?(action_name) && params[:story_event_idea_id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_idea_id])
+             elsif controller_name == "search" && action_name == "index" && params[:story_event_idea_id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:story_event_idea_id])
+             elsif params[:placeable_type].to_s == "StoryEventIdea" && params[:placeable_id].present?
+               StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: params[:placeable_id])
+             else
+               nil
+             end
+           end %>
+
+      <% current_page_type =
+           if controller_name == "story_elements" && action_name == "index"
+             "story_elements_index"
+           elsif controller_name == "story_elements" && action_name == "show"
+             "story_element"
+           elsif controller_name == "stories" && action_name == "consistency"
+             "consistency"
+           elsif controller_name == "story_event_ideas" && action_name == "show"
+             "story_event_idea"
+           elsif controller_name == "story_events" && action_name == "show"
+             "story_event"
+           elsif controller_name == "stories" && action_name == "show"
+             "story"
+           elsif controller_name == "ideas" && %w[show edit update].include?(action_name) && current_story_element.present?
+             "story_element"
+           elsif controller_name == "search" && action_name == "index"
+             params[:page_type].presence
+           end %>
+
+      <% current_page_id =
+           if current_page_type == "story_element" && current_story_element.present?
+             current_story_element.id
+           elsif controller_name == "search" && action_name == "index"
+             params[:page_id].presence
+           end %>
+
+      <% header_from =
+           if current_story_event_idea.present?
+             "story_event_idea"
+           elsif current_story_event.present?
+             "story_event"
+           elsif header_story.present?
+             "story"
+           else
+             nil
+           end %>
 
       <% if header_story.present? && allow_within_story_toggle %>
         <span class="header-search-within-story">
@@ -255,7 +380,13 @@
            else
              request.fullpath
            end %>
+
       <%= hidden_field_tag :return_to, return_to_value %>
+      <%= hidden_field_tag :from, header_from if header_from.present? %>
+      <%= hidden_field_tag :story_event_id, current_story_event.id if current_story_event.present? %>
+      <%= hidden_field_tag :story_event_idea_id, current_story_event_idea.id if current_story_event_idea.present? %>
+      <%= hidden_field_tag :page_type, current_page_type if current_page_type.present? %>
+      <%= hidden_field_tag :page_id, current_page_id if current_page_id.present? %>
 
       <span class="header-search-submit-wrap">
         <%= submit_tag "検索" %>

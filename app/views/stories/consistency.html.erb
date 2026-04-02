@@ -1,14 +1,40 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<p><%= link_to "ストーリー詳細へ戻る", story_path(@story) %></p>
+<%
+  breadcrumb_params = {
+    from: params[:from],
+    story_event_id: params[:story_event_id],
+    story_event_idea_id: params[:story_event_idea_id]
+  }.compact.symbolize_keys
+%>
 
-<h1>整合性チェック</h1>
+<p>
+  <% if params[:from] == "story_event_idea" && params[:story_event_id].present? && params[:story_event_idea_id].present? %>
+    <%= link_to "詳細メモ詳細へ戻る",
+                story_story_event_story_event_idea_path(@story, params[:story_event_id], params[:story_event_idea_id]),
+                style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+  <% elsif params[:from] == "story_event" && params[:story_event_id].present? %>
+    <%= link_to "イベント詳細へ戻る",
+                story_story_event_path(@story, params[:story_event_id]),
+                style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+  <% else %>
+    <%= link_to "ストーリー詳細へ戻る",
+                story_path(@story),
+                style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+  <% end %>
+</p>
+
+<h1 style="color: #c4b5fd;">整合性チェック</h1>
 <h4>イベントと詳細メモのみ検索対象です。アイデアは含まれません。</h4>
 <h4>詳細メモで要素を選択していても、イベント自体にその要素が設定されていない場合は表示されません。</h4>
 
 <%= form_with url: consistency_story_path(@story), method: :get, local: true do %>
+  <%= hidden_field_tag :from, params[:from] if params[:from].present? %>
+  <%= hidden_field_tag :story_event_id, params[:story_event_id] if params[:story_event_id].present? %>
+  <%= hidden_field_tag :story_event_idea_id, params[:story_event_idea_id] if params[:story_event_idea_id].present? %>
+
   <div style="max-width: 420px; width: 100%;">
-    <%= label_tag :consistency_story_element_id, "要素を選ぶ" %><br>
+    <%= label_tag :consistency_story_element_id, "要素を選ぶ", style: "color: #ffffff;" %><br>
 
     <%= select_tag :consistency_story_element_id,
       options_for_select(
@@ -34,12 +60,13 @@
       style: "width: 100%; box-sizing: border-box;" %>
 
     <div style="margin-top: 8px;">
-      <%= submit_tag "表示" %>
+      <%= submit_tag "表示",
+            style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; cursor: pointer;" %>
     </div>
   </div>
 <% end %>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <% if @selected_element %>
   <% selected_kind_label =
@@ -78,30 +105,32 @@
        end %>
 
   <% if element_memo.present? %>
-    <%= link_to story_story_element_path(@story, @selected_element),
+    <%= link_to story_story_element_path(@story, @selected_element, breadcrumb_params),
                 style: "display: block; text-decoration: none; color: inherit;" do %>
-      <div style="margin: 16px 0; padding: 16px; border: 1px solid #d8d8d8; border-left: 6px solid #999; border-radius: 12px; background: #f3f3f3;">
-        <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">選択中の要素メモ</div>
-        <div style="margin-bottom: 8px;"><strong><%= selected_label %></strong></div>
+      <div style="margin: 16px 0; padding: 16px; border: 2px solid #555555; border-left: 6px solid #888888; border-radius: 16px; background: #1e1e1e; color: #f5f5f5;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">選択中の要素メモ</div>
+        <div style="margin-bottom: 8px; color: #f5f5f5;"><strong><%= selected_label %></strong></div>
 
         <div style="margin-bottom: 12px;">
           <% if selected_element_image_url.present? %>
             <%= image_tag selected_element_image_url,
-                          style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+                          style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 2px solid #555555; border-radius: 12px;" %>
           <% else %>
-            <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+            <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 2px solid #555555; border-radius: 12px; background: #2a2a2a; color: #f5f5f5;">
               画像なし
             </div>
           <% end %>
         </div>
 
-        <%= simple_format(element_memo.to_s) %>
+        <div style="color: #f5f5f5;">
+          <%= simple_format(element_memo.to_s) %>
+        </div>
       </div>
     <% end %>
   <% end %>
 
   <div style="margin: 24px 0 12px 0;">
-    <div style="font-size: 22px; font-weight: bold; margin-bottom: 8px;">検索結果</div>
+    <div style="font-size: 22px; font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">検索結果</div>
     <p style="margin: 0 0 6px 0;">該当イベント数：<strong><%= @events.size %>件</strong></p>
     <p style="margin: 0;">該当詳細メモ数：<strong><%= total_event_detail_memos %>件</strong></p>
   </div>
@@ -124,36 +153,38 @@
                event.story_event_image.image.url
              end %>
 
-        <div style="margin: 0 0 20px 0; padding: 16px; border: 1px solid #ccc; border-radius: 12px; background: #fff;">
-          <div style="font-size: 24px; font-weight: bold; margin-bottom: 12px;">
+        <div style="margin: 0 0 20px 0; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e; color: #f5f5f5;">
+          <div style="font-size: 24px; font-weight: bold; margin-bottom: 12px; color: #c4b5fd;">
             <%= event.title %>
           </div>
 
           <div style="margin-bottom: 16px;">
             <% if event_image_url.present? %>
               <%= image_tag event_image_url,
-                            style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+                            style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 2px solid #555555; border-radius: 12px;" %>
             <% else %>
-              <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+              <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 2px solid #555555; border-radius: 12px; background: #2a2a2a; color: #f5f5f5;">
                 画像なし
               </div>
             <% end %>
           </div>
 
-          <div style="font-weight: bold; margin-bottom: 6px;">イベント本文</div>
+          <div style="font-weight: bold; margin-bottom: 6px; color: #f5f5f5;">イベント本文</div>
           <% if event.body.present? %>
-            <div style="margin-bottom: 16px;">
+            <div style="margin-bottom: 16px; color: #f5f5f5;">
               <%= simple_format(truncate(event.body.to_s, length: 160)) %>
             </div>
           <% else %>
-            <div style="margin-bottom: 16px;">本文なし</div>
+            <div style="margin-bottom: 16px; color: #dddddd;">本文なし</div>
           <% end %>
 
           <div style="margin: 30px 0 30px 0;">
-            <%= link_to "イベント詳細へ", story_story_event_path(@story, event) %>
+            <%= link_to "イベント詳細へ",
+                        story_story_event_path(@story, event),
+                        style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
           </div>
 
-          <div style="font-weight: bold; margin-bottom: 8px;">詳細メモ</div>
+          <div style="font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">詳細メモ</div>
           <% if event_detail_memos.any? %>
             <% event_detail_memos.each do |event_detail_memo| %>
               <% memo = event_detail_memo.try(:memo) ||
@@ -170,34 +201,34 @@
 
               <%= link_to story_story_event_story_event_idea_path(@story, event, event_detail_memo),
                           style: "display: block; text-decoration: none; color: inherit;" do %>
-                <div style="margin-bottom: 12px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;">
+                <div style="margin-bottom: 12px; padding: 12px; border: 2px solid #555555; border-radius: 12px; background: #2a2a2a; color: #f5f5f5;">
                   <% if event_detail_memo.title.present? %>
-                    <div style="font-weight: bold; margin-bottom: 6px;"><%= event_detail_memo.title %></div>
+                    <div style="font-weight: bold; margin-bottom: 6px; color: #f5f5f5;"><%= event_detail_memo.title %></div>
                   <% end %>
 
                   <div style="margin-bottom: 12px;">
                     <% if event_detail_memo_image_url.present? %>
                       <%= image_tag event_detail_memo_image_url,
-                                    style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+                                    style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 2px solid #555555; border-radius: 12px;" %>
                     <% else %>
-                      <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+                      <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 2px solid #555555; border-radius: 12px; background: #1e1e1e; color: #f5f5f5;">
                         画像なし
                       </div>
                     <% end %>
                   </div>
 
                   <% if memo.present? %>
-                    <div>
+                    <div style="color: #f5f5f5;">
                       <%= simple_format(truncate(memo.to_s, length: 160)) %>
                     </div>
                   <% else %>
-                    <div>本文なし</div>
+                    <div style="color: #dddddd;">本文なし</div>
                   <% end %>
                 </div>
               <% end %>
             <% end %>
           <% else %>
-            <div style="margin-bottom: 16px;">該当する詳細メモはありません。</div>
+            <div style="margin-bottom: 16px; color: #dddddd;">該当する詳細メモはありません。</div>
           <% end %>
         </div>
       <% end %>

@@ -1,5 +1,9 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<%= link_to "戻る", story_story_elements_path(@story) %>
+<%= link_to "戻る",
+            story_story_elements_path(@story, breadcrumb_params),
+            style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+
 <h1>要素追加</h1>
+
 <%= render "form" %>

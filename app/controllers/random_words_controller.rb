@@ -27,7 +27,7 @@ class RandomWordsController < ApplicationController
     when StoryEventIdea
       story_event_idea_breadcrumbs(placeable)
     when StoryElement
-      story_element_breadcrumbs(placeable)
+      story_element_breadcrumbs(placeable, return_to_breadcrumb_params)
     else
       []
     end
@@ -58,14 +58,75 @@ class RandomWordsController < ApplicationController
     ]
   end
 
-  def story_element_breadcrumbs(story_element)
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+  def story_element_breadcrumbs(story_element, breadcrumb_params = {})
     story = story_element.story
 
-    [
-      { name: story.title, path: story_path(story) },
-      { name: "要素一覧", path: story_story_elements_path(story) },
-      { name: story_element.name, path: nil }
-    ]
+    case breadcrumb_params[:from]
+    when "story_event_idea"
+      story_event = story.story_events.find_by(id: breadcrumb_params[:story_event_id])
+      story_event_idea = story_event&.story_event_ideas&.find_by(id: breadcrumb_params[:story_event_idea_id])
+
+      if story_event.present? && story_event_idea.present?
+        [
+          { name: story.title, path: story_path(story) },
+          { name: story_event.title, path: story_story_event_path(story, story_event) },
+          {
+            name: story_event_idea.title,
+            path: story_story_event_story_event_idea_path(story, story_event, story_event_idea)
+          },
+          { name: "要素一覧", path: story_story_elements_path(story, breadcrumb_params) },
+          { name: story_element.name, path: nil }
+        ]
+      else
+        [
+          { name: story.title, path: story_path(story) },
+          { name: "要素一覧", path: story_story_elements_path(story) },
+          { name: story_element.name, path: nil }
+        ]
+      end
+    when "story_event"
+      story_event = story.story_events.find_by(id: breadcrumb_params[:story_event_id])
+
+      if story_event.present?
+        [
+          { name: story.title, path: story_path(story) },
+          { name: story_event.title, path: story_story_event_path(story, story_event) },
+          { name: "要素一覧", path: story_story_elements_path(story, breadcrumb_params) },
+          { name: story_element.name, path: nil }
+        ]
+      else
+        [
+          { name: story.title, path: story_path(story) },
+          { name: "要素一覧", path: story_story_elements_path(story) },
+          { name: story_element.name, path: nil }
+        ]
+      end
+    else
+      [
+        { name: story.title, path: story_path(story) },
+        { name: "要素一覧", path: story_story_elements_path(story) },
+        { name: story_element.name, path: nil }
+      ]
+    end
+  end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+
+  def return_to_breadcrumb_params
+    return {} if params[:return_to].blank?
+
+    query = URI.parse(params[:return_to]).query
+    return {} if query.blank?
+
+    parsed = Rack::Utils.parse_nested_query(query)
+
+    {
+      from: parsed["from"],
+      story_event_id: parsed["story_event_id"],
+      story_event_idea_id: parsed["story_event_idea_id"]
+    }.compact.symbolize_keys
+  rescue URI::InvalidURIError
+    {}
   end
 
   def find_placeable_for_current_user(type, id)

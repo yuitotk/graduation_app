@@ -1,15 +1,13 @@
 <!-- app/views/search/index.html.erb -->
-<p>
-  <%= link_to "ストーリー一覧へ", stories_path %>
-</p>
-<h1>検索結果</h1>
+<h1 style="color: #c4b5fd;">検索結果</h1>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <% q = @query.to_s %>
 <% scope = (@scope.presence || "all").to_s %>
+<% breadcrumb_params = (@search_breadcrumb_params || {}).merge(return_to: request.fullpath) %>
 
-<h2>検索条件</h2>
+<h2 style="color: #c4b5fd;">検索条件</h2>
 <ul>
   <li>検索ワード：<%= q.presence || "（未入力）" %></li>
   <li>
@@ -36,7 +34,7 @@
   </li>
 </ul>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <% results = (@results || {}).with_indifferent_access %>
 
@@ -66,30 +64,30 @@
 <% render_idea_card = lambda do |idea|
      idea_image_url = idea_image_url_for.call(idea)
 %>
-  <%= link_to idea_path(idea),
+  <%= link_to idea_path(idea, breadcrumb_params),
               style: "display: block; text-decoration: none; color: inherit;" do %>
-    <div style="margin: 0 0 12px 0; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;">
+    <div style="margin: 0 0 12px 0; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e; color: #f5f5f5;">
       <% if idea.title.present? %>
-        <div style="font-weight: bold; margin-bottom: 6px;"><%= idea.title %></div>
+        <div style="font-weight: bold; margin-bottom: 6px; color: #ddd6fe;"><%= idea.title %></div>
       <% end %>
 
       <div style="margin-bottom: 12px;">
         <% if idea_image_url.present? %>
           <%= image_tag idea_image_url,
-                        style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 1px solid #999; border-radius: 12px;" %>
+                        style: "display: block; width: 240px; height: 140px; object-fit: cover; border: 2px solid #555555; border-radius: 12px;" %>
         <% else %>
-          <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 1px solid #999; border-radius: 12px; background: #f8f8f8;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 240px; height: 140px; border: 2px solid #555555; border-radius: 12px; background: #2a2a2a; color: #f5f5f5;">
             画像なし
           </div>
         <% end %>
       </div>
 
       <% if idea.memo.present? %>
-        <div style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; white-space: normal; line-height: 1.6; max-height: 4.8em;">
+        <div style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; white-space: normal; line-height: 1.6; max-height: 4.8em; color: #f5f5f5;">
           <%= simple_format(snippet_for.call(idea.memo, q)) %>
         </div>
       <% else %>
-        <div>本文なし</div>
+        <div style="color: #dddddd;">本文なし</div>
       <% end %>
     </div>
   <% end %>
@@ -98,7 +96,7 @@
 <% if q.blank? && @story_element_id.blank? %>
   <p>検索ワードを入力して検索してください。</p>
 <% else %>
-  <h2>件数</h2>
+  <h2 style="color: #c4b5fd;">件数</h2>
 
   <% if scope == "all" %>
     <ul>
@@ -122,7 +120,7 @@
     <p><strong><%= label %></strong>: <%= count %> 件</p>
   <% end %>
 
-  <hr>
+  <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
   <% render_category = lambda do |title, key, is_home: false|
        pair = results[key] || {}
@@ -130,7 +128,7 @@
        moved_rel   = pair[:moved] || Idea.none
   %>
     <section style="margin-bottom: 24px;">
-      <h1><%= title %></h1>
+      <h1 style="color: #c4b5fd;"><%= title %></h1>
 
       <% if is_home %>
         <% if created_rel.count == 0 %>
@@ -143,7 +141,7 @@
           </div>
         <% end %>
       <% else %>
-        <h2>新規作成したアイデア</h2>
+        <h2 style="color: #c4b5fd;">新規作成したアイデア</h2>
         <% if created_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>
@@ -154,7 +152,7 @@
           </div>
         <% end %>
 
-        <h2>移動してきたアイデア</h2>
+        <h2 style="color: #c4b5fd;">移動してきたアイデア</h2>
         <% if moved_rel.count == 0 %>
           <p>該当なし</p>
         <% else %>

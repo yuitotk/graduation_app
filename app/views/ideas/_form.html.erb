@@ -1,4 +1,13 @@
+<%
+  current_breadcrumb_params = {
+    from: params[:from],
+    story_event_id: params[:story_event_id],
+    story_event_idea_id: params[:story_event_idea_id]
+  }.compact.symbolize_keys
+%>
+
 <%= form_with(model: idea,
+              url: idea.persisted? ? idea_path(idea, current_breadcrumb_params) : ideas_path(current_breadcrumb_params),
               local: true,
               html: { multipart: true },
               data: {
