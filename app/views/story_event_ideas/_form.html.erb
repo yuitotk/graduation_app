@@ -12,7 +12,7 @@
   <% end %>
 
   <div style="margin-bottom: 30px;" data-controller="character-counter">
-    <%= f.label :title, "タイトル（40文字を超えた分は入力できません）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :title, "タイトル（40文字を超えた分は入力できません）", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.text_field :title,
           maxlength: 40,
           data: {
@@ -28,12 +28,12 @@
   </div>
 
   <div style="margin-bottom: 30px;">
-    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.text_area :memo, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
   <div style="margin-bottom: 30px;">
-    <%= f.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.file_field :image %>
 
     <% if @story_event_idea.image? %>
@@ -51,13 +51,13 @@
   </div>
 
   <div style="margin-bottom: 30px;">
-    <div style="font-size: 24px; font-weight: bold; color: #ffffff;">このメモの登場要素</div>
+    <div style="font-size: 24px; font-weight: bold; color: #ddd6fe;">このメモの登場要素</div>
 
     <% if @story.story_elements.any? %>
       <% grouped_elements = @story.story_elements.group_by(&:kind) %>
 
       <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
-        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ffffff;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ddd6fe;">
           選択中の要素
         </div>
 
@@ -71,7 +71,7 @@
       </div>
 
       <div style="margin-top: 16px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
-        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ffffff;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ddd6fe;">
           要素を選択する
         </div>
 

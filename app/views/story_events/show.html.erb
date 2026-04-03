@@ -1,32 +1,42 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<p>
-  <%= link_to "ストーリー詳細へ戻る", story_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+<p style="margin: 0 0 16px 0;">
+  <%= link_to "ストーリー詳細へ戻る",
+              story_path(@story),
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
-<h1>イベント詳細ページ</h1>
+<h1 style="margin: 0 0 20px 0; color: #c4b5fd;">イベント詳細ページ</h1>
 
-<hr>
+<ul style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8; color: #f5f5f5;">
+  <li>イベント（章）として入れてみたい内容は、まずアイデア作成で試してみましょう。</li>
+  <li>良かった案は、イベント編集から本文に追加していくのががおすすめです。</li>
+  <li>イベント本体には書ききれない会話案、演出案などは、詳細メモとしてさらに細かく記録して整理できます。</li>
+  <li>詳細メモは、1話、2話という感じで作成すると整理しやすくおすすめです</li>
+</ul>
 
-<h1><%= @story_event.title %></h1>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+
+<h1 style="margin: 0 0 16px 0; color: #ddd6fe;"><%= @story_event.title %></h1>
 
 <% if @story_event.story_event_image&.image? %>
-  <div style="margin-top: 16px;">
-    <%= image_tag @story_event.story_event_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
+  <div style="margin-top: 16px; margin-bottom: 20px;">
+    <%= image_tag @story_event.story_event_image.image.url,
+                  style: "max-width: 320px; height: auto; border-radius: 16px; display: block;" %>
   </div>
 <% end %>
 
-<h4>イベントの登場要素</h4>
+<h2 style="margin: 0 0 12px 0; color: #ddd6fe;">イベントの登場要素</h2>
 <% if @story_event.story_elements.any? %>
   <% grouped_elements = @story_event.story_elements.group_by(&:kind) %>
 
-  <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e;">
+  <div style="margin-top: 12px; margin-bottom: 24px; border: 1px solid #555555; border-radius: 16px; padding: 16px; background: #1e1e1e;">
     <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
       <% elements = grouped_elements[kind] || [] %>
       <% next if elements.blank? %>
 
       <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
+        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 10px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
           <%= kind_label %>（<%= elements.size %>）
         </summary>
 
@@ -41,16 +51,16 @@
     <% end %>
   </div>
 <% else %>
-  <p>未設定</p>
+  <p style="margin: 0 0 24px 0; color: #f5f5f5;">未設定</p>
 <% end %>
 
-<h4>説明</h4>
-<div>
+<h2 style="margin: 0 0 12px 0; color: #ddd6fe;">説明</h2>
+<div style="margin-bottom: 20px; color: #f5f5f5; line-height: 1.8;">
   <%= simple_format(@story_event.body) %>
 </div>
 
-<p>
-  <%= link_to "編集",
+<p style="margin: 0 0 8px 0; color: #f5f5f5;">
+  <%= link_to "イベント編集",
               edit_story_story_event_path(@story, @story_event),
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
@@ -61,12 +71,12 @@
   </span>
 </p>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <div style="margin: 24px 0; padding: 20px 0;">
-  <h2 style="margin-top: 0; margin-bottom: 12px;">要素作成・整合性チェック</h2>
+  <h2 style="margin-top: 0; margin-bottom: 12px; color: #c4b5fd;">要素作成・整合性チェック</h2>
 
-  <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.8;">
+  <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.8; color: #f5f5f5;">
     キャラクター・アイテム・設定は「要素」として登録して管理できます。<br>
     要素がどのイベントや詳細メモに登場するかは、整合性チェックで時系列に確認できます。
   </p>
@@ -90,29 +100,32 @@
   </p>
 </div>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h2>詳細メモ</h2>
+<h2 style="margin: 0 0 12px 0; color: #c4b5fd;">詳細メモ</h2>
 
-<h4>この詳細メモ欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
+<h4 style="margin: 0 0 16px 0; color: #f5f5f5; line-height: 1.8;">
+  この詳細メモ欄は、整合性チェックの対象です。上から時系列の早い順として表示します。
+</h4>
 
-<p>
+<p style="margin: 0 0 16px 0;">
   <%= link_to "詳細メモを追加",
               new_story_story_event_story_event_idea_path(@story, @story_event),
-              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5b7db1; border-radius: 12px; background: #5b7db1; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @story_event.story_event_ideas.any? %>
   <% @story_event.story_event_ideas.order(:position, :created_at).each do |idea| %>
     <%= link_to story_story_event_story_event_idea_path(@story, @story_event, idea),
                 style: "display: block; margin-bottom: 8px; border: 2px solid #555555; border-radius: 20px; padding: 24px; background-color: #1e1e1e; color: inherit; text-decoration: none;" do %>
-      <h3 style="margin-top: 0; margin-bottom: 16px; color: #f5f5f5; text-decoration: none;">
+      <h3 style="margin-top: 0; margin-bottom: 16px; color: #ddd6fe; text-decoration: none;">
         <%= idea.title %>
       </h3>
 
       <% if idea.image? %>
         <div style="margin: 8px 0 12px 0;">
-          <%= image_tag idea.image.url, style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
+          <%= image_tag idea.image.url,
+                        style: "width: 240px; height: 140px; object-fit: cover; display: block; border-radius: 12px;" %>
         </div>
       <% else %>
         <div style="width: 240px; height: 140px; margin: 8px 0 12px 0; border: 2px solid #555555; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #2a2a2a; color: #f5f5f5;">
@@ -132,7 +145,7 @@
                       method: :patch,
                       form: { style: "display: inline;" },
                       style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
-        <span>上に移動</span>
+        <span style="color: #cbd5e1;">上に移動</span>
       </div>
 
       <div style="display: flex; align-items: center; gap: 6px;">
@@ -141,17 +154,22 @@
                       method: :patch,
                       form: { style: "display: inline;" },
                       style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
-        <span>下に移動</span>
+        <span style="color: #cbd5e1;">下に移動</span>
       </div>
     </div>
   <% end %>
 <% else %>
-  <p>まだ詳細メモはありません</p>
+  <p style="color: #f5f5f5;">まだ詳細メモはありません</p>
 <% end %>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h3>新規アイデア</h3>
+<h3 style="margin: 0 0 12px 0; color: #c4b5fd;">新規アイデア</h3>
+
+<p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
+  作成した要素は、アイデア作成時に登場要素として選択できます。<br>
+  アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
+</p>
 
 <p style="margin: 0 0 16px 0;">
   <%= link_to "新規作成",
@@ -171,41 +189,41 @@
 </p>
 
 <% if @created_here_ideas.present? %>
-  <ul>
+  <ul style="margin: 0 0 20px 20px;">
     <% @created_here_ideas.each do |idea| %>
-      <li>
+      <li style="margin-bottom: 8px;">
         <%= link_to idea.title,
                     idea_path(
                       idea,
                       from: "story_event",
                       story_event_id: @story_event.id
                     ),
-                    style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+                    style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p>まだありません</p>
+  <p style="color: #f5f5f5;">まだありません</p>
 <% end %>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h3>ここに移動したアイデア</h3>
+<h3 style="margin: 0 0 12px 0; color: #c4b5fd;">ここに移動したアイデア</h3>
 
 <% if @moved_ideas.present? %>
-  <ul>
+  <ul style="margin: 0 0 20px 20px;">
     <% @moved_ideas.each do |idea| %>
-      <li>
+      <li style="margin-bottom: 8px;">
         <%= link_to idea.title,
                     idea_path(
                       idea,
                       from: "story_event",
                       story_event_id: @story_event.id
                     ),
-                    style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+                    style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p>まだありません</p>
+  <p style="color: #f5f5f5;">まだありません</p>
 <% end %>
