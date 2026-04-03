@@ -1,4 +1,4 @@
-<h1>アイデア一覧（ホーム）</h1>
+<h1 style="color: #c4b5fd;">アイデア一覧（ホーム）</h1>
 
 <p style="margin: 8px 0 8px 0; font-size: 17px;">
   思いついたアイデアを保存し、あとから見返したり整理したりできます。
@@ -10,9 +10,9 @@
   から作成できます。
 </p>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #333333; margin: 20px 0;">
 
-<h2 style="margin: 20px 0 16px 0; font-size: 24px;">作成したアイデア一覧</h2>
+<h2 style="margin: 20px 0 16px 0; font-size: 24px; color: #c4b5fd;">作成したアイデア一覧</h2>
 
 <p style="margin: 0 0 16px 0;">
   <%= link_to "アイデアを作成する", new_idea_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
@@ -29,7 +29,7 @@
   <% @ideas.each do |idea| %>
     <%= link_to idea_path(idea), style: "display: block; text-decoration: none; color: inherit;" do %>
       <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
-        <h2 style="color: #f5f5f5; text-decoration: none;"><%= idea.title %></h2>
+        <h2 style="color: #ddd6fe; text-decoration: none;"><%= idea.title %></h2>
 
         <% if idea.idea_image&.image? %>
           <div style="margin: 8px 0;">

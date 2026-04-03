@@ -1,6 +1,14 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<%= link_to "詳細へ戻る", idea_path(@idea) %>
+<%
+  current_breadcrumb_params = {
+    from: params[:from],
+    story_event_id: params[:story_event_id],
+    story_event_idea_id: params[:story_event_idea_id]
+  }.compact.symbolize_keys
+%>
+
+<%= link_to "詳細へ戻る", idea_path(@idea, current_breadcrumb_params) %>
 
 <h1>アイデア編集</h1>
 
@@ -15,7 +23,7 @@
 <%= render "form", idea: @idea %>
 
 <div style="margin-top: 32px;">
-  <%= link_to "削除", idea_path(@idea),
+  <%= link_to "削除", idea_path(@idea, current_breadcrumb_params),
         data: { turbo_method: :delete, turbo_confirm: "削除しますか？" },
         style: "display: inline-block; background: #dc2626; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; text-decoration: none; cursor: pointer;" %>
 </div>

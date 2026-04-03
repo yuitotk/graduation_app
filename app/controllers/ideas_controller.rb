@@ -95,7 +95,7 @@ class IdeasController < ApplicationController
         @idea.idea_placement.story_element_ids = Array(element_ids).compact_blank
       end
 
-      redirect_to @idea, notice: "アイデアを更新しました"
+      redirect_to idea_path(@idea, current_breadcrumb_params), notice: "アイデアを更新しました"
     else
       @idea.build_idea_image if @idea.idea_image.nil?
 
@@ -120,7 +120,11 @@ class IdeasController < ApplicationController
       when StoryEvent
         story_story_event_path(@idea.idea_placement.placeable.story, @idea.idea_placement.placeable)
       when StoryElement
-        story_story_element_path(@idea.idea_placement.placeable.story, @idea.idea_placement.placeable)
+        story_story_element_path(
+          @idea.idea_placement.placeable.story,
+          @idea.idea_placement.placeable,
+          current_breadcrumb_params
+        )
       when StoryEventIdea
         story_story_event_story_event_idea_path(
           @idea.idea_placement.placeable.story_event.story,
@@ -161,7 +165,7 @@ class IdeasController < ApplicationController
     when StoryEventIdea
       story_event_idea_breadcrumbs(placeable)
     when StoryElement
-      story_element_breadcrumbs(placeable)
+      story_element_breadcrumbs(placeable, current_breadcrumb_params)
     else
       []
     end
@@ -192,14 +196,85 @@ class IdeasController < ApplicationController
     ]
   end
 
-  def story_element_breadcrumbs(story_element)
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+  def story_element_breadcrumbs(story_element, breadcrumb_params = {})
     story = story_element.story
 
-    [
-      { name: story.title, path: story_path(story) },
-      { name: "要素一覧", path: story_story_elements_path(story) },
-      { name: story_element.name, path: nil }
-    ]
+    case breadcrumb_params[:from]
+    when "story_event_idea"
+      story_event = story.story_events.find_by(id: breadcrumb_params[:story_event_id])
+      story_event_idea = story_event&.story_event_ideas&.find_by(id: breadcrumb_params[:story_event_idea_id])
+
+      if story_event.present? && story_event_idea.present?
+        [
+          { name: story.title, path: story_path(story) },
+          { name: story_event.title, path: story_story_event_path(story, story_event) },
+          {
+            name: story_event_idea.title,
+            path: story_story_event_story_event_idea_path(story, story_event, story_event_idea)
+          },
+          { name: "要素一覧", path: story_story_elements_path(story, breadcrumb_params) },
+          { name: story_element.name, path: nil }
+        ]
+      else
+        [
+          { name: story.title, path: story_path(story) },
+          { name: "要素一覧", path: story_story_elements_path(story) },
+          { name: story_element.name, path: nil }
+        ]
+      end
+    when "story_event"
+      story_event = story.story_events.find_by(id: breadcrumb_params[:story_event_id])
+
+      if story_event.present?
+        [
+          { name: story.title, path: story_path(story) },
+          { name: story_event.title, path: story_story_event_path(story, story_event) },
+          { name: "要素一覧", path: story_story_elements_path(story, breadcrumb_params) },
+          { name: story_element.name, path: nil }
+        ]
+      else
+        [
+          { name: story.title, path: story_path(story) },
+          { name: "要素一覧", path: story_story_elements_path(story) },
+          { name: story_element.name, path: nil }
+        ]
+      end
+    else
+      [
+        { name: story.title, path: story_path(story) },
+        { name: "要素一覧", path: story_story_elements_path(story) },
+        { name: story_element.name, path: nil }
+      ]
+    end
+  end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+
+  def current_breadcrumb_params
+    return return_to_breadcrumb_params if params[:return_to].present?
+
+    {
+      from: params[:from],
+      story_event_id: params[:story_event_id],
+      story_event_idea_id: params[:story_event_idea_id]
+    }.compact.symbolize_keys
+  end
+
+  def return_to_breadcrumb_params
+    return {} if params[:return_to].blank?
+
+    query = URI.parse(params[:return_to]).query
+    return {} if query.blank?
+
+    parsed = Rack::Utils.parse_nested_query(query)
+
+    {
+      from: parsed["from"],
+      story_event_id: parsed["story_event_id"],
+      story_event_idea_id: parsed["story_event_idea_id"]
+    }.compact.symbolize_keys
+  rescue URI::InvalidURIError
+    {}
   end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

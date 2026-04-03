@@ -35,19 +35,42 @@ class IdeaPlacementsController < ApplicationController
   def redirect_target(placeable)
     case placeable
     when Story
-      story_path(placeable)
+      story_path(placeable, redirect_breadcrumb_params)
     when StoryEvent
-      story_story_event_path(placeable.story, placeable)
+      story_story_event_path(placeable.story, placeable, redirect_breadcrumb_params)
     when StoryElement
-      story_story_element_path(placeable.story, placeable)
+      story_element_redirect_path(placeable)
     when StoryEventIdea
-      story_story_event_story_event_idea_path(
-        placeable.story_event.story,
-        placeable.story_event,
-        placeable
-      )
+      story_event_idea_redirect_path(placeable)
     else
       ideas_path
     end
+  end
+
+  def story_element_redirect_path(placeable)
+    story_story_element_path(
+      placeable.story,
+      placeable,
+      redirect_breadcrumb_params.merge(
+        page_type: "story_element",
+        page_id: placeable.id
+      )
+    )
+  end
+
+  def story_event_idea_redirect_path(placeable)
+    story_story_event_story_event_idea_path(
+      placeable.story_event.story,
+      placeable.story_event,
+      placeable
+    )
+  end
+
+  def redirect_breadcrumb_params
+    {
+      from: params[:from],
+      story_event_id: params[:story_event_id],
+      story_event_idea_id: params[:story_event_idea_id]
+    }.compact
   end
 end

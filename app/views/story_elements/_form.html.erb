@@ -1,4 +1,5 @@
 <%= form_with model: [@story, @story_element],
+              url: @story_element.persisted? ? story_story_element_path(@story, @story_element, breadcrumb_params) : story_story_elements_path(@story, breadcrumb_params),
               data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
   <% if @story_element.errors.any? %>
     <ul>

@@ -1,9 +1,14 @@
 <p><%= link_to "アイデア一覧（ホーム）へ", ideas_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
-<h1>ストーリー一覧</h1>
+<h1 style="color: #c4b5fd;">ストーリー一覧</h1>
+
+<p style="margin: 8px 0 20px 0; font-size: 17px;">
+  アイデアがまとまってきたら、ストーリーを作成して整理していきましょう。<br>
+  作品ごとにイベントや要素を管理しながら、全体の流れを見やすくできます。
+</p>
 
 <p style="margin: 0 0 20px 0;">
-  <%= link_to "ストーリー作成", new_story_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5b7db1; border-radius: 12px; background: #5b7db1; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  <%= link_to "ストーリー作成", new_story_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @stories.any? %>
@@ -11,7 +16,7 @@
     <div style="margin-bottom: 20px;">
       <%= link_to story_path(story), style: "display: block; text-decoration: none; color: inherit;" do %>
         <div style="padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
-          <h2 style="color: #f5f5f5; text-decoration: none;"><%= story.title %></h2>
+          <h2 style="color: #ddd6fe; text-decoration: none;"><%= story.title %></h2>
 
           <% if story.story_image&.image? %>
             <div style="margin: 8px 0;">
@@ -33,15 +38,15 @@
         <span style="display: inline-block; margin-right: 12px;">
           <%= button_to "↑", move_up_story_path(story), method: :patch,
                         form: { style: "display:inline" },
-                        style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
-          <span>上に移動</span>
+                        style: "padding: 4px 10px; border: 1px solid #475569; border-radius: 6px; background: #334155; color: #ffffff; cursor: pointer;" %>
+          <span style="color: #cbd5e1;">上に移動</span>
         </span>
 
         <span style="display: inline-block;">
           <%= button_to "↓", move_down_story_path(story), method: :patch,
                         form: { style: "display:inline" },
-                        style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
-          <span>下に移動</span>
+                        style: "padding: 4px 10px; border: 1px solid #475569; border-radius: 6px; background: #334155; color: #ffffff; cursor: pointer;" %>
+          <span style="color: #cbd5e1;">下に移動</span>
         </span>
       </div>
     </div>

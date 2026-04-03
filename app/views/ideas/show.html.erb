@@ -38,10 +38,42 @@
 <% placement = @idea.idea_placement %>
 
 <%
+  current_breadcrumb_params = {
+    from: params[:from],
+    story_event_id: params[:story_event_id],
+    story_event_idea_id: params[:story_event_idea_id],
+    page_type: params[:page_type],
+    page_id: params[:page_id]
+  }.compact.symbolize_keys
+
+  element_breadcrumb_params_for = lambda do |element|
+    current_breadcrumb_params.merge(
+      page_type: "story_element",
+      page_id: element.id
+    )
+  end
+
+  current_story_event_idea =
+    if params[:from] == "story_event_idea" && params[:story_event_idea_id].present?
+      StoryEventIdea.includes(story_event: :story).find_by(id: params[:story_event_idea_id])
+    end
+
   back_label = nil
   back_path  = nil
 
-  if placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
+  if current_story_event_idea.present?
+    back_label = "詳細メモ詳細に戻る"
+    back_path  = story_story_event_story_event_idea_path(
+      current_story_event_idea.story_event.story,
+      current_story_event_idea.story_event,
+      current_story_event_idea,
+      {
+        from: "story_event_idea",
+        story_event_id: current_story_event_idea.story_event.id,
+        story_event_idea_id: current_story_event_idea.id
+      }
+    )
+  elsif placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
     case placement.placeable
     when Story
       back_label = "ストーリー詳細に戻る"
@@ -51,13 +83,22 @@
       back_path  = story_story_event_path(placement.placeable.story, placement.placeable)
     when StoryElement
       back_label = "要素詳細に戻る"
-      back_path  = story_story_element_path(placement.placeable.story, placement.placeable)
+      back_path  = story_story_element_path(
+        placement.placeable.story,
+        placement.placeable,
+        current_breadcrumb_params
+      )
     when StoryEventIdea
       back_label = "詳細メモ詳細に戻る"
       back_path  = story_story_event_story_event_idea_path(
         placement.placeable.story_event.story,
         placement.placeable.story_event,
-        placement.placeable
+        placement.placeable,
+        {
+          from: "story_event_idea",
+          story_event_id: placement.placeable.story_event.id,
+          story_event_idea_id: placement.placeable.id
+        }
       )
     end
   end
@@ -68,29 +109,37 @@
   end
 
   page_context_title =
-    case placement&.placeable
-    when Story
-      "ストーリー内アイデア"
-    when StoryEvent
-      "イベント内アイデア"
-    when StoryElement
-      "要素内アイデア"
-    when StoryEventIdea
+    if current_story_event_idea.present?
       "詳細メモ内アイデア"
     else
-      "ホーム内アイデア"
+      case placement&.placeable
+      when Story
+        "ストーリー内アイデア"
+      when StoryEvent
+        "イベント内アイデア"
+      when StoryElement
+        "要素内アイデア"
+      when StoryEventIdea
+        "詳細メモ内アイデア"
+      else
+        "ホーム内アイデア"
+      end
     end
 
   current_story =
-    case placement&.placeable
-    when Story
-      placement.placeable
-    when StoryEvent
-      placement.placeable.story
-    when StoryElement
-      placement.placeable.story
-    when StoryEventIdea
-      placement.placeable.story_event.story
+    if current_story_event_idea.present?
+      current_story_event_idea.story_event.story
+    else
+      case placement&.placeable
+      when Story
+        placement.placeable
+      when StoryEvent
+        placement.placeable.story
+      when StoryElement
+        placement.placeable.story
+      when StoryEventIdea
+        placement.placeable.story_event.story
+      end
     end
 
   normalize_for_sort = lambda do |text|
@@ -240,7 +289,7 @@
 <p><%= simple_format(@idea.memo) %></p>
 
 <p>
-  <%= link_to "編集", edit_idea_path(@idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+  <%= link_to "編集", edit_idea_path(@idea, current_breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @idea.created_at, format: :short %>
   </span>
@@ -256,14 +305,14 @@
 <h2>このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
 <ul>
-  <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, tab: "stories"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
-  <li><%= link_to "イベント詳細ページへ", idea_path(@idea, tab: "events"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
-  <li><%= link_to "詳細メモ詳細ページへ", idea_path(@idea, tab: "event_ideas"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
-  <li><%= link_to "要素詳細ページへ", idea_path(@idea, tab: "elements"), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "stories")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "イベント詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "events")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "詳細メモ詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "event_ideas")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
+  <li><%= link_to "要素詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "elements")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
 </ul>
 
 <% if tab.present? %>
-  <p><%= link_to "← 4択に戻る", idea_path(@idea), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
+  <p><%= link_to "← 4択に戻る", idea_path(@idea, current_breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 <% end %>
 
 <% if tab == "elements" %>
@@ -317,13 +366,18 @@
               <strong><%= element_display_label.call(el) %></strong>
             </div>
             <div style="margin-top: 4px;">
-              <%= link_to "詳細を見る", story_story_element_path(el.story, el), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+              <%= link_to "詳細を見る",
+                          story_story_element_path(el.story, el, element_breadcrumb_params_for.call(el)),
+                          style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
             </div>
             <div style="margin-top: 4px;">
               <%= button_to "ここへ移動",
                             idea_idea_placement_path(@idea),
                             method: :post,
-                            params: { placeable_type: "StoryElement", placeable_id: el.id },
+                            params: {
+                              placeable_type: "StoryElement",
+                              placeable_id: el.id
+                            }.merge(element_breadcrumb_params_for.call(el)),
                             form: { style: "display: inline;" },
                             style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
             </div>
@@ -353,13 +407,18 @@
                 <strong><%= element_display_label.call(el) %></strong>
               </div>
               <div style="margin-top: 4px;">
-                <%= link_to "詳細を見る", story_story_element_path(el.story, el), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+                <%= link_to "詳細を見る",
+                            story_story_element_path(el.story, el, element_breadcrumb_params_for.call(el)),
+                            style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
               </div>
               <div style="margin-top: 4px;">
                 <%= button_to "ここへ移動",
                               idea_idea_placement_path(@idea),
                               method: :post,
-                              params: { placeable_type: "StoryElement", placeable_id: el.id },
+                              params: {
+                                placeable_type: "StoryElement",
+                                placeable_id: el.id
+                              }.merge(element_breadcrumb_params_for.call(el)),
                               form: { style: "display: inline;" },
                               style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
               </div>
@@ -443,6 +502,13 @@
   <hr>
   <h2>移動先の詳細メモを選ぶ（時系列順）</h2>
 
+  <% event_idea_breadcrumb_params_for = lambda do |event_idea|
+       current_breadcrumb_params.merge(
+         story_event_id: event_idea.story_event.id,
+         story_event_idea_id: event_idea.id
+       )
+     end %>
+
   <% event_idea_display_label = lambda do |event_idea|
        breadcrumb_label.call([
          event_idea.story_event&.story&.title,
@@ -482,7 +548,8 @@
                           story_story_event_story_event_idea_path(
                             event_idea.story_event.story,
                             event_idea.story_event,
-                            event_idea
+                            event_idea,
+                            event_idea_breadcrumb_params_for.call(event_idea)
                           ),
                           style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
             </div>
@@ -490,7 +557,10 @@
               <%= button_to "ここへ移動",
                             idea_idea_placement_path(@idea),
                             method: :post,
-                            params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id },
+                            params: {
+                              placeable_type: "StoryEventIdea",
+                              placeable_id: event_idea.id
+                            }.merge(event_idea_breadcrumb_params_for.call(event_idea)),
                             form: { style: "display: inline;" },
                             style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
             </div>
@@ -524,7 +594,8 @@
                             story_story_event_story_event_idea_path(
                               event_idea.story_event.story,
                               event_idea.story_event,
-                              event_idea
+                              event_idea,
+                              event_idea_breadcrumb_params_for.call(event_idea)
                             ),
                             style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
               </div>
@@ -532,7 +603,10 @@
                 <%= button_to "ここへ移動",
                               idea_idea_placement_path(@idea),
                               method: :post,
-                              params: { placeable_type: "StoryEventIdea", placeable_id: event_idea.id },
+                              params: {
+                                placeable_type: "StoryEventIdea",
+                                placeable_id: event_idea.id
+                              }.merge(event_idea_breadcrumb_params_for.call(event_idea)),
                               form: { style: "display: inline;" },
                               style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
               </div>

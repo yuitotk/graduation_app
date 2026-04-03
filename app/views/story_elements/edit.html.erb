@@ -1,6 +1,8 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<%= link_to "戻る", story_story_element_path(@story, @story_element) %>
+<%= link_to "戻る",
+            story_story_element_path(@story, @story_element, breadcrumb_params),
+            style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 
 <h1>要素編集</h1>
 
@@ -13,7 +15,7 @@
 
 <p>
   <%= link_to "削除",
-        story_story_element_path(@story, @story_element),
+        story_story_element_path(@story, @story_element, breadcrumb_params),
         data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？要素内アイデアと要素選択したアイデアなどからも外れます" },
         style: "display: inline-block; background: #dc2626; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; text-decoration: none; cursor: pointer;" %>
 </p>
