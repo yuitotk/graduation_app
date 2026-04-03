@@ -63,6 +63,35 @@
 
 <hr>
 
+<div style="margin: 24px 0; padding: 20px 0;">
+  <h2 style="margin-top: 0; margin-bottom: 12px;">要素作成・整合性チェック</h2>
+
+  <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.8;">
+    キャラクター・アイテム・設定は「要素」として登録して管理できます。<br>
+    要素がどのイベントや詳細メモに登場するかは、整合性チェックで時系列に確認できます。
+  </p>
+
+  <p style="margin: 0;">
+    <%= link_to "要素を管理する",
+                story_story_elements_path(
+                  @story,
+                  from: "story_event",
+                  story_event_id: @story_event.id
+                ),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+
+    <%= link_to "整合性チェック",
+                consistency_story_path(
+                  @story,
+                  from: "story_event",
+                  story_event_id: @story_event.id
+                ),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #ec4899; border-radius: 12px; background: #ec4899; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  </p>
+</div>
+
+<hr>
+
 <h2>詳細メモ</h2>
 
 <h4>この詳細メモ欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>

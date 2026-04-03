@@ -9,20 +9,39 @@
     page_id: params[:page_id]
   }.compact.symbolize_keys
 
-  back_path =
+  story_event_idea_context_params = {
+    from: "story_event_idea",
+    story_event_id: @story_event.id,
+    story_event_idea_id: @story_event_idea.id
+  }
+
+  original_story_event_idea =
     if params[:from] == "story_event_idea" && params[:story_event_idea_id].present?
+      StoryEventIdea.includes(story_event: :story).find_by(id: params[:story_event_idea_id])
+    end
+
+  returning_to_other_story_event_idea =
+    original_story_event_idea.present? &&
+    original_story_event_idea.id.to_s != @story_event_idea.id.to_s
+
+  back_path =
+    if returning_to_other_story_event_idea
       story_story_event_story_event_idea_path(
-        @story,
-        @story_event,
-        params[:story_event_idea_id],
-        current_breadcrumb_params
+        original_story_event_idea.story_event.story,
+        original_story_event_idea.story_event,
+        original_story_event_idea,
+        {
+          from: "story_event_idea",
+          story_event_id: original_story_event_idea.story_event.id,
+          story_event_idea_id: original_story_event_idea.id
+        }
       )
     else
       story_story_event_path(@story, @story_event, current_breadcrumb_params)
     end
 
   back_label =
-    if params[:from] == "story_event_idea" && params[:story_event_idea_id].present? && params[:story_event_idea_id].to_s != @story_event_idea.id.to_s
+    if returning_to_other_story_event_idea
       "元の詳細メモへ戻る"
     else
       "イベント詳細へ戻る"
@@ -87,12 +106,7 @@
 
 <p>
   <%= link_to "詳細メモ編集",
-              edit_story_story_event_story_event_idea_path(
-                @story,
-                @story_event,
-                @story_event_idea,
-                current_breadcrumb_params
-              ),
+              edit_story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @story_event_idea.created_at.in_time_zone("Tokyo"), format: :short %>
@@ -116,14 +130,14 @@
     <%= link_to "要素を管理する",
                 story_story_elements_path(
                   @story,
-                  current_breadcrumb_params
+                  story_event_idea_context_params
                 ),
                 style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
 
     <%= link_to "整合性チェック",
                 consistency_story_path(
                   @story,
-                  current_breadcrumb_params
+                  story_event_idea_context_params
                 ),
                 style: "display: inline-block; padding: 10px 16px; border: 2px solid #ec4899; border-radius: 12px; background: #ec4899; color: #ffffff; text-decoration: none; font-weight: bold;" %>
   </p>

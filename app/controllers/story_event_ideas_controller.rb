@@ -103,9 +103,11 @@ class StoryEventIdeasController < ApplicationController
   end
 
   def set_story_event_idea
+    target_id = params[:story_event_idea_id].presence || params[:id]
+
     @story_event_idea = @story_event.story_event_ideas
                                     .includes(:story_elements)
-                                    .find(params[:id])
+                                    .find(target_id)
   end
 
   def set_breadcrumbs

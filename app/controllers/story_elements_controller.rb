@@ -98,53 +98,68 @@ class StoryElementsController < ApplicationController
       end
   end
 
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def base_breadcrumbs
-    case params[:from]
-    when "story_event_idea"
-      if params[:story_event_id].present? && params[:story_event_idea_id].present?
-        story_event = @story.story_events.find(params[:story_event_id])
-        story_event_idea = story_event.story_event_ideas.find(params[:story_event_idea_id])
+    return story_event_idea_breadcrumbs if params[:from] == "story_event_idea"
+    return story_event_breadcrumbs if params[:from] == "story_event"
 
-        [
-          { name: @story.title, path: story_path(@story) },
-          { name: story_event.title, path: story_story_event_path(@story, story_event) },
-          {
-            name: story_event_idea.title,
-            path: story_story_event_story_event_idea_path(@story, story_event, story_event_idea)
-          }
-        ]
-      else
-        [
-          { name: @story.title, path: story_path(@story) }
-        ]
-      end
-    when "story_event"
-      if params[:story_event_id].present?
-        story_event = @story.story_events.find(params[:story_event_id])
-
-        [
-          { name: @story.title, path: story_path(@story) },
-          { name: story_event.title, path: story_story_event_path(@story, story_event) }
-        ]
-      else
-        [
-          { name: @story.title, path: story_path(@story) }
-        ]
-      end
-    else
-      [
-        { name: @story.title, path: story_path(@story) }
-      ]
-    end
+    default_breadcrumbs
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+
+  def story_event_idea_breadcrumbs
+    story_event = breadcrumb_story_event
+    return default_breadcrumbs if story_event.blank?
+
+    story_event_idea = breadcrumb_story_event_idea(story_event)
+    return default_breadcrumbs if story_event_idea.blank?
+
+    story_event_idea_breadcrumb_array(story_event, story_event_idea)
+  end
+
+  def breadcrumb_story_event
+    return nil if params[:story_event_id].blank?
+
+    @story.story_events.find_by(id: params[:story_event_id])
+  end
+
+  def breadcrumb_story_event_idea(story_event)
+    return nil if params[:story_event_idea_id].blank?
+
+    story_event.story_event_ideas.find_by(id: params[:story_event_idea_id])
+  end
+
+  def story_event_idea_breadcrumb_array(story_event, story_event_idea)
+    [
+      { name: @story.title, path: story_path(@story) },
+      { name: story_event.title, path: story_story_event_path(@story, story_event) },
+      {
+        name: story_event_idea.title,
+        path: story_story_event_story_event_idea_path(@story, story_event, story_event_idea)
+      }
+    ]
+  end
+
+  def story_event_breadcrumbs
+    return default_breadcrumbs if params[:story_event_id].blank?
+
+    story_event = @story.story_events.find_by(id: params[:story_event_id])
+    return default_breadcrumbs if story_event.blank?
+
+    [
+      { name: @story.title, path: story_path(@story) },
+      { name: story_event.title, path: story_story_event_path(@story, story_event) }
+    ]
+  end
+
+  def default_breadcrumbs
+    [
+      { name: @story.title, path: story_path(@story) }
+    ]
+  end
 
   def breadcrumb_params
     params.permit(:from, :story_event_id, :story_event_idea_id).to_h.symbolize_keys
   end
 
-  # ✅ ストーリー配下に入ったら「この作品」を session に固定
   def sync_search_story_session
     session[:search_story_id] = @story.id
     session[:search_in_story] = true

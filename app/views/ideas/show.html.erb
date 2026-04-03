@@ -53,10 +53,27 @@
     )
   end
 
+  current_story_event_idea =
+    if params[:from] == "story_event_idea" && params[:story_event_idea_id].present?
+      StoryEventIdea.includes(story_event: :story).find_by(id: params[:story_event_idea_id])
+    end
+
   back_label = nil
   back_path  = nil
 
-  if placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
+  if current_story_event_idea.present?
+    back_label = "詳細メモ詳細に戻る"
+    back_path  = story_story_event_story_event_idea_path(
+      current_story_event_idea.story_event.story,
+      current_story_event_idea.story_event,
+      current_story_event_idea,
+      {
+        from: "story_event_idea",
+        story_event_id: current_story_event_idea.story_event.id,
+        story_event_idea_id: current_story_event_idea.id
+      }
+    )
+  elsif placement.present? && placement.respond_to?(:placeable) && placement.placeable.present?
     case placement.placeable
     when Story
       back_label = "ストーリー詳細に戻る"
@@ -66,14 +83,22 @@
       back_path  = story_story_event_path(placement.placeable.story, placement.placeable)
     when StoryElement
       back_label = "要素詳細に戻る"
-      back_path  = story_story_element_path(placement.placeable.story, placement.placeable, current_breadcrumb_params)
+      back_path  = story_story_element_path(
+        placement.placeable.story,
+        placement.placeable,
+        current_breadcrumb_params
+      )
     when StoryEventIdea
       back_label = "詳細メモ詳細に戻る"
       back_path  = story_story_event_story_event_idea_path(
         placement.placeable.story_event.story,
         placement.placeable.story_event,
         placement.placeable,
-        current_breadcrumb_params
+        {
+          from: "story_event_idea",
+          story_event_id: placement.placeable.story_event.id,
+          story_event_idea_id: placement.placeable.id
+        }
       )
     end
   end
@@ -84,29 +109,37 @@
   end
 
   page_context_title =
-    case placement&.placeable
-    when Story
-      "ストーリー内アイデア"
-    when StoryEvent
-      "イベント内アイデア"
-    when StoryElement
-      "要素内アイデア"
-    when StoryEventIdea
+    if current_story_event_idea.present?
       "詳細メモ内アイデア"
     else
-      "ホーム内アイデア"
+      case placement&.placeable
+      when Story
+        "ストーリー内アイデア"
+      when StoryEvent
+        "イベント内アイデア"
+      when StoryElement
+        "要素内アイデア"
+      when StoryEventIdea
+        "詳細メモ内アイデア"
+      else
+        "ホーム内アイデア"
+      end
     end
 
   current_story =
-    case placement&.placeable
-    when Story
-      placement.placeable
-    when StoryEvent
-      placement.placeable.story
-    when StoryElement
-      placement.placeable.story
-    when StoryEventIdea
-      placement.placeable.story_event.story
+    if current_story_event_idea.present?
+      current_story_event_idea.story_event.story
+    else
+      case placement&.placeable
+      when Story
+        placement.placeable
+      when StoryEvent
+        placement.placeable.story
+      when StoryElement
+        placement.placeable.story
+      when StoryEventIdea
+        placement.placeable.story_event.story
+      end
     end
 
   normalize_for_sort = lambda do |text|
@@ -388,8 +421,8 @@
                               }.merge(element_breadcrumb_params_for.call(el)),
                               form: { style: "display: inline;" },
                               style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
-            </div>
-          </li>
+              </div>
+            </li>
           <% end %>
         </ul>
       </details>

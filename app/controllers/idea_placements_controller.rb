@@ -62,8 +62,7 @@ class IdeaPlacementsController < ApplicationController
     story_story_event_story_event_idea_path(
       placeable.story_event.story,
       placeable.story_event,
-      placeable,
-      redirect_breadcrumb_params
+      placeable
     )
   end
 

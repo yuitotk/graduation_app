@@ -44,15 +44,26 @@ class SearchController < ApplicationController
   end
 
   def assign_search_params_for_index
+    assign_basic_search_params_for_index
+    assign_resolved_search_context_for_index
+    assign_page_context_params_for_index
+  end
+
+  def assign_basic_search_params_for_index
     @query = params[:q].to_s.strip
     @scope = normalize_scope(params[:scope])
     @within_story = params[:within_story].to_s == "1"
     @story_id = params[:story_id].presence&.to_i
+  end
 
+  def assign_resolved_search_context_for_index
     resolved_context = resolved_search_context_from_params_or_return_to
     @from = resolved_context[:from]
     @context_story_event_id = resolved_context[:story_event_id]
     @context_story_event_idea_id = resolved_context[:story_event_idea_id]
+  end
+
+  def assign_page_context_params_for_index
     @page_type = normalized_page_type(params[:page_type])
     @page_id = params[:page_id].presence&.to_i
   end
@@ -175,149 +186,64 @@ class SearchController < ApplicationController
     return default_search_breadcrumbs if @story.blank?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_search_breadcrumbs
-    return build_story_search_breadcrumbs if @story.blank? || @context_story_event.blank?
+    return build_story_search_breadcrumbs if missing_story_event_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_idea_search_breadcrumbs
-    return build_story_event_search_breadcrumbs if @story.blank? || @context_story_event.blank? || @context_story_event_idea.blank?
+    return build_story_event_search_breadcrumbs if missing_story_event_idea_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: @context_story_event_idea.title,
-        path: story_story_event_story_event_idea_path(
-          @story,
-          @context_story_event,
-          @context_story_event_idea,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_idea_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_elements_index_search_breadcrumbs
     return build_story_event_idea_search_breadcrumbs_with_elements_index if @from == "story_event_idea"
     return build_story_event_search_breadcrumbs_with_elements_index if @from == "story_event"
-
     return build_story_search_breadcrumbs if @story.blank?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: "要素一覧",
-        path: story_story_elements_path(@story, from: "story")
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_elements_index_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_search_breadcrumbs_with_elements_index
-    return build_story_search_breadcrumbs if @story.blank? || @context_story_event.blank?
+    return build_story_search_breadcrumbs if missing_story_event_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: "要素一覧",
-        path: story_story_elements_path(
-          @story,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_elements_index_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_idea_search_breadcrumbs_with_elements_index
-    return build_story_event_search_breadcrumbs if @story.blank? || @context_story_event.blank? || @context_story_event_idea.blank?
+    return build_story_event_search_breadcrumbs if missing_story_event_idea_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: @context_story_event_idea.title,
-        path: story_story_event_story_event_idea_path(
-          @story,
-          @context_story_event,
-          @context_story_event_idea,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "要素一覧",
-        path: story_story_elements_path(
-          @story,
-          from: "story_event_idea",
-          story_event_id: @context_story_event.id,
-          story_event_idea_id: @context_story_event_idea.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_idea_breadcrumb_item,
+      story_event_idea_elements_index_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
@@ -334,248 +260,282 @@ class SearchController < ApplicationController
   end
 
   def build_story_search_breadcrumbs_with_story_element
-    return build_story_search_breadcrumbs if @story.blank? || @page_story_element.blank?
+    return build_story_search_breadcrumbs if missing_story_element_page_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: "要素一覧",
-        path: story_story_elements_path(@story, from: "story")
-      },
-      {
-        name: @page_story_element.name,
-        path: story_story_element_path(@story, @page_story_element, from: "story")
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_elements_index_breadcrumb_item,
+      story_element_breadcrumb_item_for_story,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_search_breadcrumbs_with_story_element
-    return build_story_elements_index_search_breadcrumbs if @story.blank? || @context_story_event.blank? || @page_story_element.blank?
+    return build_story_elements_index_search_breadcrumbs if missing_story_event_story_element_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: "要素一覧",
-        path: story_story_elements_path(
-          @story,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: @page_story_element.name,
-        path: story_story_element_path(
-          @story,
-          @page_story_element,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_elements_index_breadcrumb_item,
+      story_element_breadcrumb_item_for_story_event,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_idea_search_breadcrumbs_with_story_element
-    return build_story_elements_index_search_breadcrumbs if @story.blank? || @context_story_event.blank? || @context_story_event_idea.blank? || @page_story_element.blank?
+    return build_story_elements_index_search_breadcrumbs if missing_story_event_idea_story_element_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: @context_story_event_idea.title,
-        path: story_story_event_story_event_idea_path(
-          @story,
-          @context_story_event,
-          @context_story_event_idea,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "要素一覧",
-        path: story_story_elements_path(
-          @story,
-          from: "story_event_idea",
-          story_event_id: @context_story_event.id,
-          story_event_idea_id: @context_story_event_idea.id
-        )
-      },
-      {
-        name: @page_story_element.name,
-        path: story_story_element_path(
-          @story,
-          @page_story_element,
-          from: "story_event_idea",
-          story_event_id: @context_story_event.id,
-          story_event_idea_id: @context_story_event_idea.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_idea_breadcrumb_item,
+      story_event_idea_elements_index_breadcrumb_item,
+      story_element_breadcrumb_item_for_story_event_idea,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_consistency_search_breadcrumbs
     return build_story_event_idea_search_breadcrumbs_with_consistency if @from == "story_event_idea"
     return build_story_event_search_breadcrumbs_with_consistency if @from == "story_event"
-
     return build_story_search_breadcrumbs if @story.blank?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: "整合性チェック",
-        path: consistency_story_path(@story, from: "story")
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_consistency_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_search_breadcrumbs_with_consistency
-    return build_story_search_breadcrumbs if @story.blank? || @context_story_event.blank?
+    return build_story_search_breadcrumbs if missing_story_event_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: "整合性チェック",
-        path: consistency_story_path(
-          @story,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_consistency_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def build_story_event_idea_search_breadcrumbs_with_consistency
-    return build_story_event_search_breadcrumbs if @story.blank? || @context_story_event.blank? || @context_story_event_idea.blank?
+    return build_story_event_search_breadcrumbs if missing_story_event_idea_context?
 
     [
-      {
-        name: @story.title,
-        path: story_path(@story)
-      },
-      {
-        name: @context_story_event.title,
-        path: story_story_event_path(@story, @context_story_event, from: "story")
-      },
-      {
-        name: @context_story_event_idea.title,
-        path: story_story_event_story_event_idea_path(
-          @story,
-          @context_story_event,
-          @context_story_event_idea,
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        )
-      },
-      {
-        name: "整合性チェック",
-        path: consistency_story_path(
-          @story,
-          from: "story_event_idea",
-          story_event_id: @context_story_event.id,
-          story_event_idea_id: @context_story_event_idea.id
-        )
-      },
-      {
-        name: "検索結果",
-        path: nil
-      }
+      story_breadcrumb_item,
+      story_event_breadcrumb_item,
+      story_event_idea_breadcrumb_item,
+      story_event_idea_consistency_breadcrumb_item,
+      search_result_breadcrumb_item
     ]
   end
 
   def default_search_breadcrumbs
     [
-      {
-        name: "検索結果",
-        path: nil
-      }
+      search_result_breadcrumb_item
     ]
   end
 
+  def story_breadcrumb_item
+    {
+      name: @story.title,
+      path: story_path(@story)
+    }
+  end
+
+  def story_event_breadcrumb_item
+    {
+      name: @context_story_event.title,
+      path: story_story_event_path(@story, @context_story_event, from: "story")
+    }
+  end
+
+  def story_event_idea_breadcrumb_item
+    {
+      name: @context_story_event_idea.title,
+      path: story_story_event_story_event_idea_path(
+        @story,
+        @context_story_event,
+        @context_story_event_idea,
+        from: "story_event",
+        story_event_id: @context_story_event.id
+      )
+    }
+  end
+
+  def story_elements_index_breadcrumb_item
+    {
+      name: "要素一覧",
+      path: story_story_elements_path(@story, from: "story")
+    }
+  end
+
+  def story_event_elements_index_breadcrumb_item
+    {
+      name: "要素一覧",
+      path: story_story_elements_path(
+        @story,
+        from: "story_event",
+        story_event_id: @context_story_event.id
+      )
+    }
+  end
+
+  def story_event_idea_elements_index_breadcrumb_item
+    {
+      name: "要素一覧",
+      path: story_story_elements_path(
+        @story,
+        from: "story_event_idea",
+        story_event_id: @context_story_event.id,
+        story_event_idea_id: @context_story_event_idea.id
+      )
+    }
+  end
+
+  def story_element_breadcrumb_item_for_story
+    {
+      name: @page_story_element.name,
+      path: story_story_element_path(@story, @page_story_element, from: "story")
+    }
+  end
+
+  def story_element_breadcrumb_item_for_story_event
+    {
+      name: @page_story_element.name,
+      path: story_story_element_path(
+        @story,
+        @page_story_element,
+        from: "story_event",
+        story_event_id: @context_story_event.id
+      )
+    }
+  end
+
+  def story_element_breadcrumb_item_for_story_event_idea
+    {
+      name: @page_story_element.name,
+      path: story_story_element_path(
+        @story,
+        @page_story_element,
+        from: "story_event_idea",
+        story_event_id: @context_story_event.id,
+        story_event_idea_id: @context_story_event_idea.id
+      )
+    }
+  end
+
+  def story_consistency_breadcrumb_item
+    {
+      name: "整合性チェック",
+      path: consistency_story_path(@story, from: "story")
+    }
+  end
+
+  def story_event_consistency_breadcrumb_item
+    {
+      name: "整合性チェック",
+      path: consistency_story_path(
+        @story,
+        from: "story_event",
+        story_event_id: @context_story_event.id
+      )
+    }
+  end
+
+  def story_event_idea_consistency_breadcrumb_item
+    {
+      name: "整合性チェック",
+      path: consistency_story_path(
+        @story,
+        from: "story_event_idea",
+        story_event_id: @context_story_event.id,
+        story_event_idea_id: @context_story_event_idea.id
+      )
+    }
+  end
+
+  def search_result_breadcrumb_item
+    {
+      name: "検索結果",
+      path: nil
+    }
+  end
+
+  def missing_story_event_context?
+    @story.blank? || @context_story_event.blank?
+  end
+
+  def missing_story_event_idea_context?
+    @story.blank? || @context_story_event.blank? || @context_story_event_idea.blank?
+  end
+
+  def missing_story_element_page_context?
+    @story.blank? || @page_story_element.blank?
+  end
+
+  def missing_story_event_story_element_context?
+    @story.blank? || @context_story_event.blank? || @page_story_element.blank?
+  end
+
+  def missing_story_event_idea_story_element_context?
+    @story.blank? || @context_story_event.blank? ||
+      @context_story_event_idea.blank? || @page_story_element.blank?
+  end
+
   def search_breadcrumb_params
-    params_hash =
-      case @from
-      when "story_event_idea"
-        return {} if @context_story_event.blank? || @context_story_event_idea.blank?
-
-        {
-          from: "story_event_idea",
-          story_event_id: @context_story_event.id,
-          story_event_idea_id: @context_story_event_idea.id
-        }
-      when "story_event"
-        return {} if @context_story_event.blank?
-
-        {
-          from: "story_event",
-          story_event_id: @context_story_event.id
-        }
-      else
-        @story.present? ? { from: "story" } : {}
-      end
-
+    params_hash = base_search_breadcrumb_params
     params_hash[:page_type] = @page_type if @page_type.present?
     params_hash[:page_id] = @page_id if @page_id.present?
     params_hash
   end
 
-  def resolved_search_context_from_params_or_return_to
-    direct_from = params[:from].to_s
-    direct_story_event_id = params[:story_event_id].presence&.to_i
-    direct_story_event_idea_id = params[:story_event_idea_id].presence&.to_i
-
-    if valid_from_param?(direct_from)
-      return {
-        from: direct_from,
-        story_event_id: direct_story_event_id,
-        story_event_idea_id: direct_story_event_idea_id
-      }
+  def base_search_breadcrumb_params
+    case @from
+    when "story_event_idea"
+      breadcrumb_params_for_story_event_idea
+    when "story_event"
+      breadcrumb_params_for_story_event
+    else
+      @story.present? ? { from: "story" } : {}
     end
+  end
 
+  def breadcrumb_params_for_story_event_idea
+    return {} if @context_story_event.blank? || @context_story_event_idea.blank?
+
+    {
+      from: "story_event_idea",
+      story_event_id: @context_story_event.id,
+      story_event_idea_id: @context_story_event_idea.id
+    }
+  end
+
+  def breadcrumb_params_for_story_event
+    return {} if @context_story_event.blank?
+
+    {
+      from: "story_event",
+      story_event_id: @context_story_event.id
+    }
+  end
+
+  def resolved_search_context_from_params_or_return_to
+    direct_context = direct_search_context_from_params
+    return direct_context if valid_from_param?(direct_context[:from])
+
+    return_to_search_context
+  end
+
+  def direct_search_context_from_params
+    {
+      from: params[:from].to_s,
+      story_event_id: params[:story_event_id].presence&.to_i,
+      story_event_idea_id: params[:story_event_idea_id].presence&.to_i
+    }
+  end
+
+  def return_to_search_context
     return_to_params = extract_query_params_from_path(params[:return_to])
 
     {
