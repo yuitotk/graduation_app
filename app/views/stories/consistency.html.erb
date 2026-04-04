@@ -25,7 +25,7 @@
 </p>
 
 <h1 style="color: #c4b5fd;">整合性チェック</h1>
-<h4>イベントと詳細メモのみ検索対象です。アイデアは含まれません。</h4>
+<h4>イベントと詳細メモのみ検索対象で時系列表示されます。アイデアは含まれません。</h4>
 <h4>詳細メモで要素を選択していても、イベント自体にその要素が設定されていない場合は表示されません。</h4>
 
 <%= form_with url: consistency_story_path(@story), method: :get, local: true do %>
@@ -34,7 +34,7 @@
   <%= hidden_field_tag :story_event_idea_id, params[:story_event_idea_id] if params[:story_event_idea_id].present? %>
 
   <div style="max-width: 420px; width: 100%;">
-    <%= label_tag :consistency_story_element_id, "要素を選ぶ", style: "color: #ffffff;" %><br>
+    <%= label_tag :consistency_story_element_id, "要素を選ぶ", style: "color: #c4b5fd; font-size: 24px; font-weight: bold;" %><br>
 
     <%= select_tag :consistency_story_element_id,
       options_for_select(
@@ -169,7 +169,7 @@
             <% end %>
           </div>
 
-          <div style="font-weight: bold; margin-bottom: 6px; color: #f5f5f5;">イベント本文</div>
+          <div style="font-weight: bold; margin-bottom: 6px; color: #c4b5fd;">イベント本文</div>
           <% if event.body.present? %>
             <div style="margin-bottom: 16px; color: #f5f5f5;">
               <%= simple_format(truncate(event.body.to_s, length: 160)) %>

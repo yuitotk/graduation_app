@@ -6,13 +6,13 @@
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
-<h1>要素詳細</h1>
+<h1 style="color: #c4b5fd;">要素詳細</h1>
 
 <hr>
 
-<p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0;"><strong>名前：</strong><%= @story_element.name %></p>
-<p><strong>種別：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[@story_element.kind] || @story_element.kind %></p>
-<p><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
+<p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0; color: #ddd6fe;"><strong>名前：</strong><%= @story_element.name %></p>
+<p style="color: #ddd6fe;"><strong>種別：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[@story_element.kind] || @story_element.kind %></p>
+<p style="color: #ddd6fe;"><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
 
 <% if @story_element.story_element_image&.image? %>
   <div style="margin-top: 16px;">
@@ -20,7 +20,7 @@
   </div>
 <% end %>
 
-<h2>メモ</h2>
+<h2 style="color: #ddd6fe;">メモ</h2>
 
 <% if @story_element.memo.present? %>
   <div><%= simple_format(@story_element.memo) %></div>
@@ -42,23 +42,24 @@
 
 <hr>
 
-<h3>新規アイデア</h3>
+<h3 style="color: #c4b5fd;">新規アイデア</h3>
 
-<p>
+<p style="display: flex; gap: 12px; flex-wrap: wrap;">
   <%= link_to "新規作成",
               new_idea_path(
                 return_to: request.fullpath,
                 placeable_type: "StoryElement",
                 placeable_id: @story_element.id
               ),
-              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %> |
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+
   <%= link_to "AI作成",
               random_words_pick_path(
                 return_to: request.fullpath,
                 placeable_type: "StoryElement",
                 placeable_id: @story_element.id
               ),
-              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
 <% if @created_here_ideas.present? %>
@@ -73,7 +74,7 @@
 
 <hr>
 
-<h3>ここに移動したアイデア</h3>
+<h3 style="color: #c4b5fd;">ここに移動したアイデア</h3>
 
 <% if @moved_ideas.present? %>
   <ul>

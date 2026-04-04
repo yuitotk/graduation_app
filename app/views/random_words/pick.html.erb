@@ -1,58 +1,97 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
-<%= link_to "戻る", params[:return_to].presence || ideas_path %>
+<p style="margin: 0 0 20px 0;">
+  <%= link_to "戻る",
+              params[:return_to].presence || ideas_path,
+              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+</p>
 
-<h1>ランダム辞書ワード</h1>
+<div style="max-width: 1400px; width: 100%; padding: 24px 28px; border: 2px solid #555555; border-radius: 20px; background: rgba(20, 20, 30, 0.88); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+  <h1 style="margin: 0 0 12px 0; font-size: 42px; color: #c4b5fd;">ランダム辞書ワード</h1>
 
-<% if @words.any? %>
+  <p style="margin: 0 0 24px 0; font-size: 17px; line-height: 1.8; color: #e5e7eb;">
+    2つのワードを組み合わせて、AIで新しいアイデアを作成できます。<br>
+    品詞を切り替えたり、固定にチェックして再抽選できます。
+  </p>
 
-  <div id="ai_error" style="color: red;"></div>
+  <% if @words.any? %>
+    <div id="ai_error" style="margin-bottom: 16px; color: #fca5a5; font-weight: bold;"></div>
 
-  <%= form_with url: ai_generations_path, method: :post, data: { turbo_stream: true } do |f| %>
+    <%= form_with url: ai_generations_path, method: :post, data: { turbo_stream: true } do |f| %>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: stretch; margin-bottom: 18px;">
+        <div style="flex: 1 1 480px; padding: 14px 18px; border: 2px solid #4b5563; border-radius: 16px; background: rgba(35, 35, 45, 0.95); box-sizing: border-box;">
+          <div style="margin-bottom: 10px; font-size: 22px; font-weight: bold; color: #ddd6fe;">
+            1つ目のワード
+          </div>
 
-    <p style="margin-bottom: 30px;">
-      <span style="display: inline-block; margin-right: 15px;"><%= @words[0].word %></span>
-      <%= hidden_field_tag :word1, @words[0].word %>
-      <span style="display: inline-block; margin-right: 15px;">
-        <%= select_tag :word1_pos,
-              options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word1_pos) %>
-      </span>
-      <%= check_box_tag :lock_word1, "1", params[:lock_word1] == "1" %>
-      固定
-    </p>
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <span style="display: inline-block; min-width: 140px; font-size: 30px; font-weight: bold; color: #ffffff; line-height: 1.2;">
+              <%= @words[0].word %>
+            </span>
 
-    <p style="margin-bottom: 30px;">
-      <span style="display: inline-block; margin-right: 15px;"><%= @words[1].word %></span>
-      <%= hidden_field_tag :word2, @words[1].word %>
-      <span style="display: inline-block; margin-right: 15px;">
-        <%= select_tag :word2_pos,
-              options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word2_pos) %>
-      </span>
-      <%= check_box_tag :lock_word2, "1", params[:lock_word2] == "1" %>
-      固定
-    </p>
+            <%= hidden_field_tag :word1, @words[0].word %>
 
-    <%= hidden_field_tag :return_to, params[:return_to] %>
-    <%= hidden_field_tag :placeable_type, params[:placeable_type] %>
-    <%= hidden_field_tag :placeable_id, params[:placeable_id] %>
+            <span>
+              <%= select_tag :word1_pos,
+                    options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word1_pos),
+                    style: "padding: 8px 12px; border: 1px solid #6b7280; border-radius: 10px; background: #111827; color: #ffffff; font-size: 16px;" %>
+            </span>
 
-    <div id="reroll_notice" style="margin-bottom: 12px;"></div>
+            <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 18px; font-weight: bold; color: #f5f5f5;">
+              <%= check_box_tag :lock_word1, "1", params[:lock_word1] == "1", style: "width: 18px; height: 18px;" %>
+              固定
+            </label>
+          </div>
+        </div>
 
-    <div style="margin-bottom: 30px;">
-      <%= f.submit "再抽選",
-            formaction: random_words_pick_path,
-            formmethod: :get %>
-    </div>
+        <div style="flex: 1 1 480px; padding: 14px 18px; border: 2px solid #4b5563; border-radius: 16px; background: rgba(35, 35, 45, 0.95); box-sizing: border-box;">
+          <div style="margin-bottom: 10px; font-size: 22px; font-weight: bold; color: #ddd6fe;">
+            2つ目のワード
+          </div>
 
-    <div id="generate_button" style="margin-top: 0;">
-      <%= f.submit "AIで生成する", data: { disable_with: "生成中..." } %>
-    </div>
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <span style="display: inline-block; min-width: 140px; font-size: 30px; font-weight: bold; color: #ffffff; line-height: 1.2;">
+              <%= @words[1].word %>
+            </span>
 
-    <div id="ai_result" style="margin-top: 30px;"></div>
+            <%= hidden_field_tag :word2, @words[1].word %>
+
+            <span>
+              <%= select_tag :word2_pos,
+                    options_for_select([["名詞", "noun"], ["動詞", "verb"]], @word2_pos),
+                    style: "padding: 8px 12px; border: 1px solid #6b7280; border-radius: 10px; background: #111827; color: #ffffff; font-size: 16px;" %>
+            </span>
+
+            <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 18px; font-weight: bold; color: #f5f5f5;">
+              <%= check_box_tag :lock_word2, "1", params[:lock_word2] == "1", style: "width: 18px; height: 18px;" %>
+              固定
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <%= hidden_field_tag :return_to, params[:return_to] %>
+      <%= hidden_field_tag :placeable_type, params[:placeable_type] %>
+      <%= hidden_field_tag :placeable_id, params[:placeable_id] %>
+
+      <div id="reroll_notice" style="margin: 0 0 16px 0; color: #fcd34d; font-size: 15px;"></div>
+
+      <div style="margin-top: 0; display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+        <%= f.submit "再抽選",
+              formaction: random_words_pick_path,
+              formmethod: :get,
+              style: "display: inline-block; padding: 10px 18px; border: 2px solid #ec4899; border-radius: 12px; background: #ec4899; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px; cursor: pointer;" %>
+
+        <div id="generate_button" style="margin-top: 0;">
+          <%= f.submit "AIで作成する",
+                data: { disable_with: "生成中..." },
+                style: "display: inline-block; padding: 10px 18px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px; cursor: pointer;" %>
+        </div>
+      </div>
+
+      <div id="ai_result" style="margin-top: 26px;"></div>
+    <% end %>
+  <% else %>
+    <p style="margin: 0; font-size: 17px; color: #f5f5f5;"><%= @message %></p>
   <% end %>
-
-<% else %>
-
-  <p><%= @message %></p>
-
-<% end %>
+</div>

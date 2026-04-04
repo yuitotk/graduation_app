@@ -10,7 +10,7 @@
   <% end %>
 
   <div style="margin-bottom: 20px;">
-    <%= f.label :kind, "分類", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :kind, "分類", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.select :kind,
                  [["キャラクター", "character"], ["アイテム", "item"], ["設定", "setting"]],
                  { include_blank: true },
@@ -18,7 +18,7 @@
   </div>
 
   <div style="margin-bottom: 20px;" data-controller="character-counter">
-    <%= f.label :marker, "マーカー（4文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :marker, "マーカー（4文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.text_field :marker,
                      maxlength: 4,
                      data: {
@@ -35,7 +35,7 @@
   </div>
 
   <div style="margin-bottom: 30px;" data-controller="character-counter">
-    <%= f.label :name, "名前（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :name, "名前（40文字を超えた分は消えます）", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.text_field :name,
                      maxlength: 40,
                      data: {
@@ -51,7 +51,7 @@
   </div>
 
   <div style="margin-bottom: 30px;">
-    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+    <%= f.label :memo, "メモ", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.text_area :memo, rows: 28, style: "width: 100%; max-width: 100%; box-sizing: border-box;" %>
   </div>
 
@@ -59,7 +59,7 @@
     <%= imgf.hidden_field :id if imgf.object&.persisted? %>
 
     <div style="margin-bottom: 30px;">
-      <%= imgf.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold; color: #ffffff;" %><br>
+      <%= imgf.label :image, "画像（任意）", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
       <%= imgf.file_field :image %>
 
       <% if @story_element.story_element_image&.image? %>

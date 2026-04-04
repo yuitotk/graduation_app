@@ -26,11 +26,11 @@
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 <% end %>
 
-<h1>要素一覧</h1>
+<h1 style="color: #c4b5fd;">要素一覧</h1>
 
 <%= link_to "要素追加",
             new_story_story_element_path(@story, breadcrumb_params),
-            style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+            style: "display: inline-block; margin-top: 8px; margin-bottom: 16px; padding: 10px 16px; background-color: #2563eb; color: #ffffff; font-weight: bold; text-decoration: none; border-radius: 8px;" %>
 
 <% grouped_elements = @story_elements.group_by(&:kind) %>
 
@@ -41,7 +41,7 @@
 ].each do |kind, title| %>
   <% next if grouped_elements[kind].blank? %>
 
-  <h2><%= title %></h2>
+  <h2 style="color: #c4b5fd;"><%= title %></h2>
 
   <ul>
     <% grouped_elements[kind].each do |e| %>
