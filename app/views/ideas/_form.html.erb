@@ -77,6 +77,12 @@
       <div style="margin-top: 16px;">
         <div style="font-size: 24px; font-weight: bold; color: #ddd6fe;">このアイデアの登場要素</div>
 
+        <br>
+
+        <p style="margin: 8px 0 8px 0; font-size: 17px;">
+          選択するとページ上部のアイデア検索や、何の要素が関係していのか一目でわかるようにできます。
+        </p>
+
         <% if @available_story_elements.present? %>
           <% grouped_elements = @available_story_elements.group_by(&:kind) %>
 

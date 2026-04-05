@@ -77,7 +77,11 @@
   <div style="display: flex; justify-content: space-between; align-items: center;">
     <div>
       <% logo_path = logged_in? ? ideas_path : root_path %>
-      <%= link_to "ロゴ", logo_path %>
+      <%= link_to logo_path do %>
+        <%= image_tag "logo.png",
+                      alt: "創記録",
+                      style: "height: 70px; width: auto; display: block;" %>
+      <% end %>
     </div>
 
     <% if logged_in? %>

@@ -20,9 +20,25 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <style>
+      @media (min-width: 768px) {
+        body.top-page-background {
+          background-image: url('<%= asset_path("top_main_visual.png") %>');
+          background-color: #000000;
+          background-size: calc(100% - 70px) calc(100% - 20px);
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          min-height: 100vh;
+        }
+      }
+    </style>
   </head>
 
-  <body>
+  <% body_class = (controller_name == "tops" && action_name == "top") ? "top-page-background" : nil %>
+
+  <body class="<%= body_class %>">
     <%= render "shared/header" %>
 
     <p><%= notice %></p>

@@ -304,6 +304,11 @@
 
 <h2 style="color: #c4b5fd;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
+<p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
+  別ストーリーに移動も可能です。ホームに戻すことはできません。
+</p>
+
+
 <ul>
   <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "stories")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
   <li><%= link_to "イベント詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "events")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
