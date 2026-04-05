@@ -53,6 +53,10 @@
   <div style="margin-bottom: 30px;">
     <div style="font-size: 24px; font-weight: bold; color: #ddd6fe;">このメモの登場要素</div>
 
+    <p style="margin: 8px 0 8px 0; font-size: 17px;">
+      選択すると整合性チェックでの時系列確認や、何の要素が登場するのか一目でわかるようにできます。
+    </p>
+
     <% if @story.story_elements.any? %>
       <% grouped_elements = @story.story_elements.group_by(&:kind) %>
 
