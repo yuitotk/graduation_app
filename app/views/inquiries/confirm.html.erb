@@ -1,22 +1,22 @@
-<h1>お問い合わせ確認</h1>
+<h1 style="color: #c4b5fd;">お問い合わせ確認</h1>
 
 <div style="margin-bottom: 16px;">
   <strong>名前</strong>
-  <div style="width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; background-color: #f8f8f8;">
+  <div style="width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box; border: 1px solid #555555; background-color: #1e1e1e; color: #ffffff;">
     <%= @inquiry.name %>
   </div>
 </div>
 
 <div style="margin-bottom: 16px;">
   <strong>メール</strong>
-  <div style="width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; background-color: #f8f8f8;">
+  <div style="width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box; border: 1px solid #555555; background-color: #1e1e1e; color: #ffffff;">
     <%= @inquiry.email %>
   </div>
 </div>
 
 <div style="margin-bottom: 16px;">
   <strong>本文</strong>
-  <div style="width: 100%; max-width: 720px; min-height: 420px; padding: 12px; box-sizing: border-box; border: 1px solid #ccc; background-color: #f8f8f8; white-space: pre-wrap;">
+  <div style="width: 100%; max-width: 720px; min-height: 420px; padding: 12px; box-sizing: border-box; border: 1px solid #555555; background-color: #1e1e1e; white-space: pre-wrap; color: #ffffff;">
     <%= @inquiry.body %>
   </div>
 </div>
@@ -27,7 +27,7 @@
   <%= f.hidden_field :body %>
 
   <p style="margin-bottom: 6em;">
-    <a href="javascript:history.back()">入力画面へ</a>
+    <a href="javascript:history.back()" style="color: #9ecbff;">入力画面へ</a>
   </p>
 
   <div style="margin-bottom: 16px;">
