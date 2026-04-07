@@ -44,4 +44,51 @@ ja:
 
   flash:
     idea_placements:
-      moved: "アイデアを移動しました"   
+      moved: "アイデアを移動しました"
+
+  activerecord:
+    models:
+      user: ユーザー
+      idea: アイデア
+      story: ストーリー
+      story_event: イベント
+      story_event_idea: 詳細メモ
+      story_element: 要素
+
+    attributes:
+      user:
+        email: メールアドレス
+        password: パスワード
+        password_confirmation: パスワード（確認用）
+      idea:
+        title: タイトル
+        memo: メモ
+      story:
+        title: タイトル
+      story_event:
+        title: タイトル
+      story_event_idea:
+        title: タイトル
+      story_element:
+        kind: 分類
+        name: 名前
+        description: 説明
+        memo: メモ
+
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              taken: "はすでに存在します"
+              invalid: "の形式が正しくありません"
+
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      blank: "を入力してください"
+      taken: "はすでに存在します"
+      invalid: "は不正な値です"
+      too_short: "は%{count}文字以上で入力してください"
+      too_long: "は%{count}文字以内で入力してください"
+      confirmation: "が一致しません"

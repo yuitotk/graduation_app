@@ -1,0 +1,21 @@
+<footer style="padding: 10px 0; border-top: 1px solid #333333; text-align: center;">
+  <div style="font-size: 15px; line-height: 1.5; display: flex; justify-content: center; flex-wrap: wrap; gap: 18px;">
+    <%= link_to "使い方・ヘルプ", help_path,
+                style: "color: #9ecbff; text-decoration: none;" %>
+
+    <% if logged_in? %>
+      <%= link_to "お問い合わせ", new_inquiry_path,
+                  style: "color: #9ecbff; text-decoration: none;" %>
+    <% end %>
+
+    <%= link_to "利用規約", terms_path,
+                style: "color: #9ecbff; text-decoration: none;" %>
+
+    <%= link_to "プライバシーポリシー", privacy_path,
+                style: "color: #9ecbff; text-decoration: none;" %>
+  </div>
+
+  <div style="margin-top: 6px; font-size: 12px; color: #aaaaaa;">
+    © 2026 創記録
+  </div>
+</footer>
