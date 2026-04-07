@@ -99,19 +99,7 @@
     <% end %>
   </div>
 
-  <hr style="border: none; border-top: 1px solid #333333; margin: 20px 0;">
-
   <% if logged_in? %>
-    <%= link_to "使い方・ヘルプ", help_path %> |
-    <%= link_to "お問い合わせ", new_inquiry_path %>
-    <span class="header-mobile-break">
-      <span class="header-mobile-break-prefix"> | </span>
-      <%= link_to "利用規約", terms_path %> |
-      <%= link_to "プライバシーポリシー", privacy_path %>
-    </span>
-
-    <hr>
-
     <%= form_with url: search_path, method: :get, local: true,
                   class: "header-search-form",
                   data: { controller: "search-autocomplete" } do %>
@@ -476,11 +464,5 @@
       </script>
     <% end %>
   <% else %>
-    <%= link_to "使い方・ヘルプ", help_path %> |
-    <%= link_to "利用規約", terms_path %>
-    <span class="header-mobile-break">
-      <span class="header-mobile-break-prefix"> | </span>
-      <%= link_to "プライバシーポリシー", privacy_path %>
-    </span>
   <% end %>
 </header>

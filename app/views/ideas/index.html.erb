@@ -21,11 +21,15 @@
   <%= link_to "AIで作成する", random_words_pick_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
+<br>
+
 <p style="margin: 0 0 20px 0; font-size: 15px;">
   作品化したくなったら、
   <%= link_to "ストーリー制作する", stories_path, style: "color: #fdba74; font-weight: bold; text-decoration: underline;" %>
   から作成しましょう。
 </p>
+
+<br>
 
 <% if @ideas.any? %>
   <% @ideas.each do |idea| %>

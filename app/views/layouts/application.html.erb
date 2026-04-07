@@ -38,12 +38,16 @@
 
   <% body_class = (controller_name == "tops" && action_name == "top") ? "top-page-background" : nil %>
 
-  <body class="<%= body_class %>">
+  <body class="<%= body_class %>" style="min-height: 100vh; display: flex; flex-direction: column;">
     <%= render "shared/header" %>
 
-    <p><%= notice %></p>
-    <p><%= alert %></p>
+    <main style="flex: 1;">
+      <p><%= notice %></p>
+      <p><%= alert %></p>
 
-    <%= yield %>
+      <%= yield %>
+    </main>
+
+    <%= render "shared/footer" %>
   </body>
 </html>

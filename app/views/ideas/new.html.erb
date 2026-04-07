@@ -4,12 +4,4 @@
 
 <h1 style="color: #c4b5fd;">アイデア投稿</h1>
 
-<% if @idea.errors.any? %>
-  <ul>
-    <% @idea.errors.full_messages.each do |msg| %>
-      <li><%= msg %></li>
-    <% end %>
-  </ul>
-<% end %>
-
 <%= render "form", idea: @idea %>

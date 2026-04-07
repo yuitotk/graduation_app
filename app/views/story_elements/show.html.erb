@@ -16,7 +16,7 @@
 <hr>
 
 <p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0; color: #ddd6fe;"><strong>名前：</strong><%= @story_element.name %></p>
-<p style="color: #ddd6fe;"><strong>種別：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[@story_element.kind] || @story_element.kind %></p>
+<p style="color: #ddd6fe;"><strong>分類：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定" }[@story_element.kind] || @story_element.kind %></p>
 <p style="color: #ddd6fe;"><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
 
 <% if @story_element.story_element_image&.image? %>
