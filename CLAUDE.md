@@ -122,14 +122,25 @@
 - 回答時は関係するファイル名を示す。
 - 明確に依頼されるまでファイルを変更しない。
 - 変更前に、変更する内容を説明する。
+1. **routes**：`/stories/:story_id/story_elements`（storyの入れ子リソース）
+2. **controller**（`story_elements_controller.rb`）
+    - `set_story`で`current_user.stories.find(params[:story_id])`（自分のストーリーしか触れないようにする）
+    - `index`：`@story.story_elements.order(:id)`を取得 → 種類別にグループ表示
+    - `new`/`create`：`@story.story_elements.new(...)` → 画像も一緒に保存
+    - `edit`/`update`：同様に更新
+    - `destroy`：`@story_element.destroy!`
+3. **view**：一覧は種類別グループ表示、新規/編集は共通の`_form`パーシャルを使い回す
+のように短縮しすぎると読めないため、短縮しすぎないようにする
 
 ## 学習目的
 
 このプロジェクトは、未経験・ジュニア向けRails自社開発企業の
 技術面接・ポートフォリオ深掘り対策として学習する。
 
-プロジェクト全体を網羅的に学習せず、
-対象機能の説明に必要なコードだけに絞る。
+基本はプロジェクト全体を網羅的に学習せず、
+対象機能の説明に必要なコードだけに絞る方法で学んでいきたい。
+ただ、対象機能の説明に必要なコード理解する上で必要なコード、関連しているコードだと判断したものは表示して欲しい。
+
 
 ## コードの学習レベル
 
@@ -155,3 +166,49 @@ CSS、細かいHTML、GemやRails本体の内部コード、
 Aだけ詳しく説明する。
 Bは短く説明する。
 Cは説明しない。
+
+## 機能学習コードのランク表示ルール
+
+出てきたファイルごとに、必ず次のランクを付けること。
+
+### A：深く理解する
+対象機能の中心コード。
+コードを見ながら、処理の流れ・使うModel・DBの変化・最終表示まで説明できる必要がある。
+
+### B：役割だけ理解する
+対象機能を支える一般的なコード。
+何のためにあるかを1〜2文で説明できればよく、暗記や細かい実装理解は不要。
+
+### C：今は学習しない
+対象機能の面接説明に直接必要ないコード。
+細かいHTML、CSS、Gem内部、Rails内部、汎用的な補助処理など。
+
+⑥ routes
+⑦ controller
+⑧ model・関連付け
+⑨ DBテーブル・カラム
+⑩ view
+⑪ JavaScript・Gem・外部API
+
+について、それぞれ必ず以下を示すこと。
+
+- ランク
+- ファイル名
+- メソッド名・関連付け名・該当箇所
+- どこまで理解すれば完了か
+
+出力例：
+
+- A：`app/controllers/stories_controller.rb`
+  - `move_up`
+  - `move_down`
+  - `swap_positions`
+  - 完了条件：コードを見ながら、隣のストーリー取得とposition入れ替えを説明できる
+
+- B：`config/routes.rb`
+  - `resources :stories`
+  - `member do ... end`
+  - 完了条件：通常CRUDと独自の並び替えURLをControllerへ渡す役割だと分かればよい
+
+- C：`app/javascript/controllers/character_counter_controller.js`
+  - 完了条件：今回は読まなくてよい
