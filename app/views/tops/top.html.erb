@@ -1,32 +1,242 @@
-<div style="
-  min-height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-  box-sizing: border-box;
-">
-  <div style="
-    max-width: 900px;
+<style>
+  .top-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    padding: 40px 20px 80px;
+    max-width: 1000px;
     margin: 0 auto;
-    background: rgba(0, 0, 0, 0.45);
-    padding: 32px 24px;
+    box-sizing: border-box;
+  }
+
+  .top-card {
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 16px;
-    color: #ffffff;
-  ">
-    <h1>トップページ</h1>
+    padding: 28px 24px;
+    box-sizing: border-box;
+  }
 
-    <p>このアプリの説明</p>
+  .top-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
 
+  .top-grid .top-card {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  .top-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .top-step-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .top-step-grid .top-card {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  @media (max-width: 991px) {
+    .top-step-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .top-grid,
+    .top-compare-grid,
+    .top-step-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="top-wrap">
+
+  <%# ① サービス概要 %>
+  <div class="top-card" style="text-align: center;">
+    <p style="font-size: 15px; letter-spacing: 0.08em; color: #b9d4ff; margin: 0 0 8px;">創作支援サービス</p>
+    <h1 style="font-size: clamp(28px, 5vw, 40px); margin: 0 0 16px;">創記録</h1>
+    <p style="font-size: 17px; line-height: 1.9; margin: 0 0 8px;">
+      写真付きメモの「アイデア」を蓄積し、キャラ・アイテム・設定などの「要素」と<br class="hide-mobile">
+      物語の出来事を紐づけて時系列で確認できる、創作のための整理・発想支援サービスです。
+    </p>
+    <p style="font-size: 15px; line-height: 1.8; color: #dcdcdc; margin: 0;">
+      漫画や小説を作る人が、「アイデアが散らかる」「発想が止まる」「キャラやアイテムの登場箇所が追えない」<br class="hide-mobile">
+      という悩みを解決しながら、創作に集中できることを目指しています。
+    </p>
+  </div>
+
+  <%# ② このサービスで解決できること %>
+  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+    <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">このサービスで解決できること</h2>
+
+    <div class="top-grid">
+      <div class="top-card" style="text-align: center;">
+        <div style="color: #8ec1ff; margin-bottom: 10px;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2h9A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-10z"/></svg>
+        </div>
+        <h3 style="font-size: 17px; margin: 0 0 8px;">アイデアが散らからない</h3>
+        <p style="font-size: 14px; line-height: 1.7; color: #dcdcdc; margin: 0;">
+          思いついたアイデアを、写真付きメモとして一箇所に蓄積できます。
+        </p>
+      </div>
+
+      <div class="top-card" style="text-align: center;">
+        <div style="color: #8ec1ff; margin-bottom: 10px;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>
+        </div>
+        <h3 style="font-size: 17px; margin: 0 0 8px;">物語の状況を見失わない</h3>
+        <p style="font-size: 14px; line-height: 1.7; color: #dcdcdc; margin: 0;">
+          出来事とキャラ・アイテム・設定を紐づけ、流れや登場箇所を時系列で確認できます。
+        </p>
+      </div>
+
+      <div class="top-card" style="text-align: center;">
+        <div style="color: #8ec1ff; margin-bottom: 10px;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.45 1.1 1.2 1.1 2.2h5c0-1 .5-1.75 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+        </div>
+        <h3 style="font-size: 17px; margin: 0 0 8px;">発想が止まらない</h3>
+        <p style="font-size: 14px; line-height: 1.7; color: #dcdcdc; margin: 0;">
+          「ペアアイデア」とAI提案で、思いつかないときの発想のきっかけを得られます。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <%# ③ 主要機能の説明 %>
+  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+    <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">主要機能</h2>
+
+    <div class="top-grid">
+      <div class="top-card">
+        <div style="color: #8ec1ff; margin-bottom: 10px;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.3-1.1L19 8.2a1.9 1.9 0 0 0 0-2.7l-.5-.5a1.9 1.9 0 0 0-2.7 0L5.1 15.7 4 20z"/><path d="M13.5 6.5l4 4"/></svg>
+        </div>
+        <h3 style="font-size: 16px; margin: 0 0 8px;">アイデア投稿・管理</h3>
+        <p style="font-size: 14px; line-height: 1.7; color: #dcdcdc; margin: 0;">
+          タイトル・メモ・画像1枚でアイデアを記録し、配置先（ストーリーや要素など）を決めて整理できます。
+        </p>
+      </div>
+
+      <div class="top-card">
+        <div style="color: #8ec1ff; margin-bottom: 10px;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.2-4.2-1.8-8-1.8v13.6c3.8 0 6.4.6 8 1.8 1.6-1.2 4.2-1.8 8-1.8V4.7c-3.8 0-6.4.6-8 1.8z"/><path d="M12 6.5v13.6"/></svg>
+        </div>
+        <h3 style="font-size: 16px; margin: 0 0 8px;">ストーリー・要素・整合性チェック</h3>
+        <p style="font-size: 14px; line-height: 1.7; color: #dcdcdc; margin: 0;">
+          出来事（イベント）とキャラ・アイテム・設定（要素）を紐づけ、選んだ要素が関わる場面だけを時系列で確認できます。
+        </p>
+      </div>
+
+      <div class="top-card">
+        <div style="color: #8ec1ff; margin-bottom: 10px;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <h3 style="font-size: 16px; margin: 0 0 8px;">ペアアイデア × AI発想</h3>
+        <p style="font-size: 14px; line-height: 1.7; color: #dcdcdc; margin: 0;">
+          ランダムに選ばれた2つの辞書単語を組み合わせ、AIが物語のアイデアを提案します。主役はあくまでユーザー自身です。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <%# ④ 一般的なメモアプリとの比較 %>
+  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+    <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">一般的なメモアプリとの違い</h2>
+
+    <div class="top-compare-grid">
+      <div class="top-card" style="border: 1px solid rgba(255,255,255,0.15);">
+        <h3 style="font-size: 16px; margin: 0 0 14px; color: #dcdcdc;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 4px;"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+          一般的なメモアプリ
+        </h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 2; color: #dcdcdc;">
+          <li>情報が増えると必要なメモを探しにくい</li>
+          <li>ストーリーの流れや順番が分かりにくい</li>
+          <li>「このキャラは今どこにいるか」を確認しづらい</li>
+          <li>アイデアが浮かばないと手が止まる</li>
+        </ul>
+      </div>
+
+      <div class="top-card" style="border: 1px solid #6ea8ff;">
+        <h3 style="font-size: 16px; margin: 0 0 14px; color: #b9d4ff;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 4px;"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.5 6.5l2 2M15.5 15.5l2 2M17.5 6.5l-2 2M8.5 15.5l-2 2"/></svg>
+          創記録
+        </h3>
+        <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 2;">
+          <li>アイデア・要素・出来事を目的別に整理して蓄積</li>
+          <li>ストーリーの出来事を時系列で整理して確認</li>
+          <li>要素と出来事の紐づけで登場箇所を時系列確認</li>
+          <li>ペアアイデア×AIで発想のきっかけを得られる</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <%# ⑤ 実際の使い方の流れ %>
+  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+    <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">使い方の流れ</h2>
+
+    <div class="top-step-grid">
+      <div class="top-card" style="text-align: center;">
+        <div style="font-size: 26px; margin-bottom: 6px;">①</div>
+        <p style="font-size: 14px; line-height: 1.7; margin: 0;">新規登録してログイン</p>
+      </div>
+
+      <div class="top-card" style="text-align: center;">
+        <div style="font-size: 26px; margin-bottom: 6px;">②</div>
+        <p style="font-size: 14px; line-height: 1.7; margin: 0;">アイデアを写真付きメモ、またはペアアイデア×AIで記録</p>
+      </div>
+
+      <div class="top-card" style="text-align: center;">
+        <div style="font-size: 26px; margin-bottom: 6px;">③</div>
+        <p style="font-size: 14px; line-height: 1.7; margin: 0;">ストーリー・要素を作ってイベントに紐づけ</p>
+      </div>
+
+      <div class="top-card" style="text-align: center;">
+        <div style="font-size: 26px; margin-bottom: 6px;">④</div>
+        <p style="font-size: 14px; line-height: 1.7; margin: 0;">イベントに詳細メモを追加して内容を深掘り</p>
+      </div>
+    </div>
+
+    <div class="top-card" style="margin-top: 16px; text-align: center; border: 1px dashed rgba(255,255,255,0.4);">
+      <div style="font-size: 18px; margin-bottom: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 4px;"><path d="M4 12a8 8 0 0 1 13.9-5.4"/><path d="M20 12a8 8 0 0 1-13.9 5.4"/><path d="M18 3v4h-4"/><path d="M6 21v-4h4"/></svg>
+        いつでも使える機能
+      </div>
+      <p style="font-size: 14px; line-height: 1.8; margin: 0; color: #dcdcdc;">
+        整合性チェック・検索・ペアアイデア×AI発想は、番号の流れとは関係なく、作業中いつでも使えます。<br class="hide-mobile">
+        書きながら状況を確認したり、探したいものをすぐ検索したり、詰まったら発想のきっかけを得たりできます。
+      </p>
+    </div>
+  </div>
+
+  <%# ⑥ 新規登録への誘導 %>
+  <div class="top-card" style="text-align: center;">
     <% if logged_in? %>
-      <p>ログイン中</p>
-      <%= link_to "ログアウト", logout_path, data: { turbo_method: :delete } %>
+      <h2 style="font-size: 20px; margin: 0 0 16px;">ログイン中です</h2>
+      <%= link_to "ログアウト", logout_path, data: { turbo_method: :delete },
+                  style: "display: inline-block; padding: 12px 28px; border-radius: 8px; background: #c95a5a; color: #ffffff; text-decoration: none; font-weight: bold;" %>
     <% else %>
-      <ul style="list-style: none; padding-left: 0; margin: 0;">
-        <li><%= link_to "ログインへ", login_path %></li>
-        <li><%= link_to "登録へ", signup_path %></li>
-      </ul>
+      <h2 style="font-size: 20px; margin: 0 0 10px;">さあ、あなたの物語を整理しよう</h2>
+      <p style="font-size: 14px; color: #dcdcdc; margin: 0 0 20px;">
+        無料で登録して、アイデアの整理と発想支援をすぐに使い始められます。
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <%= link_to "新規登録（無料）", signup_path,
+                    style: "display: inline-block; padding: 12px 28px; border-radius: 8px; background: #ec4899; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+        <%= link_to "ログイン", login_path,
+                    style: "display: inline-block; padding: 12px 28px; border-radius: 8px; border: 1px solid #2563eb; background: transparent; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+      </div>
     <% end %>
   </div>
+
 </div>
