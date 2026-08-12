@@ -56,7 +56,84 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .top-hero-spacer {
+    min-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px 20px 32px;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 767px) {
+    .top-hero-spacer {
+      min-height: 45vh;
+    }
+  }
+
+  .top-hero-title-wrap {
+    opacity: 0;
+    animation: top-hero-title-appear 2.5s ease-out 2s both;
+  }
+
+  .top-hero-title {
+    margin: 0;
+    font-size: clamp(48px, 11vw, 110px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 40%, #8fe0ff 55%, #bfeeff 68%, #ffffff 85%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter:
+      drop-shadow(0 0 6px rgba(0, 0, 0, 0.85))
+      drop-shadow(0 0 16px rgba(0, 0, 0, 0.6))
+      drop-shadow(20px 0 18px rgba(0, 0, 0, 0.4))
+      drop-shadow(-20px 0 18px rgba(0, 0, 0, 0.4));
+  }
+
+  @keyframes top-hero-title-appear {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .top-hero-scroll-cue {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: #ffffff;
+    opacity: 0.85;
+    animation: top-hero-bounce 1.8s ease-in-out infinite;
+  }
+
+  @keyframes top-hero-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
 </style>
+
+<%# 背景画像を先にしっかり見せるための空間。上部に発光するロゴ文字、下にスクロール案内だけを表示 %>
+<div class="top-hero-spacer">
+  <div class="top-hero-title-wrap">
+    <div class="top-hero-title">創記録</div>
+  </div>
+
+  <div class="top-hero-scroll-cue">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M6 13l6 6 6-6"/></svg>
+    <span style="font-size: 12px; letter-spacing: 0.1em;">スクロールして見る</span>
+  </div>
+</div>
 
 <div class="top-wrap">
 
