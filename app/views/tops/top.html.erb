@@ -74,8 +74,9 @@
   }
 
   .top-hero-title-wrap {
+    text-align: center;
     opacity: 0;
-    animation: top-hero-title-appear 2.5s ease-out 2s both;
+    animation: top-hero-title-appear 2.5s ease-out 1.5s both;
   }
 
   .top-hero-title {
@@ -107,6 +108,34 @@
     }
   }
 
+  .top-hero-divider {
+    width: min(320px, 60vw);
+    height: 10px;
+    margin: 14px auto 16px;
+    background:
+      radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 70%) center / 8px 8px no-repeat,
+      linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6) 42%, rgba(255, 255, 255, 0.6) 58%, transparent) center / 100% 1px no-repeat;
+  }
+
+  .top-hero-subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px 22px;
+    background: rgba(0, 0, 0, 0.82);
+    border-radius: 8px;
+    font-size: clamp(17px, 3vw, 24px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .top-hero-subtitle span.top-hero-subtitle-x {
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 400;
+  }
+
   .top-hero-scroll-cue {
     display: flex;
     flex-direction: column;
@@ -127,6 +156,16 @@
 <div class="top-hero-spacer">
   <div class="top-hero-title-wrap">
     <div class="top-hero-title">創記録</div>
+
+    <div class="top-hero-divider"></div>
+
+    <div class="top-hero-subtitle">
+      <span style="color: #8fe0a8;">AI作成</span>
+      <span class="top-hero-subtitle-x">×</span>
+      <span style="color: #f0a8d0;">要素設定</span>
+      <span class="top-hero-subtitle-x">×</span>
+      <span style="color: #f0d080;">整合性チェック</span>
+    </div>
   </div>
 
   <div class="top-hero-scroll-cue">
