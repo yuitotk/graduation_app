@@ -67,7 +67,7 @@
 
 <h4 style="color: #ddd6fe;">詳細メモの登場要素</h4>
 <% if @story_event_idea.story_elements.any? %>
-  <% grouped_elements = @story_event_idea.story_elements.group_by(&:kind) %>
+  <% grouped_elements = StoryElement.sorted_by_kind_and_name(@story_event_idea.story_elements).group_by(&:kind) %>
 
   <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e;">
     <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>

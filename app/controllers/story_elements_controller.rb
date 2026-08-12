@@ -9,7 +9,7 @@ class StoryElementsController < ApplicationController
   before_action :set_breadcrumbs, only: %i[index show new edit]
 
   def index
-    @story_elements = @story.story_elements.order(:id)
+    @story_elements = StoryElement.sorted_by_kind_and_name(@story.story_elements)
   end
 
   def show

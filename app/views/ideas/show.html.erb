@@ -241,14 +241,7 @@
 <h1 style="color: #ddd6fe;"><%= @idea.title %></h1>
 
 <% if placement.present? && placement.story_elements.present? %>
-  <% elements = placement.story_elements.to_a %>
-  <% elements =
-      if elements.first.respond_to?(:kind) && elements.first.respond_to?(:name)
-        elements.sort_by { |e| [e.kind.to_s, e.name.to_s, e.id.to_i] }
-      else
-        elements.sort_by { |e| e.id.to_i }
-      end
-  %>
+  <% elements = StoryElement.sorted_by_kind_and_name(placement.story_elements.to_a) %>
   <% grouped_elements = elements.group_by(&:kind) %>
 
   <div style="margin: 12px 0;">

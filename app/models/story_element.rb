@@ -24,6 +24,16 @@ class StoryElement < ApplicationRecord
 
   before_save :set_text_updated_at, if: :should_update_text_updated_at?
 
+  KIND_ORDER = { "character" => 0, "item" => 1, "setting" => 2 }.freeze
+
+  def self.sorted_by_kind_and_name(elements = all)
+    elements.sort_by(&:kind_and_name_sort_key)
+  end
+
+  def kind_and_name_sort_key
+    [KIND_ORDER[kind] || 99, japanese_name? ? 0 : 1, sortable_name, id]
+  end
+
   private
 
   def should_update_text_updated_at?
@@ -32,5 +42,13 @@ class StoryElement < ApplicationRecord
 
   def set_text_updated_at
     self.text_updated_at = Time.current
+  end
+
+  def japanese_name?
+    name.to_s.match?(/\A[ぁ-んァ-ヶ一-龥ー々]+\z/)
+  end
+
+  def sortable_name
+    name.to_s.downcase.tr("ァ-ヶ", "ぁ-ゖ")
   end
 end

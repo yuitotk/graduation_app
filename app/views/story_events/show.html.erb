@@ -28,7 +28,7 @@
 
 <h2 style="margin: 0 0 12px 0; color: #ddd6fe;">イベントの登場要素</h2>
 <% if @story_event.story_elements.any? %>
-  <% grouped_elements = @story_event.story_elements.group_by(&:kind) %>
+  <% grouped_elements = StoryElement.sorted_by_kind_and_name(@story_event.story_elements).group_by(&:kind) %>
 
   <div style="margin-top: 12px; margin-bottom: 24px; border: 1px solid #555555; border-radius: 16px; padding: 16px; background: #1e1e1e;">
     <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>

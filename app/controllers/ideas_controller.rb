@@ -380,9 +380,7 @@ class IdeasController < ApplicationController
   def available_story_elements_for(story)
     return [] if story.nil?
 
-    elements = story.story_elements
-    elements = elements.order(:position) if elements.respond_to?(:klass) && elements.klass.column_names.include?("position")
-    elements
+    StoryElement.sorted_by_kind_and_name(story.story_elements)
   end
 
   def safe_path(value)
