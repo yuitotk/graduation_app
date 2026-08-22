@@ -20,7 +20,7 @@
 
   <%= turbo_stream.update "generate_button" do %>
     <%= submit_tag "同じ単語で再作成",
-          data: { disable_with: "生成中..." },
+          data: { disable_with: "生成中...", action: "click->ai-loading#show" },
           style: "display: inline-block; padding: 10px 18px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px; cursor: pointer;" %>
   <% end %>
 
