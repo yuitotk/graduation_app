@@ -12,4 +12,3 @@ AllCops:
     - "bin/*"
     - "node_modules/**/*"
     - "vendor/**/*"
-    - "test/**/*"
