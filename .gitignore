@@ -4,3 +4,15 @@ tmp/
 /tmp/
 
 .env
+
+# OS
+.DS_Store
+
+# Node（importmap-railsのためnode_modules自体は使わないが念のため）
+/node_modules
+
+# テストカバレッジ
+/coverage
+
+# アップロード画像（本番はCloudinaryを使用、ローカル保存時の保険）
+/public/uploads
