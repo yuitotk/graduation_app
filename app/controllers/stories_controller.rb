@@ -209,7 +209,7 @@ class StoriesController < ApplicationController
     @stories = current_user.stories.order(:position, created_at: :desc)
 
     respond_to do |format|
-      format.turbo_stream { render "reorder" }
+      format.turbo_stream { render "refresh_list" }
       format.html { redirect_to stories_path }
     end
   end

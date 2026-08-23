@@ -72,5 +72,22 @@ RSpec.describe "Stories", type: :request do
       expect(story_b.reload.position).to eq(100)
     end
   end
+
+  describe "DELETE /stories/:id" do
+    let!(:story_to_delete) { user.stories.create!(title: "削除対象ストーリー", description: "d", position: 300) }
+
+    before do
+      post login_path, params: { email: user.email, password: "password" }
+    end
+
+    # 削除ボタンは一覧ではなく編集画面にあり、削除後は一覧へ画面遷移する必要がある
+    # (その場に留まる、という選択肢が無い)ため、turbo_stream対応はしていない。
+    it "一覧へリダイレクトし、削除される" do
+      delete story_path(story_to_delete)
+
+      expect(response).to redirect_to(stories_path)
+      expect(Story.exists?(story_to_delete.id)).to be false
+    end
+  end
 end
 # rubocop:enable RSpec/MultipleExpectations
