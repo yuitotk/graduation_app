@@ -81,7 +81,7 @@ class StoryEventIdeasController < ApplicationController
     ideas[idx], ideas[idx - 1] = ideas[idx - 1], ideas[idx]
     resequence_positions!(ideas)
 
-    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
+    render_reordered_story_event_ideas
   end
 
   def move_down
@@ -92,7 +92,7 @@ class StoryEventIdeasController < ApplicationController
     ideas[idx], ideas[idx + 1] = ideas[idx + 1], ideas[idx]
     resequence_positions!(ideas)
 
-    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
+    render_reordered_story_event_ideas
   end
 
   private
@@ -135,6 +135,17 @@ class StoryEventIdeasController < ApplicationController
       :idea_id,
       story_element_ids: []
     )
+  end
+
+  # 並び替え後の一覧を返す。Turbo Streamならその場で一覧部分だけ差し替え、
+  # それ以外(JS無効など)は今まで通りイベント詳細へリダイレクトする。
+  def render_reordered_story_event_ideas
+    respond_to do |format|
+      format.turbo_stream { render "reorder" }
+      format.html do
+        redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
+      end
+    end
   end
 
   def resequence_positions!(ideas)
