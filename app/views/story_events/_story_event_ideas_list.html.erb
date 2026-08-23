@@ -1,0 +1,10 @@
+<div id="story_event_ideas_list">
+  <% if story_event_ideas.any? %>
+    <%= render partial: "story_events/story_event_idea",
+               collection: story_event_ideas,
+               as: :idea,
+               locals: { story: story, story_event: story_event } %>
+  <% else %>
+    <p style="color: #f5f5f5;">まだ詳細メモはありません</p>
+  <% end %>
+</div>

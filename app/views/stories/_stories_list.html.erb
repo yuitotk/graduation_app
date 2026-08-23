@@ -1,0 +1,7 @@
+<div id="stories_list">
+  <% if stories.any? %>
+    <%= render partial: "story", collection: stories, as: :story %>
+  <% else %>
+    <p>まだストーリーがありません</p>
+  <% end %>
+</div>

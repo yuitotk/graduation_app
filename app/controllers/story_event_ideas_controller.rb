@@ -76,23 +76,27 @@ class StoryEventIdeasController < ApplicationController
   def move_up
     ideas = @story_event.story_event_ideas.order(:position, :created_at).to_a
     idx = ideas.index(@story_event_idea)
-    return redirect_to story_story_event_path(@story, @story_event) if idx.nil? || idx.zero?
+    moved = idx.present? && !idx.zero?
 
-    ideas[idx], ideas[idx - 1] = ideas[idx - 1], ideas[idx]
-    resequence_positions!(ideas)
+    if moved
+      ideas[idx], ideas[idx - 1] = ideas[idx - 1], ideas[idx]
+      resequence_positions!(ideas)
+    end
 
-    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
+    render_reordered_story_event_ideas(moved: moved)
   end
 
   def move_down
     ideas = @story_event.story_event_ideas.order(:position, :created_at).to_a
     idx = ideas.index(@story_event_idea)
-    return redirect_to story_story_event_path(@story, @story_event) if idx.nil? || idx == ideas.length - 1
+    moved = idx.present? && idx != ideas.length - 1
 
-    ideas[idx], ideas[idx + 1] = ideas[idx + 1], ideas[idx]
-    resequence_positions!(ideas)
+    if moved
+      ideas[idx], ideas[idx + 1] = ideas[idx + 1], ideas[idx]
+      resequence_positions!(ideas)
+    end
 
-    redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
+    render_reordered_story_event_ideas(moved: moved)
   end
 
   private
@@ -135,6 +139,23 @@ class StoryEventIdeasController < ApplicationController
       :idea_id,
       story_element_ids: []
     )
+  end
+
+  # 並び替え後の一覧を返す。Turbo Streamならその場で一覧部分だけ差し替え、
+  # それ以外(JS無効など)は今まで通りイベント詳細へリダイレクトする。
+  # 一番上/一番下で、これ以上動かせなかった場合(moved: false)は、
+  # 今まで通り「並び替えました」の通知は出さない。
+  def render_reordered_story_event_ideas(moved:)
+    respond_to do |format|
+      format.turbo_stream { render "reorder" }
+      format.html do
+        if moved
+          redirect_to story_story_event_path(@story, @story_event), notice: t("flash.story_event_ideas.reordered")
+        else
+          redirect_to story_story_event_path(@story, @story_event)
+        end
+      end
+    end
   end
 
   def resequence_positions!(ideas)

@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "story_event_ideas_list" do %>
+  <%= render "story_events/story_event_ideas_list",
+             story: @story,
+             story_event: @story_event,
+             story_event_ideas: @story_event.story_event_ideas.order(:position, :created_at) %>
+<% end %>

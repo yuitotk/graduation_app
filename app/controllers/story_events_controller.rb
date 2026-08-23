@@ -76,7 +76,7 @@ class StoryEventsController < ApplicationController
                   .first
 
     swap_positions(@story_event, upper)
-    redirect_to story_path(@story)
+    render_reordered_story_events
   end
 
   def move_down
@@ -89,7 +89,7 @@ class StoryEventsController < ApplicationController
                   .first
 
     swap_positions(@story_event, lower)
-    redirect_to story_path(@story)
+    render_reordered_story_events
   end
 
   private
@@ -141,6 +141,15 @@ class StoryEventsController < ApplicationController
     first_pos = first_record.position
     first_record.update!(position: second_record.position)
     second_record.update!(position: first_pos)
+  end
+
+  # 並び替え後の一覧を返す。Turbo Streamならその場で一覧部分だけ差し替え、
+  # それ以外(JS無効など)は今まで通りストーリー詳細へリダイレクトする。
+  def render_reordered_story_events
+    respond_to do |format|
+      format.turbo_stream { render "reorder" }
+      format.html { redirect_to story_path(@story) }
+    end
   end
 
   def next_position_for(story)

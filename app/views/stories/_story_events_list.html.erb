@@ -1,0 +1,7 @@
+<div id="story_events_list">
+  <% if story_events.any? %>
+    <%= render partial: "stories/story_event", collection: story_events, as: :event, locals: { story: story } %>
+  <% else %>
+    <p>まだイベントがありません</p>
+  <% end %>
+</div>
