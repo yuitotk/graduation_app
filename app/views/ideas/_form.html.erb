@@ -11,8 +11,8 @@
               local: true,
               html: { multipart: true },
               data: {
-                controller: "prevent-enter-submit element-selector",
-                action: "keydown->prevent-enter-submit#check change->element-selector#refresh"
+                controller: "prevent-enter-submit element-selector saving-indicator",
+                action: "keydown->prevent-enter-submit#check change->element-selector#refresh submit->saving-indicator#show"
               }) do |f| %>
   <% if idea.errors.any? %>
     <div class="alert alert-danger">
@@ -159,5 +159,9 @@
   <div style="margin-top: 30px;">
     <%= f.submit(idea.persisted? ? "アイデアの更新" : "アイデアを作成",
           style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;") %>
+
+    <span data-saving-indicator-target="indicator" hidden style="margin-left: 14px; font-weight: bold; color: #ddd6fe;">
+      <span class="inline-spinner"></span>保存中です…
+    </span>
   </div>
 <% end %>
