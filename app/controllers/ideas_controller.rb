@@ -1,6 +1,8 @@
 # app/controllers/ideas_controller.rb
 # rubocop:disable Metrics/ClassLength
 class IdeasController < ApplicationController
+  include PlaceableBreadcrumbs
+
   before_action :require_login
   before_action :sync_search_story_context_from_placeable, only: %i[new create]
   before_action :set_idea, only: %i[show edit update destroy]
@@ -153,102 +155,8 @@ class IdeasController < ApplicationController
   end
 
   def assign_breadcrumbs_from_placeable(placeable)
-    @breadcrumbs = breadcrumb_items_for_placeable(placeable)
+    @breadcrumbs = breadcrumb_items_for_placeable(placeable, current_breadcrumb_params)
   end
-
-  def breadcrumb_items_for_placeable(placeable)
-    case placeable
-    when Story
-      story_breadcrumbs(placeable)
-    when StoryEvent
-      story_event_breadcrumbs(placeable)
-    when StoryEventIdea
-      story_event_idea_breadcrumbs(placeable)
-    when StoryElement
-      story_element_breadcrumbs(placeable, current_breadcrumb_params)
-    else
-      []
-    end
-  end
-
-  def story_breadcrumbs(story)
-    [
-      { name: story.title, path: nil }
-    ]
-  end
-
-  def story_event_breadcrumbs(story_event)
-    story = story_event.story
-    [
-      { name: story.title, path: story_path(story) },
-      { name: story_event.title, path: nil }
-    ]
-  end
-
-  def story_event_idea_breadcrumbs(story_event_idea)
-    story_event = story_event_idea.story_event
-    story = story_event.story
-
-    [
-      { name: story.title, path: story_path(story) },
-      { name: story_event.title, path: story_story_event_path(story, story_event) },
-      { name: story_event_idea.title, path: nil }
-    ]
-  end
-
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
-  def story_element_breadcrumbs(story_element, breadcrumb_params = {})
-    story = story_element.story
-
-    case breadcrumb_params[:from]
-    when "story_event_idea"
-      story_event = story.story_events.find_by(id: breadcrumb_params[:story_event_id])
-      story_event_idea = story_event&.story_event_ideas&.find_by(id: breadcrumb_params[:story_event_idea_id])
-
-      if story_event.present? && story_event_idea.present?
-        [
-          { name: story.title, path: story_path(story) },
-          { name: story_event.title, path: story_story_event_path(story, story_event) },
-          {
-            name: story_event_idea.title,
-            path: story_story_event_story_event_idea_path(story, story_event, story_event_idea)
-          },
-          { name: "要素一覧", path: story_story_elements_path(story, breadcrumb_params) },
-          { name: story_element.name, path: nil }
-        ]
-      else
-        [
-          { name: story.title, path: story_path(story) },
-          { name: "要素一覧", path: story_story_elements_path(story) },
-          { name: story_element.name, path: nil }
-        ]
-      end
-    when "story_event"
-      story_event = story.story_events.find_by(id: breadcrumb_params[:story_event_id])
-
-      if story_event.present?
-        [
-          { name: story.title, path: story_path(story) },
-          { name: story_event.title, path: story_story_event_path(story, story_event) },
-          { name: "要素一覧", path: story_story_elements_path(story, breadcrumb_params) },
-          { name: story_element.name, path: nil }
-        ]
-      else
-        [
-          { name: story.title, path: story_path(story) },
-          { name: "要素一覧", path: story_story_elements_path(story) },
-          { name: story_element.name, path: nil }
-        ]
-      end
-    else
-      [
-        { name: story.title, path: story_path(story) },
-        { name: "要素一覧", path: story_story_elements_path(story) },
-        { name: story_element.name, path: nil }
-      ]
-    end
-  end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
 
   def current_breadcrumb_params
     return return_to_breadcrumb_params if params[:return_to].present?
@@ -258,23 +166,6 @@ class IdeasController < ApplicationController
       story_event_id: params[:story_event_id],
       story_event_idea_id: params[:story_event_idea_id]
     }.compact.symbolize_keys
-  end
-
-  def return_to_breadcrumb_params
-    return {} if params[:return_to].blank?
-
-    query = URI.parse(params[:return_to]).query
-    return {} if query.blank?
-
-    parsed = Rack::Utils.parse_nested_query(query)
-
-    {
-      from: parsed["from"],
-      story_event_id: parsed["story_event_id"],
-      story_event_idea_id: parsed["story_event_idea_id"]
-    }.compact.symbolize_keys
-  rescue URI::InvalidURIError
-    {}
   end
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -386,19 +277,6 @@ class IdeasController < ApplicationController
   def safe_path(value)
     v = value.to_s
     v.start_with?("/") ? v : nil
-  end
-
-  def find_placeable_for_current_user(type, id)
-    case type.to_s
-    when "Story"
-      current_user.stories.find_by(id: id)
-    when "StoryEvent"
-      StoryEvent.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
-    when "StoryElement"
-      StoryElement.joins(:story).where(stories: { user_id: current_user.id }).find_by(id: id)
-    when "StoryEventIdea"
-      StoryEventIdea.joins(story_event: :story).where(stories: { user_id: current_user.id }).find_by(id: id)
-    end
   end
 
   def story_for_placeable(placeable)
