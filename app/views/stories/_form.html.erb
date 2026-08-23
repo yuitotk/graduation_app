@@ -1,4 +1,4 @@
-<%= form_with model: story, html: { multipart: true }, data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
+<%= form_with model: story, html: { multipart: true }, data: { controller: "prevent-enter-submit saving-indicator", action: "keydown->prevent-enter-submit#check submit->saving-indicator#show" } do |f| %>
   <% if story.errors.any? %>
     <ul>
       <% story.errors.full_messages.each do |msg| %>
@@ -53,5 +53,9 @@
   <div style="margin-top: 30px;">
     <%= f.submit(story.persisted? ? "ストーリーを更新" : "ストーリーを作成",
           style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;") %>
+
+    <span data-saving-indicator-target="indicator" hidden style="margin-left: 14px; font-weight: bold; color: #ddd6fe;">
+      <span class="inline-spinner"></span>保存中です…
+    </span>
   </div>
 <% end %>

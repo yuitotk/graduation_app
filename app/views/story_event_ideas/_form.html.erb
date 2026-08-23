@@ -1,7 +1,7 @@
 <%= form_with model: [@story, @story_event, @story_event_idea],
               data: {
-                controller: "prevent-enter-submit element-selector",
-                action: "keydown->prevent-enter-submit#check change->element-selector#refresh"
+                controller: "prevent-enter-submit element-selector saving-indicator",
+                action: "keydown->prevent-enter-submit#check change->element-selector#refresh submit->saving-indicator#show"
               } do |f| %>
   <% if @story_event_idea.errors.any? %>
     <ul>
@@ -125,5 +125,9 @@
   <div style="margin-top: 24px;">
     <%= f.submit @story_event_idea.persisted? ? "詳細メモを更新する" : "詳細メモを追加する",
           style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;" %>
+
+    <span data-saving-indicator-target="indicator" hidden style="margin-left: 14px; font-weight: bold; color: #ddd6fe;">
+      <span class="inline-spinner"></span>保存中です…
+    </span>
   </div>
 <% end %>

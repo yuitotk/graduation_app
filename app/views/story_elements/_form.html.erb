@@ -1,6 +1,6 @@
 <%= form_with model: [@story, @story_element],
               url: @story_element.persisted? ? story_story_element_path(@story, @story_element, breadcrumb_params) : story_story_elements_path(@story, breadcrumb_params),
-              data: { controller: "prevent-enter-submit", action: "keydown->prevent-enter-submit#check" } do |f| %>
+              data: { controller: "prevent-enter-submit saving-indicator", action: "keydown->prevent-enter-submit#check submit->saving-indicator#show" } do |f| %>
   <% if @story_element.errors.any? %>
     <ul>
       <% @story_element.errors.full_messages.each do |msg| %>
@@ -80,5 +80,9 @@
   <div style="margin-top: 24px;">
     <%= f.submit "要素を保存する",
           style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 12px 24px; font-weight: bold; cursor: pointer;" %>
+
+    <span data-saving-indicator-target="indicator" hidden style="margin-left: 14px; font-weight: bold; color: #ddd6fe;">
+      <span class="inline-spinner"></span>保存中です…
+    </span>
   </div>
 <% end %>

@@ -93,3 +93,22 @@ hr {
 .privacy-page {
   color: #f5f5f5;
 }
+
+/* 保存ボタンを押した直後に表示する、くるくる回るローディング表示 */
+.inline-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: inline-spinner-spin 0.7s linear infinite;
+}
+
+@keyframes inline-spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
