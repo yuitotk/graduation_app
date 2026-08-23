@@ -22,7 +22,7 @@ class IdeasController < ApplicationController
     @stories = current_user.stories.order(created_at: :desc)
     story_ids = @stories.pluck(:id)
 
-    @story_events = StoryEvent.where(story_id: story_ids).order(created_at: :desc)
+    @story_events = StoryEvent.includes(:story).where(story_id: story_ids).order(created_at: :desc)
     @story_elements = StoryElement.includes(:story).where(story_id: story_ids).to_a
     @story_event_ideas = StoryEventIdea.includes(story_event: :story)
                                        .joins(story_event: :story)

@@ -71,8 +71,17 @@ Figma：https://www.figma.com/board/PpIwMCpGPlmi68IROYUKwE/%E7%94%BB%E9%9D%A2%E9
 | 認証 | sorcery |
 | 画像アップロード | carrierwave + Cloudinary |
 | AI連携 | OpenAI API（faraday経由でHTTPリクエスト） |
-| テスト / 静的解析 | RSpec、RuboCop |
+| テスト / 静的解析 | RSpec、RuboCop、Bullet（N+1クエリ検出） |
 | 開発環境 | Docker / Docker Compose |
+
+## パフォーマンスへの配慮
+
+開発環境にBulletを導入し、N+1クエリを検出できるようにしています。
+実際にBulletで検出し、対応した例：
+
+- `IdeasController#show`で`StoryEvent`の`story`関連付けにincludesが
+  抜けており、イベント一覧表示時にN+1クエリが発生していた
+  → `.includes(:story)`を追加して解消
 
 ## 外部サービス
 

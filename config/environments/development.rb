@@ -1,5 +1,6 @@
 require "active_support/core_ext/integer/time"
 
+# rubocop:disable Metrics/BlockLength
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -68,4 +69,13 @@ Rails.application.configure do
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+  # N+1クエリなどを検出して知らせてくれる(開発環境のみ・本番には影響しない)
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.rails_logger = true
+    Bullet.console = true
+    Bullet.add_footer = true
+  end
 end
+# rubocop:enable Metrics/BlockLength
