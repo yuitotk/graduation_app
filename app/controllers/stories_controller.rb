@@ -96,7 +96,7 @@ class StoriesController < ApplicationController
                         .first
 
     swap_positions(story, upper)
-    redirect_to stories_path
+    render_reordered_stories
   end
 
   # ↓へ移動
@@ -111,7 +111,7 @@ class StoriesController < ApplicationController
                         .first
 
     swap_positions(story, lower)
-    redirect_to stories_path
+    render_reordered_stories
   end
 
   private
@@ -201,6 +201,17 @@ class StoriesController < ApplicationController
     first_pos = first_record.position
     first_record.update!(position: second_record.position)
     second_record.update!(position: first_pos)
+  end
+
+  # 並び替え後の一覧を返す。Turbo Streamならその場で一覧部分だけ差し替え、
+  # それ以外(JS無効など)は今まで通り一覧ページへリダイレクトする。
+  def render_reordered_stories
+    @stories = current_user.stories.order(:position, created_at: :desc)
+
+    respond_to do |format|
+      format.turbo_stream { render "reorder" }
+      format.html { redirect_to stories_path }
+    end
   end
 
   def next_position_for(user)
