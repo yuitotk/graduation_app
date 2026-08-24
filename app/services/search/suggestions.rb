@@ -14,8 +14,9 @@ module Search
     end
     # rubocop:enable Naming/MethodParameterName
 
-    # 候補は title のみ
-    # 返り値: { home: [...], story: [...], event: [...], element: [...], story_event_idea: [...] }
+    # 検索対象はタイトル・メモ両方。候補として画面に出す文字列自体は title のみ
+    # 返り値: { home: [{ title:, matched_by_memo: }, ...], story: [...], ... }
+    # matched_by_memo は、タイトル自体は一致せず、メモの中身だけで見つかった場合に true
     # scopeが特定なら、そのカテゴリだけ返す
     def call
       return {} if @q.blank?
@@ -50,9 +51,11 @@ module Search
       Idea.where(user_id: @user.id)
     end
 
-    def apply_title_search(rel)
+    # タイトルだけでなくメモの中身も検索対象にする。
+    # 候補として画面に出す文字列自体は、あくまでタイトル(select_titles参照)。
+    def apply_text_search(rel)
       like = "%#{ActiveRecord::Base.sanitize_sql_like(@q)}%"
-      rel.where("ideas.title LIKE :q", q: like)
+      rel.where("ideas.title LIKE :q OR ideas.memo LIKE :q", q: like)
     end
 
     def apply_story_element_filter(rel)
@@ -64,10 +67,32 @@ module Search
     end
 
     def select_titles(rel)
-      rel.group("ideas.title")
-         .order(Arel.sql("MAX(ideas.created_at) DESC"))
-         .limit(LIMIT)
-         .pluck("ideas.title")
+      titles =
+        rel.group("ideas.title")
+           .order(Arel.sql("MAX(ideas.created_at) DESC"))
+           .limit(LIMIT)
+           .pluck("ideas.title")
+
+      return [] if titles.empty?
+
+      title_matched_set = titles_matching_query_itself(titles)
+
+      titles.map do |title|
+        { title: title, matched_by_memo: title_matched_set.exclude?(title) }
+      end
+    end
+
+    # 渡されたタイトル群のうち、タイトル自体にも検索ワードが含まれるものだけを返す。
+    # (これに含まれないタイトルは、メモの中身だけで見つかったということになる)
+    def titles_matching_query_itself(titles)
+      like = "%#{ActiveRecord::Base.sanitize_sql_like(@q)}%"
+
+      base_ideas
+        .where(title: titles)
+        .where("title LIKE :q", q: like)
+        .distinct
+        .pluck(:title)
+        .to_set
     end
 
     def build_home
@@ -75,7 +100,7 @@ module Search
       return [] if @story_element_id.present?
 
       rel =
-        apply_title_search(base_ideas)
+        apply_text_search(base_ideas)
         .where.missing(:idea_placement)
 
       select_titles(rel)
@@ -83,7 +108,7 @@ module Search
 
     def build_story
       rel =
-        apply_title_search(base_ideas)
+        apply_text_search(base_ideas)
         .joins(:idea_placement)
         .where(idea_placements: { placeable_type: "Story" })
 
@@ -94,7 +119,7 @@ module Search
 
     def build_event
       rel =
-        apply_title_search(base_ideas)
+        apply_text_search(base_ideas)
         .joins(:idea_placement)
         .where(idea_placements: { placeable_type: "StoryEvent" })
 
@@ -109,7 +134,7 @@ module Search
 
     def build_element
       rel =
-        apply_title_search(base_ideas)
+        apply_text_search(base_ideas)
         .joins(:idea_placement)
         .where(idea_placements: { placeable_type: "StoryElement" })
 
@@ -124,7 +149,7 @@ module Search
 
     def build_story_event_idea
       rel =
-        apply_title_search(base_ideas)
+        apply_text_search(base_ideas)
         .joins(:idea_placement)
         .where(idea_placements: { placeable_type: "StoryEventIdea" })
 
