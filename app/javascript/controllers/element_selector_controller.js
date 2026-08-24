@@ -36,7 +36,9 @@ export default class extends Controller {
     const selectedByKind = {
       character: [],
       item: [],
-      setting: []
+      setting: [],
+      place: [],
+      organization: []
     }
 
     this.checkboxTargets.forEach((checkbox) => {
@@ -93,7 +95,9 @@ export default class extends Controller {
     return {
       character: "キャラクター",
       item: "アイテム",
-      setting: "設定"
+      setting: "設定",
+      place: "場所",
+      organization: "団体・グループ"
     }[kind] || kind
   }
 
