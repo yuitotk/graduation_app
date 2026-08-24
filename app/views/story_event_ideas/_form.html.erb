@@ -71,7 +71,9 @@
 
         <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
         <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
-        <div data-element-selector-target="summary" data-kind="setting" hidden style="color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="setting" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="place" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="organization" hidden style="color: #ffffff;"></div>
       </div>
 
       <div style="margin-top: 16px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
@@ -79,7 +81,7 @@
           要素を選択する
         </div>
 
-        <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
+        <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"], ["place", "場所"], ["organization", "団体・グループ"]].each do |kind, kind_label| %>
           <% elements = grouped_elements[kind] || [] %>
           <% next if elements.blank? %>
 

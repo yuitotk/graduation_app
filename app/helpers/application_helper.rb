@@ -20,7 +20,9 @@ module ApplicationHelper
     {
       "character" => "キャラクター",
       "item" => "アイテム",
-      "setting" => "設定"
+      "setting" => "設定",
+      "place" => "場所",
+      "organization" => "団体・グループ"
     }[element.kind.to_s] || element.kind.to_s.presence
   end
 end

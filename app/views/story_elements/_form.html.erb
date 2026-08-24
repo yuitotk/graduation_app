@@ -12,7 +12,7 @@
   <div style="margin-bottom: 20px;">
     <%= f.label :kind, "分類", style: "font-size: 24px; font-weight: bold; color: #ddd6fe;" %><br>
     <%= f.select :kind,
-                 [["キャラクター", "character"], ["アイテム", "item"], ["設定", "setting"]],
+                 [["キャラクター", "character"], ["アイテム", "item"], ["設定", "setting"], ["場所", "place"], ["団体・グループ", "organization"]],
                  { include_blank: true },
                  { style: "width: 100%; max-width: 220px; box-sizing: border-box;" } %>
   </div>

@@ -248,7 +248,7 @@
     <strong>登場要素：</strong>
 
     <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e;">
-      <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"]].each do |kind, kind_label| %>
+      <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"], ["place", "場所"], ["organization", "団体・グループ"]].each do |kind, kind_label| %>
         <% kind_elements = grouped_elements[kind] || [] %>
         <% next if kind_elements.blank? %>
 
@@ -317,8 +317,8 @@
   <hr>
   <h2 style="color: #c4b5fd;">移動先の要素を選ぶ（文字順）</h2>
 
-  <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
-  <% kind_order = { "character" => 0, "item" => 1, "setting" => 2 } %>
+  <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体" } %>
+  <% kind_order = { "character" => 0, "item" => 1, "setting" => 2, "place" => 3, "organization" => 4 } %>
   <% element_display_label = lambda do |el|
        kind_label = kind_labels[el.kind] || el.kind
        marker_text = el.marker.to_s
