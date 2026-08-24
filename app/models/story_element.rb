@@ -17,14 +17,14 @@ class StoryElement < ApplicationRecord
 
   accepts_nested_attributes_for :story_element_image, allow_destroy: true
 
-  enum :kind, { character: 0, item: 1, setting: 2 }
+  enum :kind, { character: 0, item: 1, setting: 2, place: 3, organization: 4 }
 
   validates :kind, presence: true
   validates :name, presence: true
 
   before_save :set_text_updated_at, if: :should_update_text_updated_at?
 
-  KIND_ORDER = { "character" => 0, "item" => 1, "setting" => 2 }.freeze
+  KIND_ORDER = { "character" => 0, "item" => 1, "setting" => 2, "place" => 3, "organization" => 4 }.freeze
 
   def self.sorted_by_kind_and_name(elements = all)
     elements.sort_by(&:kind_and_name_sort_key)
