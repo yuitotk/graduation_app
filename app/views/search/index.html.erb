@@ -26,7 +26,7 @@
   <li>
     要素：
     <% if @selected_story_element.present? %>
-      <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
+      <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体" } %>
       [<%= kind_labels[@selected_story_element.kind.to_s] || @selected_story_element.kind %>]<%= @selected_story_element.marker %>　<%= @selected_story_element.name %>
     <% else %>
       （なし）

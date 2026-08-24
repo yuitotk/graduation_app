@@ -338,8 +338,8 @@
       <% end %>
 
       <% if header_story.present? && allow_within_story_toggle %>
-        <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定" } %>
-        <% kind_order = { "character" => 0, "item" => 1, "setting" => 2 } %>
+        <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体" } %>
+        <% kind_order = { "character" => 0, "item" => 1, "setting" => 2, "place" => 3, "organization" => 4 } %>
 
         <% story_element_options =
              [["（要素で絞り込み：なし）", ""]] +
