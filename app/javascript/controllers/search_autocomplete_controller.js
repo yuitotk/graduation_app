@@ -102,7 +102,7 @@ export default class extends Controller {
         const memoNote = it.matchedByMemo ? "・メモ内でヒット" : ""
         return `<li data-action="mousedown->search-autocomplete#pick" data-title="${this.escape(
           it.title
-        )}">${this.escape(it.title)} <small>(${this.escape(it.label)}${memoNote})</small></li>`
+        )}" data-matched-by-memo="${it.matchedByMemo}">${this.escape(it.title)} <small>(${this.escape(it.label)}${memoNote})</small></li>`
       })
       .join("")
 
@@ -116,10 +116,20 @@ export default class extends Controller {
   }
 
   pick(e) {
-    const title = e.currentTarget.dataset.title
-    this.inputTarget.value = title
+    const matchedByMemo = e.currentTarget.dataset.matchedByMemo === "true"
+
+    // メモ内でヒットした候補は、タイトルが元の入力ワードと無関係なことがあるため、
+    // 検索欄は書き換えず、入力していた言葉のまま検索する
+    // (タイトルに書き換えると、同じタイトルを持つ無関係なアイデアまで一緒に出てきてしまうため)
+    if (!matchedByMemo) {
+      const title = e.currentTarget.dataset.title
+      this.inputTarget.value = title
+    }
+
     this.renderEmpty()
-    // Enter検索はユーザーが検索ボタン/Enterで実行する（壊さない）
+    // 候補をクリックしたら、そのまま検索まで実行する
+    // (this.elementは検索フォーム自体。Enter検索/検索ボタンと同じ経路で送信する)
+    this.element.requestSubmit()
   }
 
   escape(str) {
