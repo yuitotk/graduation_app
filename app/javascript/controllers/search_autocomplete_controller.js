@@ -76,16 +76,17 @@ export default class extends Controller {
   }
 
   render(data) {
-    // data例: {home:["..."], story:["..."], event:["..."], element:["..."]}
+    // data例: {home:[{title:"...", matched_by_memo:false}, ...], story:[...], event:[...], element:[...], story_event_idea:[...]}
     const items = []
     ;[
       ["home", "ホーム未所属"],
       ["story", "ストーリー内"],
       ["event", "イベント内"],
-      ["element", "要素内"]
+      ["element", "要素内"],
+      ["story_event_idea", "詳細メモ内"]
     ].forEach(([key, label]) => {
-      ;(data[key] || []).forEach((title) => {
-        items.push({ title, label })
+      ;(data[key] || []).forEach((entry) => {
+        items.push({ title: entry.title, label, matchedByMemo: !!entry.matched_by_memo })
       })
     })
 
@@ -96,12 +97,13 @@ export default class extends Controller {
 
     const html = items
       .slice(0, 20)
-      .map(
-        (it) =>
-          `<li data-action="mousedown->search-autocomplete#pick" data-title="${this.escape(
-            it.title
-          )}">${this.escape(it.title)} <small>(${this.escape(it.label)})</small></li>`
-      )
+      .map((it) => {
+        // タイトル自体には検索ワードが含まれず、メモの中身だけで見つかった場合の注記
+        const memoNote = it.matchedByMemo ? "・メモ内でヒット" : ""
+        return `<li data-action="mousedown->search-autocomplete#pick" data-title="${this.escape(
+          it.title
+        )}">${this.escape(it.title)} <small>(${this.escape(it.label)}${memoNote})</small></li>`
+      })
       .join("")
 
     this.listTarget.innerHTML = html
