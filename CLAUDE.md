@@ -120,7 +120,7 @@ AIに創作を任せるのではなく、創作の主体はユーザーに残す
   (app/controllers/story_events_controller.rb)
 - イベント内の詳細メモ: `/stories/:story_id/story_events/:id/story_event_ideas/...`
   (app/controllers/story_event_ideas_controller.rb)
-- ストーリー配下の要素（キャラ/アイテム/設定）: `/stories/:story_id/story_elements/...`
+- ストーリー配下の要素（キャラ/アイテム/設定/場所/団体・グループ）: `/stories/:story_id/story_elements/...`
   (app/controllers/story_elements_controller.rb)
 - 検索: `/search`, `/search/suggestions`
   (app/controllers/search_controller.rb)
@@ -136,7 +136,7 @@ AIに創作を任せるのではなく、創作の主体はユーザーに残す
 3. 辞書×AI発想 — app/controllers/random_words_controller.rb, app/services/ai/idea_generator.rb
 4. ストーリー管理（並び替え可能、画像1枚） — app/models/story.rb, app/controllers/stories_controller.rb
 5. ストーリーイベント管理 — app/models/story_event.rb, app/controllers/story_events_controller.rb
-6. 要素管理（キャラ/アイテム/設定） — app/models/story_element.rb, app/controllers/story_elements_controller.rb
+6. 要素管理（キャラ/アイテム/設定/場所/団体・グループ） — app/models/story_element.rb, app/controllers/story_elements_controller.rb
 7. イベント×要素の多対多紐付け — app/models/story_event_element.rb
 8. イベント内の詳細メモ — app/models/story_event_idea.rb, app/controllers/story_event_ideas_controller.rb
 9. 整合性チェック — app/controllers/stories_controller.rb (#consistency)
