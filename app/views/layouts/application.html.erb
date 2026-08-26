@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <% if Rails.env.production? %>
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-SYTWWN5314"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-SYTWWN5314');
+      </script>
+    <% end %>
+
     <title><%= content_for?(:title) ? yield(:title) : "創記録 | AIアイデア作成・要素設定・時系列確認ができる創作支援アプリ" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="<%= content_for?(:description) ? yield(:description) : "AI作成で発想を広げ、要素設定と整合性チェックで物語の流れや登場要素を時系列で確認できる創作支援アプリです。" %>">
