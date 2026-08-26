@@ -30,10 +30,21 @@ class StoriesController < ApplicationController
 
   # ✅ 整合性チェック（要素で絞り込み。複数選んだ場合は全員そろって登場するイベントのみ表示）
   def consistency
-    @elements = StoryElement.sorted_by_kind_and_name(@story.story_elements.includes(:story_element_image))
+    @elements = StoryElement.sorted_by_kind_and_name(@story.story_elements)
 
     selected_ids = Array(params[:consistency_story_element_ids]).map(&:to_i).reject(&:zero?).uniq
-    @selected_elements = @elements.select { |element| selected_ids.include?(element.id) }
+
+    # 画像を表示する「選択中の要素」カード用に、選ばれた要素だけ改めて
+    # story_element_image込みで取得する（@elements全体をincludesすると、
+    # 選ばれなかった要素の分が無駄なeager loadになるため分けている）
+    @selected_elements =
+      if selected_ids.present?
+        StoryElement.sorted_by_kind_and_name(
+          @story.story_elements.where(id: selected_ids).includes(:story_element_image)
+        )
+      else
+        []
+      end
 
     @events =
       if @selected_elements.present?

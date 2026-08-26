@@ -61,20 +61,45 @@
     <% if @elements.blank? %>
       <p style="color: #cccccc;">要素がまだありません（先に要素を作成してください）</p>
     <% else %>
+      <% grouped_elements = @elements.group_by(&:kind) %>
+
       <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
-        <% @elements.each do |element| %>
-          <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #ffffff;">
-            <% checkbox_id = "consistency_story_element_ids_#{element.id}" %>
+        <%# 分類ごとに開閉できるようにする。要素が増えても一覧が縦に長くなりすぎないようにするため %>
+        <% [
+          ["character", "キャラクター"],
+          ["item", "アイテム"],
+          ["setting", "設定"],
+          ["place", "場所"],
+          ["organization", "団体・グループ"]
+        ].each do |kind, kind_group_label| %>
+          <% elements_of_kind = grouped_elements[kind] || [] %>
+          <% next if elements_of_kind.blank? %>
 
-            <%= check_box_tag "consistency_story_element_ids[]",
-                  element.id,
-                  @selected_elements.any? { |selected| selected.id == element.id },
-                  id: checkbox_id %>
+          <% any_selected_in_kind = elements_of_kind.any? { |el| @selected_elements.any? { |s| s.id == el.id } } %>
 
-            <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
-              <%= truncate(element_label_for.call(element), length: 40) %>
-            </label>
-          </div>
+          <%# すでにその分類から選択済みの要素がある場合は、開いた状態で表示する %>
+          <details style="margin-bottom: 12px;" <%= "open" if any_selected_in_kind %>>
+            <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
+              <%= kind_group_label %>（<%= elements_of_kind.size %>）
+            </summary>
+
+            <div style="padding: 12px 8px 0 8px;">
+              <% elements_of_kind.each do |element| %>
+                <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #ffffff;">
+                  <% checkbox_id = "consistency_story_element_ids_#{element.id}" %>
+
+                  <%= check_box_tag "consistency_story_element_ids[]",
+                        element.id,
+                        @selected_elements.any? { |selected| selected.id == element.id },
+                        id: checkbox_id %>
+
+                  <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
+                    <%= truncate(element_label_for.call(element), length: 40) %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          </details>
         <% end %>
       </div>
     <% end %>
