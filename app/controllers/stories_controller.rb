@@ -30,7 +30,7 @@ class StoriesController < ApplicationController
 
   # ✅ 整合性チェック（要素で絞り込み。複数選んだ場合は全員そろって登場するイベントのみ表示）
   def consistency
-    @elements = StoryElement.sorted_by_kind_and_name(@story.story_elements)
+    @elements = StoryElement.sorted_by_kind_and_name(@story.story_elements.includes(:story_element_image))
 
     selected_ids = Array(params[:consistency_story_element_ids]).map(&:to_i).reject(&:zero?).uniq
     @selected_elements = @elements.select { |element| selected_ids.include?(element.id) }
@@ -39,9 +39,11 @@ class StoriesController < ApplicationController
       if @selected_elements.present?
         matching_event_ids = events_matching_all_elements(@selected_elements.map(&:id)).pluck(:id)
 
+        # viewでは event.story_event_ideas.joins(...).where(...) のように
+        # 都度絞り込みクエリを投げ直しており、ここでincludesしても使われず
+        # 無駄な事前読み込みになるため付けない
         @story.story_events
               .where(id: matching_event_ids)
-              .includes(:story_elements, story_event_ideas: :story_elements)
               .order(:position)
       else
         []
