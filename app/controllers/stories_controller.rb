@@ -28,20 +28,20 @@ class StoriesController < ApplicationController
           .order("idea_placements.moved_at DESC")
   end
 
-  # ✅ 整合性チェック（要素で絞り込み）
+  # ✅ 整合性チェック（要素で絞り込み。複数選んだ場合は全員そろって登場するイベントのみ表示）
   def consistency
     @elements = StoryElement.sorted_by_kind_and_name(@story.story_elements)
 
-    @selected_element =
-      @elements.find { |element| element.id == params[:consistency_story_element_id].to_i }
+    selected_ids = Array(params[:consistency_story_element_ids]).map(&:to_i).reject(&:zero?).uniq
+    @selected_elements = @elements.select { |element| selected_ids.include?(element.id) }
 
     @events =
-      if @selected_element
+      if @selected_elements.present?
+        matching_event_ids = events_matching_all_elements(@selected_elements.map(&:id)).pluck(:id)
+
         @story.story_events
-              .joins(:story_elements)
-              .where(story_elements: { id: @selected_element.id })
+              .where(id: matching_event_ids)
               .includes(:story_elements, story_event_ideas: :story_elements)
-              .distinct
               .order(:position)
       else
         []
@@ -180,6 +180,18 @@ class StoriesController < ApplicationController
     end
   end
   # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+
+  # 渡された要素IDが「全員そろって」紐づいているイベントだけに絞り込む。
+  # GROUP BY + HAVING で絞り込んだ後、id一覧だけ取り出して別クエリで読み直す
+  # （GROUP BYした結果に対してそのままincludesすると、MySQLのONLY_FULL_GROUP_BYに
+  #   違反するため2段階に分けている）
+  def events_matching_all_elements(element_ids)
+    @story.story_events
+          .joins(:story_elements)
+          .where(story_elements: { id: element_ids })
+          .group(:id)
+          .having("COUNT(DISTINCT story_elements.id) = ?", element_ids.size)
+  end
 
   # ✅ ストーリー配下に入ったら「この作品」を session に固定
   # これでヘッダーの「この作品内（◯◯）」が安定する
