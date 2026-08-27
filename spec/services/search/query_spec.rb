@@ -4,12 +4,12 @@ RSpec.describe Search::Query, type: :service do
   let(:user) { create(:user) }
 
   # rubocop:disable Naming/MethodParameterName
-  def call(q:, scope: "all", story_id: nil, story_element_id: nil)
+  def call(q:, scope: "all", story_id: nil, story_element_ids: [])
     described_class.new(
       q: q,
       scope: scope,
       story_id: story_id,
-      story_element_id: story_element_id,
+      story_element_ids: story_element_ids,
       user: user
     ).call
   end
@@ -38,6 +38,51 @@ RSpec.describe Search::Query, type: :service do
       result = call(q: "きりん", scope: "home")
 
       expect(result[:home][:created_here]).to be_empty
+    end
+  end
+
+  describe "要素での絞り込み" do
+    let(:story) { create(:story, user: user) }
+    let(:element_a) { create(:story_element, story: story, kind: "character", name: "キャラA") }
+    let(:element_b) { create(:story_element, story: story, kind: "character", name: "キャラB") }
+
+    def idea_linked_to(*elements)
+      idea = create(:idea, user: user, title: "対象アイデア", memo: "m")
+      placement = create(:idea_placement, idea: idea, placeable: story, created_here: true)
+      placement.story_element_ids = elements.map(&:id)
+      idea
+    end
+
+    it "要素を1つ指定すると、従来通りその要素が紐づくアイデアが見つかる" do
+      idea = idea_linked_to(element_a)
+
+      result = call(q: "対象", scope: "story", story_element_ids: [element_a.id])
+
+      expect(result[:story][:created_here]).to include(idea)
+    end
+
+    it "複数指定すると、選んだ要素が全部そろって紐づいているアイデアが見つかる" do
+      idea_both = idea_linked_to(element_a, element_b)
+
+      result = call(q: "対象", scope: "story", story_element_ids: [element_a.id, element_b.id])
+
+      expect(result[:story][:created_here]).to include(idea_both)
+    end
+
+    it "複数指定すると、一部の要素しか紐づいていないアイデアは見つからない" do
+      idea_only_a = idea_linked_to(element_a)
+
+      result = call(q: "対象", scope: "story", story_element_ids: [element_a.id, element_b.id])
+
+      expect(result[:story][:created_here]).not_to include(idea_only_a)
+    end
+
+    it "選んだ要素が全部そろって紐づいているアイデアが無ければ見つからない" do
+      idea_linked_to(element_a)
+
+      result = call(q: "対象", scope: "story", story_element_ids: [element_a.id, element_b.id])
+
+      expect(result[:story][:created_here]).to be_empty
     end
   end
 

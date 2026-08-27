@@ -4,17 +4,17 @@ module Search
     VALID_SCOPES = %w[all home story event element story_event_idea].freeze
 
     # rubocop:disable Naming/MethodParameterName
-    def initialize(q:, scope:, story_id:, story_element_id:, user:)
-      @q                = q.to_s.strip
-      @scope            = normalize_scope(scope)
-      @story_id         = story_id.presence&.to_i
-      @story_element_id = story_element_id.presence&.to_i
-      @user             = user
+    def initialize(q:, scope:, story_id:, story_element_ids:, user:)
+      @q                 = q.to_s.strip
+      @scope             = normalize_scope(scope)
+      @story_id          = story_id.presence&.to_i
+      @story_element_ids = Array(story_element_ids).map(&:to_i).reject(&:zero?).uniq
+      @user              = user
     end
     # rubocop:enable Naming/MethodParameterName
 
     def call
-      return {} if @q.blank? && @story_element_id.blank?
+      return {} if @q.blank? && @story_element_ids.blank?
 
       case @scope
       when "home"             then { home: build_home }
@@ -60,16 +60,21 @@ module Search
       }
     end
 
+    # 選んだ要素が全部そろって紐づいているアイデアだけに絞り込む（AND条件）。
+    # GROUP BY + HAVINGで絞り込んだ後にcreated_hereでの分岐・並び替えを続けても
+    # 崩れないことは確認済み（idsが1個の場合は今までと同じ結果になる）
     def apply_story_element_filter(rel)
-      return rel if @story_element_id.blank?
+      return rel if @story_element_ids.blank?
 
       rel.joins(idea_placement: :idea_placement_elements)
-         .where(idea_placement_elements: { story_element_id: @story_element_id })
+         .where(idea_placement_elements: { story_element_id: @story_element_ids })
+         .group("ideas.id")
+         .having("COUNT(DISTINCT idea_placement_elements.story_element_id) = ?", @story_element_ids.size)
     end
 
     def build_home
       return empty_pair if @story_id.present?
-      return empty_pair if @story_element_id.present?
+      return empty_pair if @story_element_ids.present?
 
       rel =
         apply_text_search(base_ideas)
