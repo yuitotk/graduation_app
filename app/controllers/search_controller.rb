@@ -93,6 +93,7 @@ class SearchController < ApplicationController
   def assign_story_element_for_index
     raw_story_element_id = params[:story_element_id].presence&.to_i
 
+    # ヘッダーで選ばれた1個（従来通りの単一選択）
     @story_element_id =
       sanitize_story_element_id(
         story: @story,
@@ -100,9 +101,26 @@ class SearchController < ApplicationController
         story_element_id: raw_story_element_id
       )
 
-    return unless @story.present? && @story_element_id.present?
+    # 検索結果ページ内の「要素で絞り込む」欄で選んだ複数の要素
+    # （まだ選び直していない場合は、ヘッダーで選んだ1個をそのまま引き継ぐ）
+    @selected_story_element_ids = resolve_selected_story_element_ids
+    @selected_story_elements =
+      @story.present? ? @story.story_elements.where(id: @selected_story_element_ids) : StoryElement.none
+  end
 
-    @selected_story_element = @story.story_elements.find_by(id: @story_element_id)
+  def resolve_selected_story_element_ids
+    return [] unless @within_story && @story.present?
+
+    raw_selected_story_element_ids.select { |id| @story.story_elements.exists?(id: id) }.uniq
+  end
+
+  # 検索結果ページの絞り込みフォームが一度でも送信されていればそちらを優先し、
+  # まだなら（検索前や、ヘッダーから来た直後）ヘッダーで選んだ1個をそのまま使う
+  def raw_selected_story_element_ids
+    return Array(params[:search_story_element_ids]).map(&:to_i).reject(&:zero?) if params.key?(:search_story_element_ids)
+    return [@story_element_id] if @story_element_id.present?
+
+    []
   end
 
   def assign_page_context_for_index
@@ -146,16 +164,16 @@ class SearchController < ApplicationController
   end
 
   def perform_search
-    return {} if @query.blank? && @story_element_id.blank?
+    return {} if @query.blank? && @selected_story_element_ids.blank?
 
     service_story_id = @within_story ? @story_id : nil
-    service_story_element_id = @within_story ? @story_element_id : nil
+    service_story_element_ids = @within_story ? @selected_story_element_ids : []
 
     Search::Query.new(
       q: @query,
       scope: @scope,
       story_id: service_story_id,
-      story_element_id: service_story_element_id,
+      story_element_ids: service_story_element_ids,
       user: current_user
     ).call
   end

@@ -25,21 +25,121 @@
 
   <li>
     要素：
-    <% if @selected_story_element.present? %>
-      <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体" } %>
-      [<%= kind_labels[@selected_story_element.kind.to_s] || @selected_story_element.kind %>]<%= @selected_story_element.marker %>　<%= @selected_story_element.name %>
+    <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体" } %>
+    <% if @selected_story_elements.present? %>
+      <% @selected_story_elements.each do |element| %>
+        [<%= kind_labels[element.kind.to_s] || element.kind %>]<%= element.marker %>　<%= element.name %><br>
+      <% end %>
     <% else %>
       （なし）
     <% end %>
   </li>
 </ul>
 
+<% if @within_story && @story.present? && @story.story_elements.any? %>
+  <div style="margin: 16px 0 24px 0;">
+    <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">要素で絞り込む</div>
+    <p style="margin: 0 0 8px 0; font-size: 15px;">複数選ぶと、選んだ要素が全部そろって紐づいているアイデアだけに絞り込まれます。</p>
+
+    <%= form_with url: search_path, method: :get, local: true,
+                  data: { controller: "element-selector", action: "change->element-selector#refresh" } do %>
+      <%= hidden_field_tag :q, params[:q] if params[:q].present? %>
+      <%= hidden_field_tag :scope, params[:scope] if params[:scope].present? %>
+      <%= hidden_field_tag :within_story, "1" %>
+      <%= hidden_field_tag :story_id, @story.id %>
+      <%= hidden_field_tag :from, params[:from] if params[:from].present? %>
+      <%= hidden_field_tag :story_event_id, params[:story_event_id] if params[:story_event_id].present? %>
+      <%= hidden_field_tag :story_event_idea_id, params[:story_event_idea_id] if params[:story_event_idea_id].present? %>
+      <%= hidden_field_tag :page_type, params[:page_type] if params[:page_type].present? %>
+      <%= hidden_field_tag :page_id, params[:page_id] if params[:page_id].present? %>
+      <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
+
+      <%# チェックを全部外した状態でも送信できるよう、キー自体を必ず残しておく隠しフィールド %>
+      <%= hidden_field_tag "search_story_element_ids[]", "" %>
+
+      <% grouped_elements = @story.story_elements.group_by(&:kind) %>
+
+      <%# チェックした瞬間、押す前でもここに選んだ要素がタグで表示される %>
+      <div style="margin-bottom: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff; max-width: 420px;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 4px; color: #ddd6fe;">
+          選択中の要素
+        </div>
+        <p style="margin: 0 0 12px 0; font-size: 14px; color: #cccccc;">
+          ×を押すと、その要素の選択を解除できます。
+        </p>
+
+        <p data-element-selector-target="emptyMessage" style="margin: 0; color: #cccccc;">
+          まだ選択されていません
+        </p>
+
+        <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="setting" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="place" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="organization" hidden style="color: #ffffff;"></div>
+      </div>
+
+      <div style="border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff; max-width: 420px;">
+        <%# 要素数が増えても縦に長くなりすぎないよう、分類ごとに開閉できるようにする %>
+        <% [
+          ["character", "キャラクター"],
+          ["item", "アイテム"],
+          ["setting", "設定"],
+          ["place", "場所"],
+          ["organization", "団体・グループ"]
+        ].each do |kind, kind_group_label| %>
+          <% elements_of_kind = grouped_elements[kind] || [] %>
+          <% next if elements_of_kind.blank? %>
+
+          <% any_selected_in_kind = elements_of_kind.any? { |el| @selected_story_element_ids.include?(el.id) } %>
+
+          <details style="margin-bottom: 12px;" <%= "open" if any_selected_in_kind %>>
+            <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
+              <%= kind_group_label %>（<%= elements_of_kind.size %>）
+            </summary>
+
+            <div style="padding: 12px 8px 0 8px;">
+              <% elements_of_kind.each do |element| %>
+                <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #ffffff;">
+                  <% checkbox_id = "search_story_element_ids_#{element.id}" %>
+
+                  <%= check_box_tag "search_story_element_ids[]",
+                        element.id,
+                        @selected_story_element_ids.include?(element.id),
+                        id: checkbox_id,
+                        data: {
+                          "element-selector-target": "checkbox",
+                          kind: element.kind,
+                          label: truncate("#{element.marker}　#{element.name}", length: 40)
+                        } %>
+
+                  <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
+                    <%= truncate("#{element.marker}　#{element.name}", length: 40) %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+
+      <div style="margin-top: 8px;">
+        <%= submit_tag "絞り込む",
+              style: "background: #2563eb; color: #ffffff; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; cursor: pointer;" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <% results = (@results || {}).with_indifferent_access %>
 
-<% pair_total = ->(pair) { (pair[:created_here]&.count || 0) + (pair[:moved]&.count || 0) } %>
-<% home_total = ->(pair) { (pair[:created_here]&.count || 0) } %>
+<%# 要素を複数指定した検索結果はGROUP BYされているため、.countだと合計件数ではなく
+    グループごとの内訳(Hash)が返ってきてしまう。.to_a.sizeなら常に件数(Integer)になる %>
+<% record_count = ->(rel) { rel.nil? ? 0 : rel.to_a.size } %>
+<% pair_total = ->(pair) { record_count.call(pair[:created_here]) + record_count.call(pair[:moved]) } %>
+<% home_total = ->(pair) { record_count.call(pair[:created_here]) } %>
 
 <% snippet_for = lambda do |text, keyword|
      s = text.to_s
@@ -93,7 +193,7 @@
   <% end %>
 <% end %>
 
-<% if q.blank? && @story_element_id.blank? %>
+<% if q.blank? && @selected_story_element_ids.blank? %>
   <p>検索ワードを入力して検索してください。</p>
 <% else %>
   <h2 style="color: #c4b5fd;">件数</h2>
@@ -131,7 +231,7 @@
       <h1 style="color: #c4b5fd;"><%= title %></h1>
 
       <% if is_home %>
-        <% if created_rel.count == 0 %>
+        <% if created_rel.to_a.empty? %>
           <p>該当なし</p>
         <% else %>
           <div style="margin: 16px 0;">
@@ -142,7 +242,7 @@
         <% end %>
       <% else %>
         <h2 style="color: #c4b5fd;">新規作成したアイデア</h2>
-        <% if created_rel.count == 0 %>
+        <% if created_rel.to_a.empty? %>
           <p>該当なし</p>
         <% else %>
           <div style="margin: 16px 0;">
@@ -153,7 +253,7 @@
         <% end %>
 
         <h2 style="color: #c4b5fd;">移動してきたアイデア</h2>
-        <% if moved_rel.count == 0 %>
+        <% if moved_rel.to_a.empty? %>
           <p>該当なし</p>
         <% else %>
           <div style="margin: 16px 0;">

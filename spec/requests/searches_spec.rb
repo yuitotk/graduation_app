@@ -58,6 +58,62 @@ RSpec.describe "Searches", type: :request do
       expect(response.body).to include("この作品内（ポケモン）")
     end
 
+    describe "要素での絞り込み（複数選択）" do
+      let(:story) { create(:story, user: user, title: "検索絞り込み確認用") }
+      let(:element_a) { create(:story_element, story: story, kind: "character", name: "アリス") }
+      let(:element_b) { create(:story_element, story: story, kind: "character", name: "ボブ") }
+
+      def idea_linked_to(story, user, *elements)
+        idea = create(:idea, user: user, title: "対象アイデア", memo: "m")
+        placement = create(:idea_placement, idea: idea, placeable: story, created_here: true)
+        placement.story_element_ids = elements.map(&:id)
+        idea
+      end
+
+      it "ヘッダーで選んだ要素1個がそのまま結果に反映される（後方互換）" do
+        idea_linked_to(story, user, element_a)
+
+        get search_path, params: {
+          q: "対象", scope: "all", within_story: "1", story_id: story.id, story_element_id: element_a.id
+        }
+
+        expect(response.body).to include("対象アイデア")
+      end
+
+      it "結果ページで複数チェックすると、全部そろって紐づくアイデアだけに絞り込まれる" do
+        idea_linked_to(story, user, element_a, element_b)
+
+        get search_path, params: {
+          q: "対象", scope: "all", within_story: "1", story_id: story.id,
+          search_story_element_ids: [element_a.id, element_b.id]
+        }
+
+        expect(response.body).to include("対象アイデア")
+      end
+
+      it "一部の要素しか紐づいていないアイデアは、複数選ぶと表示されなくなる" do
+        idea_linked_to(story, user, element_a)
+
+        get search_path, params: {
+          q: "対象", scope: "all", within_story: "1", story_id: story.id,
+          search_story_element_ids: [element_a.id, element_b.id]
+        }
+
+        expect(response.body).not_to include("対象アイデア")
+      end
+
+      it "結果ページでチェックを全部外すと絞り込みが解除される" do
+        idea_linked_to(story, user, element_a)
+
+        get search_path, params: {
+          q: "対象", scope: "all", within_story: "1", story_id: story.id,
+          search_story_element_ids: [""]
+        }
+
+        expect(response.body).to include("対象アイデア")
+      end
+    end
+
     it "作品内ONではホーム未所属が結果に混ざらない（ストーリー内だけ出る）" do
       story = create(:story, user: user, title: "ポケモン")
 
