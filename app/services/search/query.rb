@@ -61,15 +61,21 @@ module Search
     end
 
     # 選んだ要素が全部そろって紐づいているアイデアだけに絞り込む（AND条件）。
-    # GROUP BY + HAVINGで絞り込んだ後にcreated_hereでの分岐・並び替えを続けても
-    # 崩れないことは確認済み（idsが1個の場合は今までと同じ結果になる）
+    # GROUP BY + HAVINGで一致するIDだけを求め、そのIDで別クエリを読み直す2段階構成。
+    # GROUP BYした結果に対してcreated_here分岐やidea_placements.moved_atでの
+    # 並び替えをそのまま続けると、別テーブルの列で並び替えることになり、
+    # PostgreSQL・MySQL(ONLY_FULL_GROUP_BY)いずれでもエラーになるため分離した
     def apply_story_element_filter(rel)
       return rel if @story_element_ids.blank?
 
-      rel.joins(idea_placement: :idea_placement_elements)
-         .where(idea_placement_elements: { story_element_id: @story_element_ids })
-         .group("ideas.id")
-         .having("COUNT(DISTINCT idea_placement_elements.story_element_id) = ?", @story_element_ids.size)
+      matching_ids =
+        rel.joins(idea_placement: :idea_placement_elements)
+           .where(idea_placement_elements: { story_element_id: @story_element_ids })
+           .group("ideas.id")
+           .having("COUNT(DISTINCT idea_placement_elements.story_element_id) = ?", @story_element_ids.size)
+           .pluck("ideas.id")
+
+      rel.where(ideas: { id: matching_ids })
     end
 
     def build_home

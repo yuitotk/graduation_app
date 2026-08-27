@@ -46,9 +46,9 @@ RSpec.describe Search::Query, type: :service do
     let(:element_a) { create(:story_element, story: story, kind: "character", name: "キャラA") }
     let(:element_b) { create(:story_element, story: story, kind: "character", name: "キャラB") }
 
-    def idea_linked_to(*elements)
+    def idea_linked_to(*elements, created_here: true)
       idea = create(:idea, user: user, title: "対象アイデア", memo: "m")
-      placement = create(:idea_placement, idea: idea, placeable: story, created_here: true)
+      placement = create(:idea_placement, idea: idea, placeable: story, created_here: created_here)
       placement.story_element_ids = elements.map(&:id)
       idea
     end
@@ -83,6 +83,17 @@ RSpec.describe Search::Query, type: :service do
       result = call(q: "対象", scope: "story", story_element_ids: [element_a.id, element_b.id])
 
       expect(result[:story][:created_here]).to be_empty
+    end
+
+    # 移動してきたアイデア(moved)は、created_hereとは別テーブルの列(moved_at)で
+    # 並び替えている。要素の複数指定と組み合わせたときにエラーにならないことを確認する
+    # (本番のPostgreSQLでGROUP BY関連のエラーが実際に発生したための回帰テスト)
+    it "移動してきたアイデアも、複数の要素で絞り込める" do
+      idea_moved = idea_linked_to(element_a, element_b, created_here: false)
+
+      result = call(q: "対象", scope: "story", story_element_ids: [element_a.id, element_b.id])
+
+      expect(result[:story][:moved]).to include(idea_moved)
     end
   end
 
