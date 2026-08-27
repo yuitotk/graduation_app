@@ -91,7 +91,7 @@ export default class extends Controller {
             title="クリックで選択解除"
             style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 9999px; cursor: pointer;">
         ${this.escapeHtml(item.label)}
-        <span aria-hidden="true">×</span>
+        <span aria-hidden="true" style="color: #f87171; font-weight: bold;">×</span>
       </span>
     `
   }
