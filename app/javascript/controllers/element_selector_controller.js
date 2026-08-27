@@ -67,7 +67,7 @@ export default class extends Controller {
           ${this.kindLabel(kind)}（${items.length}）
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          ${items.map((item) => this.badgeHtml(item.label)).join("")}
+          ${items.map((item) => this.badgeHtml(item)).join("")}
         </div>
       `
     })
@@ -83,12 +83,26 @@ export default class extends Controller {
     }
   }
 
-  badgeHtml(label) {
+  // タグ自体を押すと、対応するチェックボックスのチェックを外して選択解除する
+  badgeHtml(item) {
     return `
-      <span style="display: inline-block; padding: 6px 10px; border: 1px solid #ccc; border-radius: 9999px;">
-        ${this.escapeHtml(label)}
+      <span data-action="click->element-selector#remove"
+            data-id="${this.escapeHtml(item.id)}"
+            title="クリックで選択解除"
+            style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 9999px; cursor: pointer;">
+        ${this.escapeHtml(item.label)}
+        <span aria-hidden="true">×</span>
       </span>
     `
+  }
+
+  remove(event) {
+    const id = event.currentTarget.dataset.id
+    const checkbox = this.checkboxTargets.find((element) => element.value === id)
+    if (!checkbox) return
+
+    checkbox.checked = false
+    this.refresh()
   }
 
   kindLabel(kind) {
