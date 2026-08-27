@@ -41,7 +41,8 @@
     <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">要素で絞り込む</div>
     <p style="margin: 0 0 8px 0; font-size: 15px;">複数選ぶと、選んだ要素が全部そろって紐づいているアイデアだけに絞り込まれます。</p>
 
-    <%= form_with url: search_path, method: :get, local: true do %>
+    <%= form_with url: search_path, method: :get, local: true,
+                  data: { controller: "element-selector", action: "change->element-selector#refresh" } do %>
       <%= hidden_field_tag :q, params[:q] if params[:q].present? %>
       <%= hidden_field_tag :scope, params[:scope] if params[:scope].present? %>
       <%= hidden_field_tag :within_story, "1" %>
@@ -57,6 +58,23 @@
       <%= hidden_field_tag "search_story_element_ids[]", "" %>
 
       <% grouped_elements = @story.story_elements.group_by(&:kind) %>
+
+      <%# チェックした瞬間、押す前でもここに選んだ要素がタグで表示される %>
+      <div style="margin-bottom: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff; max-width: 420px;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ddd6fe;">
+          選択中の要素
+        </div>
+
+        <p data-element-selector-target="emptyMessage" style="margin: 0; color: #cccccc;">
+          まだ選択されていません
+        </p>
+
+        <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="setting" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="place" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="organization" hidden style="color: #ffffff;"></div>
+      </div>
 
       <div style="border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff; max-width: 420px;">
         <%# 要素数が増えても縦に長くなりすぎないよう、分類ごとに開閉できるようにする %>
@@ -85,7 +103,12 @@
                   <%= check_box_tag "search_story_element_ids[]",
                         element.id,
                         @selected_story_element_ids.include?(element.id),
-                        id: checkbox_id %>
+                        id: checkbox_id,
+                        data: {
+                          "element-selector-target": "checkbox",
+                          kind: element.kind,
+                          label: truncate("#{element.marker}　#{element.name}", length: 40)
+                        } %>
 
                   <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
                     <%= truncate("#{element.marker}　#{element.name}", length: 40) %>

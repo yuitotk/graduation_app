@@ -50,7 +50,8 @@
      "[#{kind_label_for.call(element)}]#{element.try(:marker)}　#{element.name}"
    end %>
 
-<%= form_with url: consistency_story_path(@story), method: :get, local: true do %>
+<%= form_with url: consistency_story_path(@story), method: :get, local: true,
+              data: { controller: "element-selector", action: "change->element-selector#refresh" } do %>
   <%= hidden_field_tag :from, params[:from] if params[:from].present? %>
   <%= hidden_field_tag :story_event_id, params[:story_event_id] if params[:story_event_id].present? %>
   <%= hidden_field_tag :story_event_idea_id, params[:story_event_idea_id] if params[:story_event_idea_id].present? %>
@@ -62,6 +63,23 @@
       <p style="color: #cccccc;">要素がまだありません（先に要素を作成してください）</p>
     <% else %>
       <% grouped_elements = @elements.group_by(&:kind) %>
+
+      <%# チェックした瞬間、押す前でもここに選んだ要素がタグで表示される %>
+      <div style="margin-top: 12px; margin-bottom: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px; color: #ddd6fe;">
+          選択中の要素
+        </div>
+
+        <p data-element-selector-target="emptyMessage" style="margin: 0; color: #cccccc;">
+          まだ選択されていません
+        </p>
+
+        <div data-element-selector-target="summary" data-kind="character" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="item" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="setting" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="place" hidden style="margin-bottom: 16px; color: #ffffff;"></div>
+        <div data-element-selector-target="summary" data-kind="organization" hidden style="color: #ffffff;"></div>
+      </div>
 
       <div style="margin-top: 12px; border: 1px solid #555555; border-radius: 8px; padding: 16px; background: #1e1e1e; color: #ffffff;">
         <%# 分類ごとに開閉できるようにする。要素が増えても一覧が縦に長くなりすぎないようにするため %>
@@ -91,7 +109,12 @@
                   <%= check_box_tag "consistency_story_element_ids[]",
                         element.id,
                         @selected_elements.any? { |selected| selected.id == element.id },
-                        id: checkbox_id %>
+                        id: checkbox_id,
+                        data: {
+                          "element-selector-target": "checkbox",
+                          kind: element.kind,
+                          label: truncate(element_label_for.call(element), length: 40)
+                        } %>
 
                   <label for="<%= checkbox_id %>" style="cursor: pointer; margin-bottom: 0; color: #ffffff;">
                     <%= truncate(element_label_for.call(element), length: 40) %>
@@ -114,7 +137,7 @@
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <% if @selected_elements.present? %>
-  <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">選択中の要素</div>
+  <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #c4b5fd;">選択した要素の詳細</div>
 
   <% @selected_elements.each do |selected_element| %>
     <% element_memo = selected_element.try(:memo) ||
