@@ -63,9 +63,9 @@ RSpec.describe "Searches", type: :request do
       let(:element_a) { create(:story_element, story: story, kind: "character", name: "アリス") }
       let(:element_b) { create(:story_element, story: story, kind: "character", name: "ボブ") }
 
-      def idea_linked_to(story, user, *elements)
+      def idea_linked_to(story, user, *elements, created_here: true)
         idea = create(:idea, user: user, title: "対象アイデア", memo: "m")
-        placement = create(:idea_placement, idea: idea, placeable: story, created_here: true)
+        placement = create(:idea_placement, idea: idea, placeable: story, created_here: created_here)
         placement.story_element_ids = elements.map(&:id)
         idea
       end
@@ -110,6 +110,21 @@ RSpec.describe "Searches", type: :request do
           search_story_element_ids: [""]
         }
 
+        expect(response.body).to include("対象アイデア")
+      end
+
+      # 移動してきたアイデアはidea_placements.moved_atで並び替えており、
+      # 要素の複数指定と組み合わせた時に画面が壊れないことを確認する
+      # （本番のPostgreSQLでGROUP BY関連のエラーが実際に発生したための回帰テスト）
+      it "移動してきたアイデアも、複数の要素で絞り込んだ画面に正常に表示される" do
+        idea_linked_to(story, user, element_a, element_b, created_here: false)
+
+        get search_path, params: {
+          q: "対象", scope: "all", within_story: "1", story_id: story.id,
+          search_story_element_ids: [element_a.id, element_b.id]
+        }
+
+        expect(response).to have_http_status(:ok)
         expect(response.body).to include("対象アイデア")
       end
     end
