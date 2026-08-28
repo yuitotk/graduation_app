@@ -1,0 +1,25 @@
+<% items = quick_action_menu_items(
+     story: @story,
+     story_event: @story_event,
+     story_event_idea: @story_event_idea,
+     story_element: @story_element
+   ) %>
+<% if items.present? %>
+  <div data-controller="quick-action-menu"
+       style="position: fixed; right: 20px; bottom: 20px; z-index: 1000;">
+    <button type="button"
+            data-action="click->quick-action-menu#toggle"
+            aria-label="よく使う操作を開く"
+            style="width: 56px; height: 56px; border-radius: 50%; border: none; background: #2563eb; color: #ffffff; font-size: 24px; line-height: 56px; text-align: center; padding: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); cursor: pointer;">
+      ⚡
+    </button>
+
+    <div data-quick-action-menu-target="menu" hidden
+         style="position: absolute; right: 0; bottom: 66px; min-width: 200px; background: #1e1e1e; border: 1px solid #555555; border-radius: 12px; padding: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);">
+      <% items.each do |item| %>
+        <%= link_to item[:label], item[:url],
+              style: "display: block; padding: 10px 14px; border-radius: 8px; color: #ffffff; text-decoration: none; font-weight: bold; white-space: nowrap;" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
