@@ -143,6 +143,11 @@ AIに創作を任せるのではなく、創作の主体はユーザーに残す
 10. 検索（アイデアタイトル・メモをLIKE検索） — app/services/search/query.rb, app/services/search/suggestions.rb
 11. ユーザー認証 — app/models/user.rb, config/initializers/sorcery.rb
 12. お問い合わせ — app/models/inquiry.rb, app/controllers/inquiries_controller.rb
+13. クイックアクションボタン（画面右下の⚡、ページに応じてアイデア作成/AI作成/要素管理/
+    整合性チェック/イベント追加/詳細メモ追加へのショートカットを表示） —
+    app/helpers/application_helper.rb (#quick_action_menu_items),
+    app/views/shared/_quick_action_button.html.erb,
+    app/javascript/controllers/quick_action_menu_controller.js
 
 ## 使用技術
 
