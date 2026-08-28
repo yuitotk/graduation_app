@@ -113,53 +113,57 @@
 
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h3 style="color: #c4b5fd;">新規アイデア</h3>
+<div data-controller="scroll-into-view">
+  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">新規アイデア</h3>
 
-<p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
-  作成した要素は、アイデア作成時に登場要素として選択できます。<br>
-  アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
-</p>
+  <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
+    作成した要素は、アイデア作成時に登場要素として選択できます。<br>
+    アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
+  </p>
 
-<p style="margin: 0 0 16px 0;">
-  <%= link_to "新規作成",
-              new_idea_path(
-                return_to: request.fullpath,
-                placeable_type: "StoryEventIdea",
-                placeable_id: @story_event_idea.id
-              ),
-              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+  <p style="margin: 0 0 16px 0;">
+    <%= link_to "新規作成",
+                new_idea_path(
+                  return_to: request.fullpath,
+                  placeable_type: "StoryEventIdea",
+                  placeable_id: @story_event_idea.id
+                ),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
 
-  <%= link_to "AI作成",
-              random_words_pick_path(
-                return_to: request.fullpath,
-                placeable_type: "StoryEventIdea",
-                placeable_id: @story_event_idea.id
-              ),
-              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-</p>
+    <%= link_to "AI作成",
+                random_words_pick_path(
+                  return_to: request.fullpath,
+                  placeable_type: "StoryEventIdea",
+                  placeable_id: @story_event_idea.id
+                ),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  </p>
 
-<%= render "shared/placed_ideas",
-           ideas: @created_here_ideas,
-           frame_id: "created_here_ideas_list",
-           page_param: :created_here_page,
-           link_params: {
-             from: "story_event_idea",
-             story_event_id: @story_event.id,
-             story_event_idea_id: @story_event_idea.id
-           },
-           link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+  <%= render "shared/placed_ideas",
+             ideas: @created_here_ideas,
+             frame_id: "created_here_ideas_list",
+             page_param: :created_here_page,
+             link_params: {
+               from: "story_event_idea",
+               story_event_id: @story_event.id,
+               story_event_idea_id: @story_event_idea.id
+             },
+             link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+</div>
 
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h3 style="color: #c4b5fd;">ここに移動したアイデア</h3>
+<div data-controller="scroll-into-view">
+  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">ここに移動したアイデア</h3>
 
-<%= render "shared/placed_ideas",
-           ideas: @moved_ideas,
-           frame_id: "moved_ideas_list",
-           page_param: :moved_page,
-           link_params: {
-             from: "story_event_idea",
-             story_event_id: @story_event.id,
-             story_event_idea_id: @story_event_idea.id
-           },
-           link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+  <%= render "shared/placed_ideas",
+             ideas: @moved_ideas,
+             frame_id: "moved_ideas_list",
+             page_param: :moved_page,
+             link_params: {
+               from: "story_event_idea",
+               story_event_id: @story_event.id,
+               story_event_idea_id: @story_event_idea.id
+             },
+             link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+</div>

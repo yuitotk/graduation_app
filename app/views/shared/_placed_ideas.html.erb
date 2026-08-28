@@ -9,9 +9,13 @@
     link_params - アイデアへのリンクに付け足す追加パラメータ（戻り先の情報など）
     link_style  - リンクの見た目（呼び出し元によって色が違うため）
 %>
+<%#
+  この欄を包む側(呼び出し元)で data-controller="scroll-into-view" を持つ要素を
+  用意しておくこと。turbo:frame-load はここから発生しても、その祖先要素まで
+  伝わる(バブリングする)ので、action はここに書くだけでよい。
+%>
 <%= turbo_frame_tag frame_id,
                      data: {
-                       controller: "scroll-into-view",
                        action: "turbo:frame-load->scroll-into-view#scrollToTop"
                      } do %>
   <% if ideas.present? %>

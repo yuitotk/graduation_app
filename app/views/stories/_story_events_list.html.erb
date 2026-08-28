@@ -1,6 +1,6 @@
+<%# 呼び出し元(見出し側)に data-controller="scroll-into-view" があること前提 %>
 <%= turbo_frame_tag "story_events_list",
                      data: {
-                       controller: "scroll-into-view",
                        action: "turbo:frame-load->scroll-into-view#scrollToTop"
                      } do %>
   <% if story_events.any? %>
