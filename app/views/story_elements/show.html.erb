@@ -67,26 +67,20 @@
               style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
-<% if @created_here_ideas.present? %>
-  <ul>
-    <% @created_here_ideas.each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea, breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>まだありません</p>
-<% end %>
+<%= render "shared/placed_ideas",
+           ideas: @created_here_ideas,
+           frame_id: "created_here_ideas_list",
+           page_param: :created_here_page,
+           link_params: breadcrumb_params,
+           link_style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 
 <hr>
 
 <h3 style="color: #c4b5fd;">ここに移動したアイデア</h3>
 
-<% if @moved_ideas.present? %>
-  <ul>
-    <% @moved_ideas.each do |idea| %>
-      <li><%= link_to idea.title, idea_path(idea, breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>まだありません</p>
-<% end %>
+<%= render "shared/placed_ideas",
+           ideas: @moved_ideas,
+           frame_id: "moved_ideas_list",
+           page_param: :moved_page,
+           link_params: breadcrumb_params,
+           link_style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>

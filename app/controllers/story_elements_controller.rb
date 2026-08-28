@@ -20,12 +20,14 @@ class StoryElementsController < ApplicationController
                     .joins(:idea_placement)
                     .where(idea_placements: { created_here: true })
                     .order(created_at: :desc)
+                    .page(params[:created_here_page])
 
     @moved_ideas =
       @story_element.placed_ideas
                     .joins(:idea_placement)
                     .where(idea_placements: { created_here: false })
                     .order("idea_placements.moved_at DESC")
+                    .page(params[:moved_page])
   end
 
   def new

@@ -1,0 +1,29 @@
+<%#
+  「作られたアイデア」「移動してきたアイデア」の一覧を表示する共通パーシャル。
+  ストーリー詳細・イベント詳細・詳細メモ詳細・要素詳細の4ページで使い回す。
+
+  受け取るlocal変数:
+    ideas       - 表示するアイデア（ページ分割済みのもの）
+    frame_id    - この欄を囲むTurbo Frameの id（他の欄を巻き込まず、この欄だけ切り替えるための目印）
+    page_param  - ページ番号をURLに乗せるときのパラメータ名（欄ごとに別の名前にする）
+    link_params - アイデアへのリンクに付け足す追加パラメータ（戻り先の情報など）
+    link_style  - リンクの見た目（呼び出し元によって色が違うため）
+%>
+<%= turbo_frame_tag frame_id,
+                     data: {
+                       controller: "scroll-into-view",
+                       action: "turbo:frame-load->scroll-into-view#scrollToTop"
+                     } do %>
+  <% if ideas.present? %>
+    <ul style="margin: 0 0 12px 20px;">
+      <% ideas.each do |idea| %>
+        <li style="margin-bottom: 8px;">
+          <%= link_to idea.title, idea_path(idea, **link_params), style: link_style %>
+        </li>
+      <% end %>
+    </ul>
+    <%= paginate ideas, param_name: page_param %>
+  <% else %>
+    <p>まだありません</p>
+  <% end %>
+<% end %>

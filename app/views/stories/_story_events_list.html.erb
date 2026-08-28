@@ -1,7 +1,12 @@
-<div id="story_events_list">
+<%= turbo_frame_tag "story_events_list",
+                     data: {
+                       controller: "scroll-into-view",
+                       action: "turbo:frame-load->scroll-into-view#scrollToTop"
+                     } do %>
   <% if story_events.any? %>
     <%= render partial: "stories/story_event", collection: story_events, as: :event, locals: { story: story } %>
+    <%= paginate story_events, param_name: :events_page %>
   <% else %>
     <p>まだイベントがありません</p>
   <% end %>
-</div>
+<% end %>

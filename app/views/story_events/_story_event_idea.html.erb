@@ -24,7 +24,7 @@
   <div style="margin-top: 0; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; color: #f5f5f5;">
     <div style="display: flex; align-items: center; gap: 6px;">
       <%= button_to "↑",
-                    move_up_story_story_event_story_event_idea_path(story, story_event, idea),
+                    move_up_story_story_event_story_event_idea_path(story, story_event, idea, ideas_page: params[:ideas_page]),
                     method: :patch,
                     form: { style: "display: inline;" },
                     style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>
@@ -33,7 +33,7 @@
 
     <div style="display: flex; align-items: center; gap: 6px;">
       <%= button_to "↓",
-                    move_down_story_story_event_story_event_idea_path(story, story_event, idea),
+                    move_down_story_story_event_story_event_idea_path(story, story_event, idea, ideas_page: params[:ideas_page]),
                     method: :patch,
                     form: { style: "display: inline;" },
                     style: "padding: 4px 10px; border: 1px solid #666666; border-radius: 6px; background: #2a2a2a; color: #f5f5f5; cursor: pointer;" %>

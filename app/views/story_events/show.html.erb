@@ -88,7 +88,7 @@
 <%= render "story_event_ideas_list",
            story: @story,
            story_event: @story_event,
-           story_event_ideas: @story_event.story_event_ideas.order(:position, :created_at) %>
+           story_event_ideas: @story_event_ideas %>
 
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
@@ -116,42 +116,20 @@
               style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
 </p>
 
-<% if @created_here_ideas.present? %>
-  <ul style="margin: 0 0 20px 20px;">
-    <% @created_here_ideas.each do |idea| %>
-      <li style="margin-bottom: 8px;">
-        <%= link_to idea.title,
-                    idea_path(
-                      idea,
-                      from: "story_event",
-                      story_event_id: @story_event.id
-                    ),
-                    style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p style="color: #f5f5f5;">まだありません</p>
-<% end %>
+<%= render "shared/placed_ideas",
+           ideas: @created_here_ideas,
+           frame_id: "created_here_ideas_list",
+           page_param: :created_here_page,
+           link_params: { from: "story_event", story_event_id: @story_event.id },
+           link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
 
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
 <h3 style="margin: 0 0 12px 0; color: #c4b5fd;">ここに移動したアイデア</h3>
 
-<% if @moved_ideas.present? %>
-  <ul style="margin: 0 0 20px 20px;">
-    <% @moved_ideas.each do |idea| %>
-      <li style="margin-bottom: 8px;">
-        <%= link_to idea.title,
-                    idea_path(
-                      idea,
-                      from: "story_event",
-                      story_event_id: @story_event.id
-                    ),
-                    style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p style="color: #f5f5f5;">まだありません</p>
-<% end %>
+<%= render "shared/placed_ideas",
+           ideas: @moved_ideas,
+           frame_id: "moved_ideas_list",
+           page_param: :moved_page,
+           link_params: { from: "story_event", story_event_id: @story_event.id },
+           link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
