@@ -14,6 +14,7 @@ class IdeasController < ApplicationController
     @ideas = current_user.ideas
                          .where.missing(:idea_placement)
                          .order(created_at: :desc)
+                         .page(params[:page])
   end
 
   def show

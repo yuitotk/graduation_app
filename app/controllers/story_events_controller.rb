@@ -10,17 +10,24 @@ class StoryEventsController < ApplicationController
   def show
     @current_story = @story
 
+    @story_event_ideas =
+      @story_event.story_event_ideas
+                  .order(:position, :created_at)
+                  .page(params[:ideas_page])
+
     @created_here_ideas =
       @story_event.placed_ideas
                   .joins(:idea_placement)
                   .where(idea_placements: { created_here: true })
                   .order(created_at: :desc)
+                  .page(params[:created_here_page])
 
     @moved_ideas =
       @story_event.placed_ideas
                   .joins(:idea_placement)
                   .where(idea_placements: { created_here: false })
                   .order("idea_placements.moved_at DESC")
+                  .page(params[:moved_page])
   end
 
   def new
@@ -145,7 +152,11 @@ class StoryEventsController < ApplicationController
 
   # 並び替え後の一覧を返す。Turbo Streamならその場で一覧部分だけ差し替え、
   # それ以外(JS無効など)は今まで通りストーリー詳細へリダイレクトする。
+  # 並び替え前に見ていたページ番号(events_page)はそのまま保ち、
+  # 並び替えるたびに1ページ目に戻ってしまわないようにする。
   def render_reordered_story_events
+    @story_events = @story.story_events.order(:position).page(params[:events_page])
+
     respond_to do |format|
       format.turbo_stream { render "reorder" }
       format.html { redirect_to story_path(@story) }

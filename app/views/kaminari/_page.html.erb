@@ -1,0 +1,11 @@
+<%# ページ番号1つ分。今見ているページ(page.current?)だけ色を付けて目立たせる %>
+<% if page.current? %>
+  <span style="display: inline-block; min-width: 30px; text-align: center; padding: 4px 10px; border-radius: 6px; background: #2563eb; color: #ffffff; font-weight: bold;">
+    <%= page %>
+  </span>
+<% else %>
+  <%= link_to page, url,
+              remote: remote,
+              rel: page.rel,
+              style: "display: inline-block; min-width: 30px; text-align: center; padding: 4px 10px; border-radius: 6px; color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+<% end -%>

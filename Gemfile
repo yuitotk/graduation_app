@@ -18,6 +18,9 @@ gem "carrierwave"
 gem "cloudinary"
 gem "mimemagic", "0.3.10"
 
+# ページネーション（一覧を件数で区切って表示する）用のGem
+gem "kaminari"
+
 group :production do
   gem "pg"
 end

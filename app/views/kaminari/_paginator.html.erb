@@ -1,0 +1,12 @@
+<%# ページ番号だけを並べるページネーション（前へ/次へ/最初/最後のリンクは表示しない） %>
+<%= paginator.render do -%>
+  <nav style="margin: 16px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;" aria-label="pager">
+    <% each_page do |page| -%>
+      <% if page.display_tag? -%>
+        <%= page_tag page %>
+      <% elsif !page.was_truncated? -%>
+        <%= gap_tag %>
+      <% end -%>
+    <% end -%>
+  </nav>
+<% end -%>

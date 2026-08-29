@@ -1,10 +1,15 @@
-<div id="story_event_ideas_list">
+<%# 呼び出し元(見出し側)に data-controller="scroll-into-view" があること前提 %>
+<%= turbo_frame_tag "story_event_ideas_list",
+                     data: {
+                       action: "turbo:frame-load->scroll-into-view#scrollToTop"
+                     } do %>
   <% if story_event_ideas.any? %>
     <%= render partial: "story_events/story_event_idea",
                collection: story_event_ideas,
                as: :idea,
                locals: { story: story, story_event: story_event } %>
+    <%= paginate story_event_ideas, param_name: :ideas_page %>
   <% else %>
     <p style="color: #f5f5f5;">まだ詳細メモはありません</p>
   <% end %>
-</div>
+<% end %>

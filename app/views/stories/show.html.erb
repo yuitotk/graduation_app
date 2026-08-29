@@ -42,57 +42,53 @@
 
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h2 style="color: #c4b5fd;">イベント（時系列）</h2>
+<div data-controller="scroll-into-view">
+  <h2 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">イベント（時系列）</h2>
 
-<h4>このイベント欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
+  <h4>このイベント欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
 
-<p>
-  <%= link_to "イベント追加", new_story_story_event_path(@story),
-              style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-</p>
+  <p>
+    <%= link_to "イベント追加", new_story_story_event_path(@story),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  </p>
 
-<%= render "story_events_list", story: @story, story_events: @story_events %>
-
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
-
-<h3 style="color: #c4b5fd;">新規アイデア</h3>
-
-<p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
-  作成した要素は、アイデア作成時に登場要素として選択できます。<br>
-  アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
-</p>
-
-<p style="margin: 0 0 16px 0;">
-  <%= link_to "アイデアを作成する", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id),
-              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
-  <%= link_to "AIで作成する", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id),
-              style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-</p>
-
-<% if @created_here_ideas.present? %>
-  <ul>
-    <% @created_here_ideas.each do |idea| %>
-      <li>
-        <%= link_to idea.title, idea_path(idea), style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>まだありません</p>
-<% end %>
+  <%= render "story_events_list", story: @story, story_events: @story_events %>
+</div>
 
 <hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
 
-<h3 style="color: #c4b5fd;">ここに移動したアイデア</h3>
+<div data-controller="scroll-into-view">
+  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">新規アイデア</h3>
 
-<% if @moved_ideas.present? %>
-  <ul>
-    <% @moved_ideas.each do |idea| %>
-      <li>
-        <%= link_to idea.title, idea_path(idea), style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>まだありません</p>
-<% end %>
+  <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
+    作成した要素は、アイデア作成時に登場要素として選択できます。<br>
+    アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
+  </p>
+
+  <p style="margin: 0 0 16px 0;">
+    <%= link_to "アイデアを作成する", new_idea_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+    <%= link_to "AIで作成する", random_words_pick_path(return_to: request.fullpath, placeable_type: "Story", placeable_id: @story.id),
+                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  </p>
+
+  <%= render "shared/placed_ideas",
+             ideas: @created_here_ideas,
+             frame_id: "created_here_ideas_list",
+             page_param: :created_here_page,
+             link_params: {},
+             link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+</div>
+
+<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+
+<div data-controller="scroll-into-view">
+  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">ここに移動したアイデア</h3>
+
+  <%= render "shared/placed_ideas",
+             ideas: @moved_ideas,
+             frame_id: "moved_ideas_list",
+             page_param: :moved_page,
+             link_params: {},
+             link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+</div>

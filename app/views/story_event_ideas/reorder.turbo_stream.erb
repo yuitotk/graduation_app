@@ -2,5 +2,5 @@
   <%= render "story_events/story_event_ideas_list",
              story: @story,
              story_event: @story_event,
-             story_event_ideas: @story_event.story_event_ideas.order(:position, :created_at) %>
+             story_event_ideas: @story_event_ideas %>
 <% end %>

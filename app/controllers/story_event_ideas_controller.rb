@@ -22,10 +22,12 @@ class StoryEventIdeasController < ApplicationController
     @created_here_ideas =
       base.where(idea_placements: { created_here: true })
           .order(created_at: :desc)
+          .page(params[:created_here_page])
 
     @moved_ideas =
       base.where(idea_placements: { created_here: false })
           .order("idea_placements.moved_at DESC")
+          .page(params[:moved_page])
   end
 
   def new
@@ -145,7 +147,14 @@ class StoryEventIdeasController < ApplicationController
   # それ以外(JS無効など)は今まで通りイベント詳細へリダイレクトする。
   # 一番上/一番下で、これ以上動かせなかった場合(moved: false)は、
   # 今まで通り「並び替えました」の通知は出さない。
+  # 並び替え前に見ていたページ番号(ideas_page)はそのまま保ち、
+  # 並び替えるたびに1ページ目に戻ってしまわないようにする。
   def render_reordered_story_event_ideas(moved:)
+    @story_event_ideas =
+      @story_event.story_event_ideas
+                  .order(:position, :created_at)
+                  .page(params[:ideas_page])
+
     respond_to do |format|
       format.turbo_stream { render "reorder" }
       format.html do

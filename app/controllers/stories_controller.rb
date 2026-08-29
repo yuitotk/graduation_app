@@ -12,7 +12,7 @@ class StoriesController < ApplicationController
   def show
     @current_story = @story
 
-    @story_events = @story.story_events.order(:position)
+    @story_events = @story.story_events.order(:position).page(params[:events_page])
 
     base =
       @story.placed_ideas
@@ -22,10 +22,12 @@ class StoriesController < ApplicationController
     @created_here_ideas =
       base.where(idea_placements: { created_here: true })
           .order(created_at: :desc)
+          .page(params[:created_here_page])
 
     @moved_ideas =
       base.where(idea_placements: { created_here: false })
           .order("idea_placements.moved_at DESC")
+          .page(params[:moved_page])
   end
 
   # ✅ 整合性チェック（要素で絞り込み。複数選んだ場合は全員そろって登場するイベントのみ表示）
