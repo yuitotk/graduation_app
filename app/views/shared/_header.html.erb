@@ -99,7 +99,12 @@
     <% end %>
   </div>
 
-  <% if logged_in? %>
+  <%# お問い合わせ・利用規約・プライバシーポリシーのページでは、検索欄は不要なので出さない %>
+  <% hide_search_bar =
+       controller_name == "inquiries" ||
+       (controller_name == "static_pages" && %w[terms privacy].include?(action_name)) %>
+
+  <% if logged_in? && !hide_search_bar %>
     <%= form_with url: search_path, method: :get, local: true,
                   class: "header-search-form",
                   data: { controller: "search-autocomplete" } do %>
