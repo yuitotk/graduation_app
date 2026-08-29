@@ -1,5 +1,7 @@
 <div id="<%= dom_id(event) %>" style="margin-bottom: 20px;">
-  <%= link_to story_story_event_path(story, event), style: "display: block; text-decoration: none; color: inherit;" do %>
+  <%# data-turbo-frame="_top": この欄(Turbo Frame)の外に出て、画面全体を
+      イベント詳細ページへ遷移させる(付けないと「Content missing」になる) %>
+  <%= link_to story_story_event_path(story, event), style: "display: block; text-decoration: none; color: inherit;", data: { turbo_frame: "_top" } do %>
     <div style="padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
       <h3 style="margin-top: 0; color: #ddd6fe; text-decoration: none;"><%= event.title %></h3>
 

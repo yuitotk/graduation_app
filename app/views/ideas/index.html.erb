@@ -38,7 +38,9 @@
                        } do %>
   <% if @ideas.any? %>
     <% @ideas.each do |idea| %>
-      <%= link_to idea_path(idea), style: "display: block; text-decoration: none; color: inherit;" do %>
+      <%# data-turbo-frame="_top": この欄(Turbo Frame)の外に出て、画面全体を
+          アイデア詳細ページへ遷移させる(付けないと「Content missing」になる) %>
+      <%= link_to idea_path(idea), style: "display: block; text-decoration: none; color: inherit;", data: { turbo_frame: "_top" } do %>
         <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
           <h2 style="color: #ddd6fe; text-decoration: none;"><%= idea.title %></h2>
 

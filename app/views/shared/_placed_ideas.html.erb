@@ -22,7 +22,10 @@
     <ul style="margin: 0 0 12px 20px;">
       <% ideas.each do |idea| %>
         <li style="margin-bottom: 8px;">
-          <%= link_to idea.title, idea_path(idea, **link_params), style: link_style %>
+          <%# data-turbo-frame="_top": この欄(Turbo Frame)の外に出て、画面全体を
+              アイデア詳細ページへ遷移させる。付けないと、この欄の中だけで
+              遷移しようとして「Content missing」と表示されてしまう。 %>
+          <%= link_to idea.title, idea_path(idea, **link_params), style: link_style, data: { turbo_frame: "_top" } %>
         </li>
       <% end %>
     </ul>
