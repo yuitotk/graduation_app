@@ -1,49 +1,64 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
+<style>
+  /*
+    ストーリー詳細ページ専用のカード枠。
+    これまで <hr> の線1本だけで区切っていたセクションを、
+    背景色と枠線のついた「箱」で囲むことで、区切りをはっきりさせる。
+  */
+  .story-section-card {
+    background: rgba(40, 28, 74, 0.55);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+</style>
+
 <p><%= link_to "ストーリー一覧へ", stories_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
-<h1 style="color: #c4b5fd;">ストーリー詳細ページ</h1>
+<div class="story-section-card">
+  <h1 style="color: #c4b5fd; margin-top: 0;">ストーリー詳細ページ</h1>
 
-<ul style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
-  <li>ホームで作成したアイデアの中から、この作品に合うものを移動してみましょう。</li>
-  <li>ストーリー本文はあとから整えていけるので、まずはアイデアを作成で気楽に素材を増やしてみましょう。</li>
-  <li>良かったものや使いたいものができたら、ストーリー編集から本文に追加して、この作品の内容を少しずつ作っていけます。</li>
-  <li>ストーリーがまとまってきたら、イベントを追加して、章ごとの物語の流れを時系列で整理していけます。</li>
-</ul>
+  <ul style="margin: 8px 0 0 20px; font-size: 17px; line-height: 1.8;">
+    <li>ホームで作成したアイデアの中から、この作品に合うものを移動してみましょう。</li>
+    <li>ストーリー本文はあとから整えていけるので、まずはアイデアを作成で気楽に素材を増やしてみましょう。</li>
+    <li>良かったものや使いたいものができたら、ストーリー編集から本文に追加して、この作品の内容を少しずつ作っていけます。</li>
+    <li>ストーリーがまとまってきたら、イベントを追加して、章ごとの物語の流れを時系列で整理していけます。</li>
+  </ul>
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+  <hr style="border: none; border-top: 1px solid rgba(196, 181, 253, 0.35); margin: 20px 0;">
 
-<h1 style="color: #ddd6fe;"><%= @story.title %></h1>
+  <h1 style="color: #ddd6fe; margin-top: 0;"><%= @story.title %></h1>
 
-<% if @story.story_image&.image? %>
-  <div style="margin-top: 16px;">
-    <%= image_tag @story.story_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
-  </div>
-<% end %>
+  <% if @story.story_image&.image? %>
+    <div style="margin-top: 16px;">
+      <%= image_tag @story.story_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
+    </div>
+  <% end %>
 
-<h2 style="color: #ddd6fe;">説明</h2>
-<% if @story.description.present? %>
-  <div>
-    <%= simple_format(@story.description) %>
-  </div>
-<% else %>
-  <p>なし</p>
-<% end %>
+  <h2 style="color: #ddd6fe;">説明</h2>
+  <% if @story.description.present? %>
+    <div>
+      <%= simple_format(@story.description) %>
+    </div>
+  <% else %>
+    <p>なし</p>
+  <% end %>
 
-<p>
-  <%= link_to "ストーリー編集", edit_story_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
-  <span style="display: inline-block; margin-left: 24px;">
-    作成日: <%= l @story.created_at.in_time_zone("Tokyo"), format: :short %>
-  </span>
-  <span style="display: inline-block; margin-left: 24px;">
-    更新日（文字修正のみ）: <%= l (@story.text_updated_at || @story.created_at).in_time_zone("Tokyo"), format: :short %>
-  </span>
-</p>
+  <p>
+    <%= link_to "ストーリー編集", edit_story_path(@story), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+    <span style="display: inline-block; margin-left: 24px;">
+      作成日: <%= l @story.created_at.in_time_zone("Tokyo"), format: :short %>
+    </span>
+    <span style="display: inline-block; margin-left: 24px;">
+      更新日（文字修正のみ）: <%= l (@story.text_updated_at || @story.created_at).in_time_zone("Tokyo"), format: :short %>
+    </span>
+  </p>
+</div>
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
-
-<div data-controller="scroll-into-view">
-  <h2 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">イベント（時系列）</h2>
+<div class="story-section-card" data-controller="scroll-into-view">
+  <h2 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">イベント（時系列）</h2>
 
   <h4>このイベント欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
 
@@ -55,10 +70,8 @@
   <%= render "story_events_list", story: @story, story_events: @story_events %>
 </div>
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
-
-<div data-controller="scroll-into-view">
-  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">新規アイデア</h3>
+<div class="story-section-card" data-controller="scroll-into-view">
+  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">新規アイデア</h3>
 
   <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
     作成した要素は、アイデア作成時に登場要素として選択できます。<br>
@@ -80,10 +93,8 @@
              link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
 </div>
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
-
-<div data-controller="scroll-into-view">
-  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">ここに移動したアイデア</h3>
+<div class="story-section-card" data-controller="scroll-into-view">
+  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">ここに移動したアイデア</h3>
 
   <%= render "shared/placed_ideas",
              ideas: @moved_ideas,
