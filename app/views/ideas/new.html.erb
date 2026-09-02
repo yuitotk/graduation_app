@@ -59,7 +59,7 @@
 
 <%= link_to "戻る", (params[:return_to].presence || ideas_path) %>
 
-<div class="story-section-card" style="--card-accent-rgb: 192, 132, 252;">
+<div class="story-section-card">
   <h1 style="color: #c4b5fd; margin-top: 0;">アイデア投稿</h1>
 
   <%= render "form", idea: @idea %>
