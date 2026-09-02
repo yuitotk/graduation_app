@@ -1,4 +1,5 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
+<%= render "shared/page_position_indicator", current: :story_event %>
 
 <style>
   /*
@@ -189,7 +190,7 @@
         <%= simple_format(@story_event.body) %>
       </div>
 
-      <p style="margin-bottom: 0;">
+      <p style="margin-bottom: 40px;">
         <%= link_to "イベント編集",
                     edit_story_story_event_path(@story, @story_event),
                     style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>

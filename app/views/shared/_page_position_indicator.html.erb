@@ -1,0 +1,16 @@
+<%#
+  パンくずとは別に、「ストーリー／イベント／詳細メモ」の3つを常に並べて表示し、
+  今どの階層のページにいるかを、そこだけ青文字にして示すための表示。
+  リンク機能はなく、ただの文字（現在地の目印）。
+
+  呼び出し元で current: :story / :story_event / :story_event_idea を渡す。
+%>
+<div style="margin: 4px 0 0 0; font-size: 14px;">
+  <% [[:story, "ストーリー"], [:story_event, "イベント"], [:story_event_idea, "詳細メモ"]].each_with_index do |(key, label), index| %>
+    <% is_current = key == current %>
+    <span style="color: <%= is_current ? "#9ecbff" : "#777777" %>; <%= "font-weight: bold;" if is_current %>"><%= label %></span>
+    <% unless index == 2 %>
+      <span style="color: #555555; margin: 0 6px;">／</span>
+    <% end %>
+  <% end %>
+</div>

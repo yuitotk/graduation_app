@@ -1,4 +1,5 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
+<%= render "shared/page_position_indicator", current: :story_event_idea %>
 
 <%
   current_breadcrumb_params = {
@@ -230,7 +231,7 @@
         <%= simple_format(@story_event_idea.memo) %>
       </div>
 
-      <p style="margin-bottom: 0;">
+      <p style="margin-bottom: 40px;">
         <%= link_to "詳細メモ編集",
                     edit_story_story_event_story_event_idea_path(@story, @story_event, @story_event_idea),
                     style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
