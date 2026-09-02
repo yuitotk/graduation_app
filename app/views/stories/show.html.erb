@@ -1,5 +1,4 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
-<%= render "shared/page_position_indicator", current: :story %>
 
 <style>
   /*
@@ -161,7 +160,10 @@
 <p><%= link_to "ストーリー一覧へ", stories_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
 <div class="story-section-card">
-  <h1 style="color: #c4b5fd; margin-top: 0; margin-bottom: 8px;">ストーリー詳細ページ</h1>
+  <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;">
+    <h1 style="color: #c4b5fd; margin: 0;">ストーリー詳細ページ</h1>
+    <%= render "shared/page_position_indicator", current: :story %>
+  </div>
 
   <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
     アイデアをこの作品に移動して素材を増やし、イベントを追加すると物語の流れを時系列で整理できます。

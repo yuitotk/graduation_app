@@ -1,5 +1,4 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
-<%= render "shared/page_position_indicator", current: :story_event_idea %>
 
 <%
   current_breadcrumb_params = {
@@ -205,7 +204,10 @@
 </p>
 
 <div class="story-section-card">
-  <h1 style="color: #c4b5fd; margin-top: 0; margin-bottom: 8px;">詳細メモ詳細ページ</h1>
+  <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
+    <h1 style="color: #c4b5fd; margin: 0;">詳細メモ詳細ページ</h1>
+    <%= render "shared/page_position_indicator", current: :story_event_idea %>
+  </div>
 
   <ul style="margin: 8px 0 0 20px; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
     <li>詳細メモは、アニメや漫画で見る一場面の会話や演出など、細かい内容をまとめていくページです。</li>

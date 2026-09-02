@@ -3,9 +3,13 @@
   今どの階層のページにいるかを、そこだけ青文字にして示すための表示。
   リンク機能はなく、ただの文字（現在地の目印）。
 
+  各ページの「○○詳細ページ」という見出しの隣に並べて使う想定
+  （呼び出し元で display: flex; align-items: baseline; などの
+  行で見出しと横並びにする）。
+
   呼び出し元で current: :story / :story_event / :story_event_idea を渡す。
 %>
-<div style="margin: 4px 0 0 0; font-size: 14px;">
+<div style="display: inline-block; font-size: 14px;">
   <% [[:story, "ストーリー"], [:story_event, "イベント"], [:story_event_idea, "詳細メモ"]].each_with_index do |(key, label), index| %>
     <% is_current = key == current %>
     <span style="color: <%= is_current ? "#9ecbff" : "#777777" %>; <%= "font-weight: bold;" if is_current %>"><%= label %></span>
