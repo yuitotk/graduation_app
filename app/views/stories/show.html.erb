@@ -26,17 +26,38 @@
     margin: 20px 0;
   }
 
-  /* 左右それぞれの列。列の中でカードを縦に積み重ねる */
+  /*
+    左右それぞれの列。列の中でカードを縦に積み重ねる。
+    片方の中身が少ない（例：イベントが1件だけ）ときに、その列だけ
+    極端にスカスカ・寸足らずに見えないよう、最低限の高さを確保しておく。
+  */
   .story-two-col__column {
     display: flex;
     flex-direction: column;
     gap: 20px;
     flex: 1 1 320px;
     min-width: 0;
+    min-height: 360px;
   }
 
   .story-two-col__column > .story-section-card {
     margin: 0;
+  }
+
+  /*
+    左カラム（ストーリー本文）だけ、スクロールしても画面内に留まるようにする実験。
+    右カラム（イベント・アイデア関連）は通常どおりページと一緒にスクロールする。
+
+    本文が長くて画面の高さより大きくなる場合、position: sticky だけだと
+    画面からはみ出た部分がページスクロールでは出てこなくなってしまうため、
+    このカラム自体の高さを画面の高さまでに制限し、はみ出た分は
+    このカラムの中だけでスクロールして読めるようにしている。
+  */
+  .story-two-col__column--sticky {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
   }
 </style>
 
@@ -54,7 +75,7 @@
 </div>
 
 <div class="story-two-col">
-  <div class="story-two-col__column">
+  <div class="story-two-col__column story-two-col__column--sticky">
     <div class="story-section-card">
       <h1 style="color: #ddd6fe; margin-top: 0;"><%= @story.title %></h1>
 
@@ -82,6 +103,21 @@
           更新日（文字修正のみ）: <%= l (@story.text_updated_at || @story.created_at).in_time_zone("Tokyo"), format: :short %>
         </span>
       </p>
+    </div>
+  </div>
+
+  <div class="story-two-col__column">
+    <div class="story-section-card" data-controller="scroll-into-view">
+      <h2 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">イベント（時系列）</h2>
+
+      <h4>このイベント欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
+
+      <p>
+        <%= link_to "イベント追加", new_story_story_event_path(@story),
+                    style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+      </p>
+
+      <%= render "story_events_list", story: @story, story_events: @story_events %>
     </div>
 
     <div class="story-section-card" data-controller="scroll-into-view">
@@ -116,21 +152,6 @@
                  page_param: :moved_page,
                  link_params: {},
                  link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
-    </div>
-  </div>
-
-  <div class="story-two-col__column">
-    <div class="story-section-card" data-controller="scroll-into-view">
-      <h2 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">イベント（時系列）</h2>
-
-      <h4>このイベント欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
-
-      <p>
-        <%= link_to "イベント追加", new_story_story_event_path(@story),
-                    style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-      </p>
-
-      <%= render "story_events_list", story: @story, story_events: @story_events %>
     </div>
   </div>
 </div>
