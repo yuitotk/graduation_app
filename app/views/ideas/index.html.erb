@@ -71,8 +71,8 @@
   </p>
 </div>
 
-<div data-controller="scroll-into-view">
-  <h2 data-scroll-into-view-target="anchor" style="margin: 20px 0 16px 0; font-size: 24px; color: #c4b5fd;">作成したアイデア一覧</h2>
+<div class="story-section-card" data-controller="scroll-into-view">
+  <h2 data-scroll-into-view-target="anchor" style="margin: 0 0 16px 0; font-size: 24px; color: #7dd3fc;">作成したアイデア一覧</h2>
 
   <p style="margin: 0 0 16px 0;">
     <%= link_to "アイデアを作成する", new_idea_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
@@ -99,7 +99,7 @@
           アイデア詳細ページへ遷移させる(付けないと「Content missing」になる) %>
       <%= link_to idea_path(idea), style: "display: block; text-decoration: none; color: inherit;", data: { turbo_frame: "_top" } do %>
         <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
-          <h2 style="color: #ddd6fe; text-decoration: none;"><%= idea.title %></h2>
+          <h2 style="color: #7dd3fc; text-decoration: none;"><%= idea.title %></h2>
 
           <% if idea.idea_image&.image? %>
             <div style="margin: 8px 0;">
