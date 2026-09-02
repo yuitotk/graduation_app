@@ -21,6 +21,7 @@ class StoryEventsController < ApplicationController
                   .where(idea_placements: { created_here: true })
                   .order(created_at: :desc)
                   .page(params[:created_here_page])
+                  .per(30)
 
     @moved_ideas =
       @story_event.placed_ideas
@@ -28,6 +29,7 @@ class StoryEventsController < ApplicationController
                   .where(idea_placements: { created_here: false })
                   .order("idea_placements.moved_at DESC")
                   .page(params[:moved_page])
+                  .per(30)
   end
 
   def new
