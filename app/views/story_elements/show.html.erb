@@ -1,90 +1,270 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
+<style>
+  /*
+    要素詳細ページ専用のカード枠。
+    他の詳細ページと同じ考え方で、<hr> の線1本だけの区切りをやめ、
+    背景色と枠線のついた「箱」で囲んで区切りをはっきりさせている。
+  */
+  .story-section-card {
+    background: rgba(40, 28, 74, 0.55);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  /*
+    左＝要素本文、右＝アイデアのタブ欄を横並びにする行。
+
+    この行自体を画面に固定し（sticky）、画面の高さを上限にしている。
+    左右それぞれの中はこの行の中だけで独立してスクロールするので、
+    ページ全体をどれだけスクロールしても、本文の表示位置は変わらない。
+
+    height ではなく max-height にしているのは、中身が少ない要素
+    （アイデアがまだ無いなど）のときに、画面の高さぶん無理やり
+    引き伸ばされて大きな空白ができてしまわないようにするため。
+    中身が画面の高さを超えたときだけ、そこで頭打ちになり内部スクロールが働く。
+
+    （画面が狭いとき（スマホなど）は、下の @media で通常の縦積み・
+    通常スクロールに戻す）
+  */
+  .story-two-col {
+    display: flex;
+    gap: 120px;
+    margin: 20px 0;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+  }
+
+  /*
+    左右それぞれの列の外枠。高さは常にこの行いっぱい（100%）。
+    列自体はスクロールさせず、中の「スクロールする範囲」だけを決める土台にする。
+  */
+  .story-two-col__column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1 1 320px;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .story-two-col__column > .story-section-card {
+    margin: 0;
+  }
+
+  /*
+    幅は、左（要素本文）を右（アイデアのタブ欄）より
+    広め（6:3）にしている。間の隙間（gap）をページのスクロール操作用に
+    広く取りたいので、左を少し狭めにしている。
+  */
+  .story-two-col__column--wide {
+    flex-grow: 6;
+  }
+
+  .story-two-col__column:not(.story-two-col__column--wide) {
+    flex-grow: 3;
+  }
+
+  /*
+    左（本文）も、中身がこの高さより長くなったら、この欄の中だけで
+    スクロールする（.story-two-col__column--wide は、横方向の幅比率
+    (flex-grow: 6)を上書きしないよう、flex-shrink/flex-basis だけを
+    個別に指定している）。
+
+    overscroll-behavior は指定しない（初期値 auto のまま）。
+    本文欄のスクロールが端（上端・下端）まで来たら、その先はページ全体の
+    スクロールにそのまま引き継がれてよい、という意図。
+  */
+  .story-two-col__column--wide {
+    flex-shrink: 1;
+    flex-basis: 320px;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /*
+    右（アイデア）は、タブ欄を除いた下側だけがスクロール範囲
+    （.story-tab-panels）で、タブ欄自体は常に上に留まる。
+    overflow-y: auto でこの範囲の中だけでスクロールし、
+    overscroll-behavior: contain で、スクロールが端まで来ても
+    その先（ページ全体）が引きずられて動かないようにする。
+  */
+  .story-tab-panels {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* スマホなど画面が狭いときは、固定・独立スクロールをやめて通常表示に戻す */
+  @media (max-width: 767px) {
+    .story-two-col {
+      flex-wrap: wrap;
+      position: static;
+      max-height: none;
+    }
+
+    .story-tab-panels {
+      overflow-y: visible;
+      overscroll-behavior: auto;
+    }
+  }
+
+  /*
+    右カラムの「新規アイデア／移動したアイデア」切り替えタブ。
+    2つのアイコンボタンを並べ、押した欄だけを表示する
+    （表示の切り替えは app/javascript/controllers/panel_tabs_controller.js）。
+    タブ欄自体はスクロールせず、常に右カラムの上に留まる。
+  */
+  .story-tab-bar {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .story-tab-button {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    background: rgba(40, 28, 74, 0.55);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .story-tab-button svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .story-tab-button.is-active {
+    background: rgba(124, 58, 237, 0.35);
+    border-color: #c4b5fd;
+    color: #f5f5f5;
+    font-weight: bold;
+  }
+</style>
+
 <p>
   <%= link_to "要素一覧へ戻る",
               story_story_elements_path(@story, breadcrumb_params),
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
-<h1 style="color: #c4b5fd;">要素詳細</h1>
+<div class="story-section-card">
+  <h1 style="color: #c4b5fd; margin-top: 0; margin-bottom: 8px;">要素詳細ページ</h1>
 
-<p style="margin: 8px 0 8px 0; font-size: 17px;">
-  一つの要素として、何をするのかなどの記録や行動候補をアイデアとして作成していき<br>
-  良かった案が出たら、要素に追加して詳細メモに追加するのがおすすめです
-</p>
-
-<hr>
-
-<p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0; color: #ddd6fe;"><strong>名前：</strong><%= @story_element.name %></p>
-<p style="color: #ddd6fe;"><strong>分類：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体・グループ" }[@story_element.kind] || @story_element.kind %></p>
-<p style="color: #ddd6fe;"><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
-
-<% if @story_element.story_element_image&.image? %>
-  <div style="margin-top: 16px;">
-    <%= image_tag @story_element.story_element_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
-  </div>
-<% end %>
-
-<h2 style="color: #ddd6fe;">メモ</h2>
-
-<% if @story_element.memo.present? %>
-  <div><%= simple_format(@story_element.memo) %></div>
-<% else %>
-  <p>なし</p>
-<% end %>
-
-<p>
-  <%= link_to "編集",
-              edit_story_story_element_path(@story, @story_element, breadcrumb_params),
-              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
-  <span style="display: inline-block; margin-left: 24px;">
-    作成日: <%= l @story_element.created_at.in_time_zone("Tokyo"), format: :short %>
-  </span>
-  <span style="display: inline-block; margin-left: 24px;">
-    更新日（文字修正のみ）: <%= l (@story_element.text_updated_at || @story_element.created_at).in_time_zone("Tokyo"), format: :short %>
-  </span>
-</p>
-
-<hr>
-
-<div data-controller="scroll-into-view">
-  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">新規アイデア</h3>
-
-  <p style="display: flex; gap: 12px; flex-wrap: wrap;">
-    <%= link_to "新規作成",
-                new_idea_path(
-                  return_to: request.fullpath,
-                  placeable_type: "StoryElement",
-                  placeable_id: @story_element.id
-                ),
-                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-
-    <%= link_to "AI作成",
-                random_words_pick_path(
-                  return_to: request.fullpath,
-                  placeable_type: "StoryElement",
-                  placeable_id: @story_element.id
-                ),
-                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
+    一つの要素として、何をするのかなどの記録や行動候補をアイデアとして作成していき、
+    良かった案が出たら要素に追加して詳細メモに追加するのがおすすめです。
   </p>
-
-  <%= render "shared/placed_ideas",
-             ideas: @created_here_ideas,
-             frame_id: "created_here_ideas_list",
-             page_param: :created_here_page,
-             link_params: breadcrumb_params,
-             link_style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </div>
 
-<hr>
+<div class="story-two-col">
+  <div class="story-two-col__column story-two-col__column--wide">
+    <div class="story-section-card">
+      <p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0; color: #ddd6fe;"><strong>名前：</strong><%= @story_element.name %></p>
+      <p style="color: #ddd6fe;"><strong>分類：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体・グループ" }[@story_element.kind] || @story_element.kind %></p>
+      <p style="color: #ddd6fe;"><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
 
-<div data-controller="scroll-into-view">
-  <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd;">ここに移動したアイデア</h3>
+      <% if @story_element.story_element_image&.image? %>
+        <div style="margin-top: 16px;">
+          <%= image_tag @story_element.story_element_image.image.url, style: "max-width: 320px; height: auto; border-radius: 16px;" %>
+        </div>
+      <% end %>
 
-  <%= render "shared/placed_ideas",
-             ideas: @moved_ideas,
-             frame_id: "moved_ideas_list",
-             page_param: :moved_page,
-             link_params: breadcrumb_params,
-             link_style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+      <h2 style="color: #ddd6fe;">メモ</h2>
+
+      <% if @story_element.memo.present? %>
+        <div><%= simple_format(@story_element.memo) %></div>
+      <% else %>
+        <p>なし</p>
+      <% end %>
+
+      <p style="margin-bottom: 0;">
+        <%= link_to "編集",
+                    edit_story_story_element_path(@story, @story_element, breadcrumb_params),
+                    style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+        <span style="display: inline-block; margin-left: 24px;">
+          作成日: <%= l @story_element.created_at.in_time_zone("Tokyo"), format: :short %>
+        </span>
+        <span style="display: inline-block; margin-left: 24px;">
+          更新日（文字修正のみ）: <%= l (@story_element.text_updated_at || @story_element.created_at).in_time_zone("Tokyo"), format: :short %>
+        </span>
+      </p>
+
+      <%# 本文の表示範囲に余白を持たせるための空間 %>
+      <div style="height: 60px;"></div>
+    </div>
+  </div>
+
+  <div class="story-two-col__column" data-controller="panel-tabs">
+    <div class="story-tab-bar">
+      <button type="button" class="story-tab-button" data-panel-tabs-target="tab" data-action="panel-tabs#select" data-panel-tabs-index-param="0" aria-label="新規アイデア">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.45 1.1 1.2 1.1 2.2h5c0-1 .5-1.75 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+        <span>新規アイデア</span>
+      </button>
+      <button type="button" class="story-tab-button" data-panel-tabs-target="tab" data-action="panel-tabs#select" data-panel-tabs-index-param="1" aria-label="移動したアイデア">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h9"/><path d="M11 12h9M17 9l3 3-3 3"/></svg>
+        <span>移動アイデア</span>
+      </button>
+    </div>
+
+    <div class="story-tab-panels">
+      <div data-panel-tabs-target="panel">
+        <div class="story-section-card" data-controller="scroll-into-view">
+          <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">新規アイデア</h3>
+
+          <p style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <%= link_to "新規作成",
+                        new_idea_path(
+                          return_to: request.fullpath,
+                          placeable_type: "StoryElement",
+                          placeable_id: @story_element.id
+                        ),
+                        style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+
+            <%= link_to "AI作成",
+                        random_words_pick_path(
+                          return_to: request.fullpath,
+                          placeable_type: "StoryElement",
+                          placeable_id: @story_element.id
+                        ),
+                        style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+          </p>
+
+          <%= render "shared/placed_ideas",
+                     ideas: @created_here_ideas,
+                     frame_id: "created_here_ideas_list",
+                     page_param: :created_here_page,
+                     link_params: breadcrumb_params,
+                     link_style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+        </div>
+      </div>
+
+      <div data-panel-tabs-target="panel" hidden>
+        <div class="story-section-card" data-controller="scroll-into-view">
+          <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">ここに移動したアイデア</h3>
+
+          <%= render "shared/placed_ideas",
+                     ideas: @moved_ideas,
+                     frame_id: "moved_ideas_list",
+                     page_param: :moved_page,
+                     link_params: breadcrumb_params,
+                     link_style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,141 +1,325 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
+<style>
+  /*
+    イベント詳細ページ専用のカード枠。
+    ストーリー詳細ページと同じ考え方で、<hr> の線1本だけの区切りをやめ、
+    背景色と枠線のついた「箱」で囲んで区切りをはっきりさせている。
+  */
+  .story-section-card {
+    background: rgba(40, 28, 74, 0.55);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  /*
+    左＝イベント本文、右＝詳細メモ・アイデアのタブ欄を横並びにする行。
+
+    この行自体を画面に固定し（sticky）、画面の高さを上限にしている。
+    左右それぞれの中はこの行の中だけで独立してスクロールするので、
+    ページ全体をどれだけスクロールしても、本文の表示位置は変わらない。
+
+    height ではなく max-height にしているのは、中身が少ないイベント
+    （詳細メモ・アイデアがまだ無いなど）のときに、画面の高さぶん
+    無理やり引き伸ばされて大きな空白ができてしまわないようにするため。
+    中身が画面の高さを超えたときだけ、そこで頭打ちになり内部スクロールが働く。
+
+    （画面が狭いとき（スマホなど）は、下の @media で通常の縦積み・
+    通常スクロールに戻す）
+  */
+  .story-two-col {
+    display: flex;
+    gap: 120px;
+    margin: 20px 0;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+  }
+
+  /*
+    左右それぞれの列の外枠。高さは常にこの行いっぱい（100%）。
+    列自体はスクロールさせず、中の「スクロールする範囲」だけを決める土台にする。
+  */
+  .story-two-col__column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1 1 320px;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .story-two-col__column > .story-section-card {
+    margin: 0;
+  }
+
+  /*
+    幅は、左（イベント本文）を右（詳細メモ・アイデアのタブ欄）より
+    広め（6:3）にしている。間の隙間（gap）をページのスクロール操作用に
+    広く取りたいので、左を少し狭めにしている。
+  */
+  .story-two-col__column--wide {
+    flex-grow: 6;
+  }
+
+  .story-two-col__column:not(.story-two-col__column--wide) {
+    flex-grow: 3;
+  }
+
+  /*
+    左（本文）も、中身がこの高さより長くなったら、この欄の中だけで
+    スクロールする（.story-two-col__column--wide は、横方向の幅比率
+    (flex-grow: 6)を上書きしないよう、flex-shrink/flex-basis だけを
+    個別に指定している）。
+
+    overscroll-behavior は指定しない（初期値 auto のまま）。
+    本文欄のスクロールが端（上端・下端）まで来たら、その先はページ全体の
+    スクロールにそのまま引き継がれてよい、という意図。
+  */
+  .story-two-col__column--wide {
+    flex-shrink: 1;
+    flex-basis: 320px;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /*
+    右（詳細メモ・アイデア）は、タブ欄を除いた下側だけがスクロール範囲
+    （.story-tab-panels）で、タブ欄自体は常に上に留まる。
+    overflow-y: auto でこの範囲の中だけでスクロールし、
+    overscroll-behavior: contain で、スクロールが端まで来ても
+    その先（ページ全体）が引きずられて動かないようにする。
+  */
+  .story-tab-panels {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* スマホなど画面が狭いときは、固定・独立スクロールをやめて通常表示に戻す */
+  @media (max-width: 767px) {
+    .story-two-col {
+      flex-wrap: wrap;
+      position: static;
+      max-height: none;
+    }
+
+    .story-tab-panels {
+      overflow-y: visible;
+      overscroll-behavior: auto;
+    }
+  }
+
+  /*
+    右カラムの「詳細メモ／新規アイデア／移動したアイデア」切り替えタブ。
+    3つのアイコンボタンを並べ、押した欄だけを表示する
+    （表示の切り替えは app/javascript/controllers/panel_tabs_controller.js）。
+    タブ欄自体はスクロールせず、常に右カラムの上に留まる。
+  */
+  .story-tab-bar {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .story-tab-button {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    background: rgba(40, 28, 74, 0.55);
+    border: 1px solid rgba(196, 181, 253, 0.35);
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .story-tab-button svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .story-tab-button.is-active {
+    background: rgba(124, 58, 237, 0.35);
+    border-color: #c4b5fd;
+    color: #f5f5f5;
+    font-weight: bold;
+  }
+</style>
+
 <p style="margin: 0 0 16px 0;">
   <%= link_to "ストーリー詳細へ戻る",
               story_path(@story),
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
-<h1 style="margin: 0 0 20px 0; color: #c4b5fd;">イベント詳細ページ</h1>
-
-<ul style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8; color: #f5f5f5;">
-  <li>イベント（章）として入れてみたい内容は、まずアイデア作成で試してみましょう。</li>
-  <li>良かった案は、イベント編集から本文に追加していくのががおすすめです。</li>
-  <li>イベント本体には書ききれない会話案、演出案などは、詳細メモとしてさらに細かく記録して整理できます。</li>
-  <li>詳細メモは、1話、2話という感じで作成すると整理しやすくおすすめです</li>
-</ul>
-
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
-
-<h1 style="margin: 0 0 16px 0; color: #ddd6fe;"><%= @story_event.title %></h1>
-
-<% if @story_event.story_event_image&.image? %>
-  <div style="margin-top: 16px; margin-bottom: 20px;">
-    <%= image_tag @story_event.story_event_image.image.url,
-                  style: "max-width: 320px; height: auto; border-radius: 16px; display: block;" %>
+<div class="story-section-card">
+  <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
+    <h1 style="color: #c4b5fd; margin: 0;">イベント詳細ページ</h1>
+    <%= render "shared/page_position_indicator", current: :story_event %>
   </div>
-<% end %>
 
-<h2 style="margin: 0 0 12px 0; color: #ddd6fe;">イベントの登場要素</h2>
-<% if @story_event.story_elements.any? %>
-  <% grouped_elements = StoryElement.sorted_by_kind_and_name(@story_event.story_elements).group_by(&:kind) %>
+  <ul style="margin: 8px 0 0 20px; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
+    <li>イベント（章）として入れてみたい内容は、まずアイデア作成で試してみましょう。</li>
+    <li>良かった案は、イベント編集から本文に追加していくのがおすすめです。</li>
+    <li>イベント本体には書ききれない会話案、演出案などは、詳細メモとしてさらに細かく記録して整理できます。</li>
+  </ul>
+</div>
 
-  <div style="margin-top: 12px; margin-bottom: 24px; border: 1px solid #555555; border-radius: 16px; padding: 16px; background: #1e1e1e;">
-    <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"], ["place", "場所"], ["organization", "団体・グループ"]].each do |kind, kind_label| %>
-      <% elements = grouped_elements[kind] || [] %>
-      <% next if elements.blank? %>
+<div class="story-two-col">
+  <div class="story-two-col__column story-two-col__column--wide">
+    <div class="story-section-card">
+      <h1 style="color: #ddd6fe; margin-top: 0;"><%= @story_event.title %></h1>
 
-      <details style="margin-bottom: 16px;">
-        <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 10px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
-          <%= kind_label %>（<%= elements.size %>）
-        </summary>
+      <% if @story_event.story_event_image&.image? %>
+        <div style="margin-top: 16px; margin-bottom: 20px;">
+          <%= image_tag @story_event.story_event_image.image.url,
+                        style: "max-width: 320px; height: auto; border-radius: 16px; display: block;" %>
+        </div>
+      <% end %>
 
-        <div style="padding: 12px 8px 0 8px;">
-          <% elements.each do |el| %>
-            <div style="margin-bottom: 8px; color: #f5f5f5;">
-              <%= story_element_short_label(el) %>
-            </div>
+      <h2 style="color: #ddd6fe;">説明</h2>
+      <div style="margin-bottom: 20px; color: #f5f5f5; line-height: 1.8;">
+        <%= simple_format(@story_event.body) %>
+      </div>
+
+      <p style="margin-bottom: 40px;">
+        <%= link_to "イベント編集",
+                    edit_story_story_event_path(@story, @story_event),
+                    style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+        <span style="display: inline-block; margin-left: 24px;">
+          作成日: <%= l @story_event.created_at.in_time_zone("Tokyo"), format: :short %>
+        </span>
+        <span style="display: inline-block; margin-left: 24px;">
+          更新日（文字修正のみ）: <%= l (@story_event.text_updated_at || @story_event.created_at).in_time_zone("Tokyo"), format: :short %>
+        </span>
+      </p>
+
+      <h2 style="color: #ddd6fe;">イベントの登場要素</h2>
+      <% if @story_event.story_elements.any? %>
+        <% grouped_elements = StoryElement.sorted_by_kind_and_name(@story_event.story_elements).group_by(&:kind) %>
+
+        <div style="margin-top: 12px; margin-bottom: 24px; border: 1px solid #555555; border-radius: 16px; padding: 16px; background: #1e1e1e;">
+          <% [["character", "キャラクター"], ["item", "アイテム"], ["setting", "設定"], ["place", "場所"], ["organization", "団体・グループ"]].each do |kind, kind_label| %>
+            <% elements = grouped_elements[kind] || [] %>
+            <% next if elements.blank? %>
+
+            <details style="margin-bottom: 16px;">
+              <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 10px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
+                <%= kind_label %>（<%= elements.size %>）
+              </summary>
+
+              <div style="padding: 12px 8px 0 8px;">
+                <% elements.each do |el| %>
+                  <div style="margin-bottom: 8px; color: #f5f5f5;">
+                    <%= story_element_short_label(el) %>
+                  </div>
+                <% end %>
+              </div>
+            </details>
           <% end %>
         </div>
-      </details>
-    <% end %>
+      <% else %>
+        <p style="margin: 0 0 24px 0; color: #f5f5f5;">未設定</p>
+      <% end %>
+
+      <%# 本文の表示範囲に余白を持たせるための空間 %>
+      <div style="height: 60px;"></div>
+    </div>
   </div>
-<% else %>
-  <p style="margin: 0 0 24px 0; color: #f5f5f5;">未設定</p>
-<% end %>
 
-<h2 style="margin: 0 0 12px 0; color: #ddd6fe;">説明</h2>
-<div style="margin-bottom: 20px; color: #f5f5f5; line-height: 1.8;">
-  <%= simple_format(@story_event.body) %>
-</div>
+  <div class="story-two-col__column" data-controller="panel-tabs">
+    <div class="story-tab-bar">
+      <button type="button" class="story-tab-button" data-panel-tabs-target="tab" data-action="panel-tabs#select" data-panel-tabs-index-param="0" aria-label="詳細メモ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        <span>詳細メモ</span>
+      </button>
+      <button type="button" class="story-tab-button" data-panel-tabs-target="tab" data-action="panel-tabs#select" data-panel-tabs-index-param="1" aria-label="新規アイデア">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.45 1.1 1.2 1.1 2.2h5c0-1 .5-1.75 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+        <span>新規アイデア</span>
+      </button>
+      <button type="button" class="story-tab-button" data-panel-tabs-target="tab" data-action="panel-tabs#select" data-panel-tabs-index-param="2" aria-label="移動したアイデア">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h9"/><path d="M11 12h9M17 9l3 3-3 3"/></svg>
+        <span>移動アイデア</span>
+      </button>
+    </div>
 
-<p style="margin: 0 0 8px 0; color: #f5f5f5;">
-  <%= link_to "イベント編集",
-              edit_story_story_event_path(@story, @story_event),
-              style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
-  <span style="display: inline-block; margin-left: 24px;">
-    作成日: <%= l @story_event.created_at.in_time_zone("Tokyo"), format: :short %>
-  </span>
-  <span style="display: inline-block; margin-left: 24px;">
-    更新日（文字修正のみ）: <%= l (@story_event.text_updated_at || @story_event.created_at).in_time_zone("Tokyo"), format: :short %>
-  </span>
-</p>
+    <div class="story-tab-panels">
+      <div data-panel-tabs-target="panel">
+        <div class="story-section-card" data-controller="scroll-into-view">
+          <h2 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">詳細メモ</h2>
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+          <h4>この詳細メモ欄は、整合性チェックの対象です。上から時系列の早い順として表示します。</h4>
 
-<div data-controller="scroll-into-view">
-  <h2 data-scroll-into-view-target="anchor" style="margin: 0 0 12px 0; color: #c4b5fd;">詳細メモ</h2>
+          <p>
+            <%= link_to "詳細メモを追加",
+                        new_story_story_event_story_event_idea_path(@story, @story_event),
+                        style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+          </p>
 
-  <h4 style="margin: 0 0 16px 0; color: #f5f5f5; line-height: 1.8;">
-    この詳細メモ欄は、整合性チェックの対象です。上から時系列の早い順として表示します。
-  </h4>
+          <%= render "story_event_ideas_list",
+                     story: @story,
+                     story_event: @story_event,
+                     story_event_ideas: @story_event_ideas %>
+        </div>
+      </div>
 
-  <p style="margin: 0 0 16px 0;">
-    <%= link_to "詳細メモを追加",
-                new_story_story_event_story_event_idea_path(@story, @story_event),
-                style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-  </p>
+      <div data-panel-tabs-target="panel" hidden>
+        <div class="story-section-card" data-controller="scroll-into-view">
+          <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">新規アイデア</h3>
 
-  <%= render "story_event_ideas_list",
-             story: @story,
-             story_event: @story_event,
-             story_event_ideas: @story_event_ideas %>
-</div>
+          <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
+            作成した要素は、アイデア作成時に登場要素として選択できます。<br>
+            アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
+          </p>
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+          <p style="margin: 0 0 16px 0;">
+            <%= link_to "新規作成",
+                        new_idea_path(
+                          return_to: request.fullpath,
+                          placeable_type: "StoryEvent",
+                          placeable_id: @story_event.id
+                        ),
+                        style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
+            <%= link_to "AI作成",
+                        random_words_pick_path(
+                          return_to: request.fullpath,
+                          placeable_type: "StoryEvent",
+                          placeable_id: @story_event.id
+                        ),
+                        style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+          </p>
 
-<div data-controller="scroll-into-view">
-  <h3 data-scroll-into-view-target="anchor" style="margin: 0 0 12px 0; color: #c4b5fd;">新規アイデア</h3>
+          <%= render "shared/placed_ideas",
+                     ideas: @created_here_ideas,
+                     frame_id: "created_here_ideas_list",
+                     page_param: :created_here_page,
+                     link_params: { from: "story_event", story_event_id: @story_event.id },
+                     link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+        </div>
+      </div>
 
-  <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
-    作成した要素は、アイデア作成時に登場要素として選択できます。<br>
-    アイデアと要素を結びつけておくと、検索で見つけやすくなり、あとから設定や登場場面を整理しやすくなります。
-  </p>
+      <div data-panel-tabs-target="panel" hidden>
+        <div class="story-section-card" data-controller="scroll-into-view">
+          <h3 data-scroll-into-view-target="anchor" style="color: #c4b5fd; margin-top: 0;">ここに移動したアイデア</h3>
 
-  <p style="margin: 0 0 16px 0;">
-    <%= link_to "新規作成",
-                new_idea_path(
-                  return_to: request.fullpath,
-                  placeable_type: "StoryEvent",
-                  placeable_id: @story_event.id
-                ),
-                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f8f6b; border-radius: 12px; background: #5f8f6b; color: #ffffff; text-decoration: none; font-weight: bold; margin-right: 12px;" %>
-    <%= link_to "AI作成",
-                random_words_pick_path(
-                  return_to: request.fullpath,
-                  placeable_type: "StoryEvent",
-                  placeable_id: @story_event.id
-                ),
-                style: "display: inline-block; padding: 10px 16px; border: 2px solid #5f6ee6; border-radius: 12px; background: #5f6ee6; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-  </p>
-
-  <%= render "shared/placed_ideas",
-             ideas: @created_here_ideas,
-             frame_id: "created_here_ideas_list",
-             page_param: :created_here_page,
-             link_params: { from: "story_event", story_event_id: @story_event.id },
-             link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
-</div>
-
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
-
-<div data-controller="scroll-into-view">
-  <h3 data-scroll-into-view-target="anchor" style="margin: 0 0 12px 0; color: #c4b5fd;">ここに移動したアイデア</h3>
-
-  <%= render "shared/placed_ideas",
-             ideas: @moved_ideas,
-             frame_id: "moved_ideas_list",
-             page_param: :moved_page,
-             link_params: { from: "story_event", story_event_id: @story_event.id },
-             link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+          <%= render "shared/placed_ideas",
+                     ideas: @moved_ideas,
+                     frame_id: "moved_ideas_list",
+                     page_param: :moved_page,
+                     link_params: { from: "story_event", story_event_id: @story_event.id },
+                     link_style: "color: #ddd6fe; font-weight: bold; text-decoration: underline;" %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
