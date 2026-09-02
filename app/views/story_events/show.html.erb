@@ -7,11 +7,57 @@
     背景色と枠線のついた「箱」で囲んで区切りをはっきりさせている。
   */
   .story-section-card {
-    background: rgba(40, 28, 74, 0.55);
-    border: 1px solid rgba(196, 181, 253, 0.35);
-    border-radius: 16px;
+    /*
+      枠・角ブラケット・発光に使う色。ここでは青をデフォルトにしているが、
+      個別のカード側で style="--card-accent-rgb: 168, 85, 247;" のように
+      上書きすると、そのカードだけ色を変えられる（下の紫カードの例）。
+    */
+    --card-accent-rgb: 56, 189, 248;
+
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+    border-radius: 6px;
     padding: 20px;
     margin: 20px 0;
+
+    /*
+      対象をロックオンしているような「四隅の角ブラケット」。
+      背が高いカード（本文カード・右のタブエリアなど）だと、上下の角ブラケット
+      だけでは辺の途中に線が無く途切れて見えるため、辺をつなぐ細く薄い線として
+      上の border を敷き、その上に太く明るい角ブラケットを重ねている。
+      background-image に、線1本ぶんの単色グラデーションを8枚重ね、
+      それぞれを background-position で四隅（横線・縦線のペア）に配置している。
+      内側に余白を空けず、カードの実際の角ぴったりに合わせている。
+    */
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    /*
+      ロックオン中のようなうっすら発光する雰囲気を、カード全体に足す。
+      1つ目（inset無し）が外側への光、2つ目（inset）が内側への光。
+    */
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
   }
 
   /*
@@ -162,7 +208,7 @@
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
-<div class="story-section-card">
+<div class="story-section-card" style="--card-accent-rgb: 192, 132, 252;">
   <div style="display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;">
     <h1 style="color: #c4b5fd; margin: 0;">イベント詳細ページ</h1>
     <%= render "shared/page_position_indicator", current: :story_event %>
