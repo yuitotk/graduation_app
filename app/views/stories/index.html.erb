@@ -1,12 +1,71 @@
+<style>
+  /*
+    このページ冒頭の紹介カード。ストーリー詳細ページなどの紹介カードと
+    同じ考え方で、見出し＋説明文を背景色と枠線のついた「箱」で囲んでいる。
+  */
+  .story-section-card {
+    /*
+      枠・角ブラケット・発光に使う色。ここでは青をデフォルトにしているが、
+      個別のカード側で style="--card-accent-rgb: 168, 85, 247;" のように
+      上書きすると、そのカードだけ色を変えられる（下の紫カードの例）。
+    */
+    --card-accent-rgb: 56, 189, 248;
+
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+
+    /*
+      対象をロックオンしているような「四隅の角ブラケット」。
+      background-image に、線1本ぶんの単色グラデーションを8枚重ね、
+      それぞれを background-position で四隅（横線・縦線のペア）に配置している。
+      内側に余白を空けず、カードの実際の角ぴったりに合わせている。
+    */
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    /*
+      ロックオン中のようなうっすら発光する雰囲気を、カード全体に足す。
+      1つ目（inset無し）が外側への光、2つ目（inset）が内側への光。
+    */
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
+  }
+</style>
+
 <p><%= link_to "アイデア一覧（ホーム）へ", ideas_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
-<h1 style="color: #c4b5fd;">ストーリー一覧</h1>
+<div class="story-section-card" style="--card-accent-rgb: 192, 132, 252;">
+  <h1 style="color: #c4b5fd; margin-top: 0;">ストーリー一覧</h1>
 
-<ul style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
-  <li>アイデアがまとまってきたら、ストーリーを作成していきましょう。</li>
-  <li>作品内でイベントや要素を管理しながら、全体の流れを見やすくできます。</li>
-  <li>何回でも修正できるので、まずは気楽に作成してみるのがおすすめです</li>
-</ul>
+  <ul style="margin: 8px 0 0 20px; font-size: 17px; line-height: 1.8;">
+    <li>アイデアがまとまってきたら、ストーリーを作成していきましょう。</li>
+    <li>作品内でイベントや要素を管理しながら、全体の流れを見やすくできます。</li>
+    <li>何回でも修正できるので、まずは気楽に作成してみるのがおすすめです</li>
+  </ul>
+</div>
 
 <p style="margin: 0 0 20px 0;">
   <%= link_to "ストーリー作成", new_story_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
