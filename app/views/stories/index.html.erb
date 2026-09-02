@@ -67,8 +67,10 @@
   </ul>
 </div>
 
-<p style="margin: 0 0 20px 0;">
-  <%= link_to "ストーリー作成", new_story_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
-</p>
+<div class="story-section-card">
+  <p style="margin: 0 0 20px 0;">
+    <%= link_to "ストーリー作成", new_story_path, style: "display: inline-block; padding: 10px 16px; border: 2px solid #2563eb; border-radius: 12px; background: #2563eb; color: #ffffff; text-decoration: none; font-weight: bold;" %>
+  </p>
 
-<%= render "stories_list", stories: @stories %>
+  <%= render "stories_list", stories: @stories %>
+</div>
