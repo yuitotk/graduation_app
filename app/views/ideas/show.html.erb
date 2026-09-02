@@ -331,7 +331,7 @@
 
 <p><%= simple_format(@idea.memo) %></p>
 
-<p>
+<p style="margin-top: 40px;">
   <%= link_to "編集", edit_idea_path(@idea, current_breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @idea.created_at, format: :short %>
