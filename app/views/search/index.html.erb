@@ -1,14 +1,71 @@
 <!-- app/views/search/index.html.erb -->
-<h1 style="color: #c4b5fd;">検索結果</h1>
+<style>
+  /*
+    このページの紹介カード（紫）・結果カード（青）に使う共通の箱。
+    ストーリー詳細ページなどのカードと同じ考え方で、背景色と枠線の
+    ついた「箱」で内容を囲んで区切りをはっきりさせている。
+  */
+  .story-section-card {
+    /*
+      枠・角ブラケット・発光に使う色。ここでは青をデフォルトにしているが、
+      個別のカード側で style="--card-accent-rgb: 168, 85, 247;" のように
+      上書きすると、そのカードだけ色を変えられる（上の紫カードの例）。
+    */
+    --card-accent-rgb: 56, 189, 248;
 
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+
+    /*
+      対象をロックオンしているような「四隅の角ブラケット」。
+      background-image に、線1本ぶんの単色グラデーションを8枚重ね、
+      それぞれを background-position で四隅（横線・縦線のペア）に配置している。
+      内側に余白を空けず、カードの実際の角ぴったりに合わせている。
+    */
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    /*
+      ロックオン中のようなうっすら発光する雰囲気を、カード全体に足す。
+      1つ目（inset無し）が外側への光、2つ目（inset）が内側への光。
+    */
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
+  }
+</style>
 
 <% q = @query.to_s %>
 <% scope = (@scope.presence || "all").to_s %>
 <% breadcrumb_params = (@search_breadcrumb_params || {}).merge(return_to: request.fullpath) %>
 
-<h2 style="color: #c4b5fd;">検索条件</h2>
-<ul>
+<div class="story-section-card" style="--card-accent-rgb: 192, 132, 252;">
+  <h1 style="color: #c4b5fd; margin-top: 0;">検索結果</h1>
+
+  <h2 style="color: #c4b5fd;">検索条件</h2>
+  <ul>
   <li>検索ワード：<%= q.presence || "（未入力）" %></li>
   <li>
     範囲：
@@ -130,8 +187,7 @@
     <% end %>
   </div>
 <% end %>
-
-<hr style="border: none; border-top: 1px solid #444444; margin: 20px 0;">
+</div>
 
 <% results = (@results || {}).with_indifferent_access %>
 
@@ -168,7 +224,7 @@
               style: "display: block; text-decoration: none; color: inherit;" do %>
     <div style="margin: 0 0 12px 0; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e; color: #f5f5f5;">
       <% if idea.title.present? %>
-        <div style="font-weight: bold; margin-bottom: 6px; color: #ddd6fe;"><%= idea.title %></div>
+        <div style="font-weight: bold; margin-bottom: 6px; color: #7dd3fc;"><%= idea.title %></div>
       <% end %>
 
       <div style="margin-bottom: 12px;">
@@ -193,10 +249,11 @@
   <% end %>
 <% end %>
 
+<div class="story-section-card">
 <% if q.blank? && @selected_story_element_ids.blank? %>
-  <p>検索ワードを入力して検索してください。</p>
+  <p style="margin: 0;">検索ワードを入力して検索してください。</p>
 <% else %>
-  <h2 style="color: #c4b5fd;">件数</h2>
+  <h2 style="color: #7dd3fc; margin-top: 0;">件数</h2>
 
   <% if scope == "all" %>
     <ul>
@@ -228,7 +285,7 @@
        moved_rel   = pair[:moved] || Idea.none
   %>
     <section style="margin-bottom: 24px;">
-      <h1 style="color: #c4b5fd;"><%= title %></h1>
+      <h1 style="color: #7dd3fc;"><%= title %></h1>
 
       <% if is_home %>
         <% if created_rel.to_a.empty? %>
@@ -241,7 +298,7 @@
           </div>
         <% end %>
       <% else %>
-        <h2 style="color: #c4b5fd;">新規作成したアイデア</h2>
+        <h2 style="color: #7dd3fc;">新規作成したアイデア</h2>
         <% if created_rel.to_a.empty? %>
           <p>該当なし</p>
         <% else %>
@@ -252,7 +309,7 @@
           </div>
         <% end %>
 
-        <h2 style="color: #c4b5fd;">移動してきたアイデア</h2>
+        <h2 style="color: #7dd3fc;">移動してきたアイデア</h2>
         <% if moved_rel.to_a.empty? %>
           <p>該当なし</p>
         <% else %>
@@ -284,3 +341,4 @@
     <% render_category.call("要素内", :element) %>
   <% end %>
 <% end %>
+</div>
