@@ -340,12 +340,10 @@
     更新日（文字編集のみ）: <%= l @idea.updated_at, format: :short %>
   </span>
 </p>
-</div>
 
 <% tab = params[:tab].presence || @tab %>
 
-<div class="story-section-card">
-<h2 style="color: #7dd3fc; margin-top: 0;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
+<h2 style="color: #7dd3fc;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
 <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
   別ストーリーに移動も可能です。ホームに戻すことはできません。
