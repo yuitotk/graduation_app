@@ -288,7 +288,7 @@
 <h1 style="color: #c4b5fd;"><%= page_context_title %></h1>
 
 <div class="story-section-card">
-<h1 style="color: #7dd3fc; margin-top: 0;"><%= @idea.title %></h1>
+<h1 style="color: #7dd3fc; margin-top: 0; margin-bottom: 40px;"><%= @idea.title %></h1>
 
 <% if placement.present? && placement.story_elements.present? %>
   <% elements = StoryElement.sorted_by_kind_and_name(placement.story_elements.to_a) %>
@@ -329,7 +329,7 @@
   </div>
 <% end %>
 
-<p><%= simple_format(@idea.memo) %></p>
+<p style="margin-top: 40px;"><%= simple_format(@idea.memo) %></p>
 
 <p style="margin-top: 40px;">
   <%= link_to "編集", edit_idea_path(@idea, current_breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
