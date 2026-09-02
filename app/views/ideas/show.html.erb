@@ -285,10 +285,10 @@
 
 <p><%= link_to back_label, back_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
-<div class="story-section-card">
-<h1 style="color: #7dd3fc; margin-top: 0;"><%= page_context_title %></h1>
+<h1 style="color: #c4b5fd;"><%= page_context_title %></h1>
 
-<h1 style="color: #7dd3fc;"><%= @idea.title %></h1>
+<div class="story-section-card">
+<h1 style="color: #7dd3fc; margin-top: 0;"><%= @idea.title %></h1>
 
 <% if placement.present? && placement.story_elements.present? %>
   <% elements = StoryElement.sorted_by_kind_and_name(placement.story_elements.to_a) %>
@@ -343,7 +343,7 @@
 
 <% tab = params[:tab].presence || @tab %>
 
-<h2 style="color: #7dd3fc;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
+<h2 style="color: #c4b5fd;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
 <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
   別ストーリーに移動も可能です。ホームに戻すことはできません。
@@ -477,7 +477,7 @@
 
 <% elsif tab == "stories" %>
   <hr>
-  <h2 style="color: #7dd3fc;">移動先のストーリーを選ぶ（文字順）</h2>
+  <h2 style="color: #c4b5fd;">移動先のストーリーを選ぶ（文字順）</h2>
 
   <% sorted_stories = (@stories || []).sort_by { |story| story_sort_key.call(story) } %>
 
