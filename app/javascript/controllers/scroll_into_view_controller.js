@@ -14,6 +14,38 @@ export default class extends Controller {
 
   scrollToTop() {
     const target = this.hasAnchorTarget ? this.anchorTarget : this.element
-    target.scrollIntoView({ block: "start" })
+
+    // 自分の中だけでスクロールする領域（例: ストーリー詳細ページの
+    // 分割ペイン）の中にいる場合は、その領域の中だけをスクロールし、
+    // ページ全体は動かさない。そういう領域が無ければ、
+    // これまで通りページ全体をスクロールして戻す。
+    const scrollContainer = this.findScrollableAncestor(target)
+
+    if (scrollContainer) {
+      const containerRect = scrollContainer.getBoundingClientRect()
+      const targetRect = target.getBoundingClientRect()
+      scrollContainer.scrollTop += targetRect.top - containerRect.top
+    } else {
+      target.scrollIntoView({ block: "start" })
+    }
+  }
+
+  // targetの祖先をたどり、実際にスクロールしている（中身が高さをはみ出している）
+  // overflow-y: auto/scroll の要素を探す。無ければ null。
+  findScrollableAncestor(target) {
+    let node = target.parentElement
+
+    while (node && node !== document.body) {
+      const style = window.getComputedStyle(node)
+      const scrollable = (style.overflowY === "auto" || style.overflowY === "scroll")
+
+      if (scrollable && node.scrollHeight > node.clientHeight) {
+        return node
+      }
+
+      node = node.parentElement
+    }
+
+    return null
   }
 }
