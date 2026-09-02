@@ -33,6 +33,57 @@
       display: none;
     }
   }
+
+  /*
+    このページの内容を囲むカード。ストーリー詳細ページなどのカードと
+    同じ考え方で、背景色と枠線のついた「箱」で内容を囲んでいる。
+  */
+  .story-section-card {
+    /* 枠・角ブラケット・発光に使う色。青をデフォルトにしている。 */
+    --card-accent-rgb: 56, 189, 248;
+
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+
+    /*
+      対象をロックオンしているような「四隅の角ブラケット」。
+      background-image に、線1本ぶんの単色グラデーションを8枚重ね、
+      それぞれを background-position で四隅（横線・縦線のペア）に配置している。
+      内側に余白を空けず、カードの実際の角ぴったりに合わせている。
+    */
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    /*
+      ロックオン中のようなうっすら発光する雰囲気を、カード全体に足す。
+      1つ目（inset無し）が外側への光、2つ目（inset）が内側への光。
+    */
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
+  }
 </style>
 
 <% placement = @idea.idea_placement %>
@@ -236,9 +287,8 @@
 
 <h1 style="color: #c4b5fd;"><%= page_context_title %></h1>
 
-<hr>
-
-<h1 style="color: #ddd6fe;"><%= @idea.title %></h1>
+<div class="story-section-card">
+<h1 style="color: #7dd3fc; margin-top: 0; margin-bottom: 40px;"><%= @idea.title %></h1>
 
 <% if placement.present? && placement.story_elements.present? %>
   <% elements = StoryElement.sorted_by_kind_and_name(placement.story_elements.to_a) %>
@@ -279,9 +329,9 @@
   </div>
 <% end %>
 
-<p><%= simple_format(@idea.memo) %></p>
+<p style="margin-top: 40px;"><%= simple_format(@idea.memo) %></p>
 
-<p>
+<p style="margin-top: 40px;">
   <%= link_to "編集", edit_idea_path(@idea, current_breadcrumb_params), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
   <span style="display: inline-block; margin-left: 24px;">
     作成日: <%= l @idea.created_at, format: :short %>
@@ -291,11 +341,9 @@
   </span>
 </p>
 
-<hr>
-
 <% tab = params[:tab].presence || @tab %>
 
-<h2 style="color: #c4b5fd;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
+<h2 style="color: #c4b5fd; margin-top: 60px;">このアイデアどこへ移動する？（まず4つから選ぶ）</h2>
 
 <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
   別ストーリーに移動も可能です。ホームに戻すことはできません。
@@ -315,7 +363,7 @@
 
 <% if tab == "elements" %>
   <hr>
-  <h2 style="color: #c4b5fd;">移動先の要素を選ぶ（文字順）</h2>
+  <h2 style="color: #7dd3fc;">移動先の要素を選ぶ（文字順）</h2>
 
   <% kind_labels = { "character" => "キャラ", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体" } %>
   <% kind_order = { "character" => 0, "item" => 1, "setting" => 2, "place" => 3, "organization" => 4 } %>
@@ -350,7 +398,7 @@
   <% end %>
 
   <% if current_story.present? && current_elements.any? %>
-    <h3 style="color: #c4b5fd;">今いるストーリーの要素</h3>
+    <h3 style="color: #7dd3fc;">今いるストーリーの要素</h3>
 
     <details open style="margin-bottom: 16px;">
       <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
@@ -387,7 +435,7 @@
 
   <% if other_elements.any? %>
     <% if current_story.present? %>
-      <h3 style="color: #c4b5fd;">別のストーリーの要素</h3>
+      <h3 style="color: #7dd3fc;">別のストーリーの要素</h3>
     <% end %>
 
     <% other_elements_grouped = other_elements.group_by(&:story) %>
@@ -445,7 +493,7 @@
   <% end %>
 
   <% if current_story.present? && current_stories.any? %>
-    <h3 style="color: #c4b5fd;">今いるストーリー</h3>
+    <h3 style="color: #7dd3fc;">今いるストーリー</h3>
 
     <ul>
       <% current_stories.each do |story| %>
@@ -471,7 +519,7 @@
 
   <% if other_stories.any? %>
     <% if current_story.present? %>
-      <h3 style="color: #c4b5fd;">別のストーリー</h3>
+      <h3 style="color: #7dd3fc;">別のストーリー</h3>
     <% end %>
 
     <ul>
@@ -498,7 +546,7 @@
 
 <% elsif tab == "event_ideas" %>
   <hr>
-  <h2 style="color: #c4b5fd;">移動先の詳細メモを選ぶ（時系列順）</h2>
+  <h2 style="color: #7dd3fc;">移動先の詳細メモを選ぶ（時系列順）</h2>
 
   <% event_idea_breadcrumb_params_for = lambda do |event_idea|
        current_breadcrumb_params.merge(
@@ -528,7 +576,7 @@
   <% end %>
 
   <% if current_story.present? && current_event_ideas.any? %>
-    <h3 style="color: #c4b5fd;">今いるストーリーの詳細メモ</h3>
+    <h3 style="color: #7dd3fc;">今いるストーリーの詳細メモ</h3>
 
     <details open style="margin-bottom: 16px;">
       <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
@@ -570,7 +618,7 @@
 
   <% if other_event_ideas.any? %>
     <% if current_story.present? %>
-      <h3 style="color: #c4b5fd;">別のストーリーの詳細メモ</h3>
+      <h3 style="color: #7dd3fc;">別のストーリーの詳細メモ</h3>
     <% end %>
 
     <% other_event_ideas_grouped = other_event_ideas.group_by { |event_idea| event_idea.story_event&.story } %>
@@ -617,7 +665,7 @@
 
 <% elsif tab == "events" %>
   <hr>
-  <h2 style="color: #c4b5fd;">移動先のイベントを選ぶ（時系列順）</h2>
+  <h2 style="color: #7dd3fc;">移動先のイベントを選ぶ（時系列順）</h2>
 
   <% event_display_label = lambda do |event|
        breadcrumb_label.call([event.story&.title, event.title])
@@ -636,7 +684,7 @@
   <% end %>
 
   <% if current_story.present? && current_events.any? %>
-    <h3 style="color: #c4b5fd;">今いるストーリーのイベント</h3>
+    <h3 style="color: #7dd3fc;">今いるストーリーのイベント</h3>
 
     <details open style="margin-bottom: 16px;">
       <summary style="cursor: pointer; background: #2a2a2a; border: 1px solid #555555; border-radius: 6px; padding: 10px 12px; font-weight: bold; color: #f5f5f5;">
@@ -668,7 +716,7 @@
 
   <% if other_events.any? %>
     <% if current_story.present? %>
-      <h3 style="color: #c4b5fd;">別のストーリーのイベント</h3>
+      <h3 style="color: #7dd3fc;">別のストーリーのイベント</h3>
     <% end %>
 
     <% other_events_grouped = other_events.group_by(&:story) %>
@@ -703,3 +751,4 @@
     <% end %>
   <% end %>
 <% end %>
+</div>

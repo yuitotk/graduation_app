@@ -1,13 +1,70 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
+<style>
+  /*
+    このページ全体を囲む紹介カード。ストーリー詳細ページなどの紹介カードと
+    同じ考え方で、背景色と枠線のついた「箱」で内容全体を囲んでいる。
+  */
+  .story-section-card {
+    /*
+      枠・角ブラケット・発光に使う色。ここでは青をデフォルトにしているが、
+      個別のカード側で style="--card-accent-rgb: 168, 85, 247;" のように
+      上書きすると、そのカードだけ色を変えられる（下の紫カードの例）。
+    */
+    --card-accent-rgb: 56, 189, 248;
+
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+
+    /*
+      対象をロックオンしているような「四隅の角ブラケット」。
+      background-image に、線1本ぶんの単色グラデーションを8枚重ね、
+      それぞれを background-position で四隅（横線・縦線のペア）に配置している。
+      内側に余白を空けず、カードの実際の角ぴったりに合わせている。
+    */
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    /*
+      ロックオン中のようなうっすら発光する雰囲気を、カード全体に足す。
+      1つ目（inset無し）が外側への光、2つ目（inset）が内側への光。
+    */
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
+  }
+</style>
+
 <p style="margin: 0 0 20px 0;">
   <%= link_to "戻る",
               params[:return_to].presence || ideas_path,
               style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
 </p>
 
-<div style="max-width: 1400px; width: 100%; padding: 24px 28px; border: 2px solid #555555; border-radius: 20px; background: rgba(20, 20, 30, 0.88); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
-  <h1 style="margin: 0 0 12px 0; font-size: 42px; color: #c4b5fd;">ランダム辞書ワード</h1>
+<div class="story-section-card" style="max-width: 1400px; width: 100%; padding: 24px 28px; box-sizing: border-box;">
+  <h1 style="margin: 0 0 12px 0; font-size: 42px; color: #7dd3fc;">ランダム辞書ワード</h1>
 
   <p style="margin: 0 0 24px 0; font-size: 17px; line-height: 1.8; color: #e5e7eb;">
     2つのワードを組み合わせて、AIで新しいアイデアを作成できます。<br>
@@ -20,7 +77,7 @@
     <%= form_with url: ai_generations_path, method: :post, data: { turbo_stream: true, controller: "ai-loading" } do |f| %>
       <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: stretch; margin-bottom: 18px;">
         <div style="flex: 1 1 480px; padding: 14px 18px; border: 2px solid #4b5563; border-radius: 16px; background: rgba(35, 35, 45, 0.95); box-sizing: border-box;">
-          <div style="margin-bottom: 10px; font-size: 22px; font-weight: bold; color: #ddd6fe;">
+          <div style="margin-bottom: 10px; font-size: 22px; font-weight: bold; color: #7dd3fc;">
             1つ目のワード
           </div>
 
@@ -45,7 +102,7 @@
         </div>
 
         <div style="flex: 1 1 480px; padding: 14px 18px; border: 2px solid #4b5563; border-radius: 16px; background: rgba(35, 35, 45, 0.95); box-sizing: border-box;">
-          <div style="margin-bottom: 10px; font-size: 22px; font-weight: bold; color: #ddd6fe;">
+          <div style="margin-bottom: 10px; font-size: 22px; font-weight: bold; color: #7dd3fc;">
             2つ目のワード
           </div>
 

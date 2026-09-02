@@ -1,15 +1,70 @@
 <%= render "shared/breadcrumbs", items: @breadcrumbs %>
 
+<style>
+  /*
+    このページ全体を囲む紹介カード。ストーリー詳細ページなどの紹介カードと
+    同じ考え方で、背景色と枠線のついた「箱」で内容全体を囲んでいる。
+  */
+  .story-section-card {
+    /* 枠・角ブラケット・発光に使う色。ここでは紫を指定している。 */
+    --card-accent-rgb: 192, 132, 252;
+
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+
+    /*
+      対象をロックオンしているような「四隅の角ブラケット」。
+      background-image に、線1本ぶんの単色グラデーションを8枚重ね、
+      それぞれを background-position で四隅（横線・縦線のペア）に配置している。
+      内側に余白を空けず、カードの実際の角ぴったりに合わせている。
+    */
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    /*
+      ロックオン中のようなうっすら発光する雰囲気を、カード全体に足す。
+      1つ目（inset無し）が外側への光、2つ目（inset）が内側への光。
+    */
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
+  }
+</style>
+
 <p>
   <%= link_to "戻る", story_story_event_path(@story, @story_event) %>
 </p>
 
-<h1 style="color: #c4b5fd;">詳細メモ追加</h1>
+<div class="story-section-card">
+  <h1 style="color: #c4b5fd; margin-top: 0;">詳細メモ追加</h1>
 
-<ul style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
-  <li>イベント本体には書ききれない会話案、演出案などは、詳細メモとしてさらに細かく記録して整理できます。</li>
-  <li>詳細メモは、1話、2話という感じで作成すると整理しやすくおすすめです</li>
-  <li>何回も修正、追加して良くしていく前提なので、気楽に作成していきましょう。</li>
-</ul>
+  <ul style="margin: 8px 0 0 20px; font-size: 17px; line-height: 1.8;">
+    <li>イベント本体には書ききれない会話案、演出案などは、詳細メモとしてさらに細かく記録して整理できます。</li>
+    <li>詳細メモは、1話、2話という感じで作成すると整理しやすくおすすめです</li>
+    <li>何回も修正、追加して良くしていく前提なので、気楽に作成していきましょう。</li>
+  </ul>
 
-<%= render "form" %>
+  <%= render "form" %>
+</div>
