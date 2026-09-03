@@ -16,6 +16,43 @@
     box-sizing: border-box;
   }
 
+  /*
+    各セクション全体を囲む、大きい方の黒いカードだけに付ける紫のレイアウト。
+    ストーリー詳細ページなどと同じ「紫の発光枠＋四隅の角ブラケット」の考え方。
+    文字色はここでは一切変更していない（枠・背景・発光だけを足している）。
+  */
+  .top-card.story-section-card {
+    --card-accent-rgb: 192, 132, 252;
+
+    border: 2px solid rgba(var(--card-accent-rgb), 0.5);
+
+    background-image:
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1)),
+      linear-gradient(rgba(var(--card-accent-rgb), 1), rgba(var(--card-accent-rgb), 1));
+    background-repeat: no-repeat;
+    background-size:
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px,
+      32px 3px, 3px 32px;
+    background-position:
+      left 0 top 0, left 0 top 0,
+      right 0 top 0, right 0 top 0,
+      left 0 bottom 0, left 0 bottom 0,
+      right 0 bottom 0, right 0 bottom 0;
+    background-origin: border-box;
+
+    box-shadow:
+      0 0 24px rgba(var(--card-accent-rgb), 0.55),
+      inset 0 0 80px rgba(var(--card-accent-rgb), 0.65);
+  }
+
   .top-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -177,7 +214,7 @@
 <div class="top-wrap">
 
   <%# ① サービス概要 %>
-  <div class="top-card" style="text-align: center;">
+  <div class="top-card story-section-card" style="text-align: center;">
     <p style="font-size: 15px; letter-spacing: 0.08em; color: #b9d4ff; margin: 0 0 8px;">創作支援サービス</p>
     <h1 style="font-size: clamp(28px, 5vw, 40px); margin: 0 0 16px;">創記録</h1>
     <p style="font-size: 17px; line-height: 1.9; margin: 0 0 8px;">
@@ -191,7 +228,7 @@
   </div>
 
   <%# ② このサービスで解決できること %>
-  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+  <div class="top-card story-section-card">
     <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">このサービスで解決できること</h2>
 
     <div class="top-grid">
@@ -228,7 +265,7 @@
   </div>
 
   <%# ③ 主要機能の説明 %>
-  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+  <div class="top-card story-section-card">
     <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">主要機能</h2>
 
     <div class="top-grid">
@@ -265,7 +302,7 @@
   </div>
 
   <%# ④ 一般的なメモアプリとの比較 %>
-  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+  <div class="top-card story-section-card">
     <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">一般的なメモアプリとの違い</h2>
 
     <div class="top-compare-grid">
@@ -298,7 +335,7 @@
   </div>
 
   <%# ⑤ 実際の使い方の流れ %>
-  <div class="top-card" style="border: 1px solid rgba(255, 255, 255, 0.45);">
+  <div class="top-card story-section-card">
     <h2 style="text-align: center; font-size: 22px; margin: 0 0 20px;">使い方の流れ</h2>
 
     <div class="top-step-grid">
@@ -336,7 +373,7 @@
   </div>
 
   <%# ⑥ 新規登録への誘導 %>
-  <div class="top-card" style="text-align: center;">
+  <div class="top-card story-section-card" style="text-align: center;">
     <% if logged_in? %>
       <h2 style="font-size: 20px; margin: 0 0 16px;">ログイン中です</h2>
       <%= link_to "ログアウト", logout_path, data: { turbo_method: :delete },
