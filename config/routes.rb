@@ -20,6 +20,9 @@ Rails.application.routes.draw do
   get "/login/google",   to: "oauths#google",   as: :google_login
   get "/oauth/callback", to: "oauths#callback"
 
+  # ゲストログイン
+  post "/guest_login", to: "guest_sessions#create", as: :guest_login
+
   # パスワードリセット
   resources :password_resets, only: %i[new create edit update]
 
