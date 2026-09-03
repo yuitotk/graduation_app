@@ -16,6 +16,10 @@ Rails.application.routes.draw do
   post   "/login",  to: "user_sessions#create"
   delete "/logout", to: "user_sessions#destroy"
 
+  # SNS（Google）ログイン
+  get "/login/google",   to: "oauths#google",   as: :google_login
+  get "/oauth/callback", to: "oauths#callback"
+
   # パスワードリセット
   resources :password_resets, only: %i[new create edit update]
 

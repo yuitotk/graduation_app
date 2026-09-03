@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :ideas, dependent: :destroy
   has_many :inquiries, dependent: :destroy
   has_many :stories, dependent: :destroy
+  has_many :authentications, dependent: :destroy # ✅ 連携しているSNSアカウント（Googleなど）の一覧
 
   validates :email,
             presence: true,
