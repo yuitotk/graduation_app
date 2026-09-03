@@ -16,7 +16,8 @@
 <%= form_with model: @user, url: guest_upgrade_path, method: :patch do |f| %>
   <div style="margin-bottom: 16px;">
     <%= f.label :email, "メールアドレス" %><br>
-    <%= f.email_field :email, maxlength: 150, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
+    <%# ゲストの仮メールアドレスは本人には無意味な値なので、初期表示では空欄にする %>
+    <%= f.email_field :email, value: nil, maxlength: 150, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
   </div>
 
   <div style="margin-bottom: 16px;">
