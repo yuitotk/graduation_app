@@ -23,6 +23,9 @@ Rails.application.routes.draw do
   # ゲストログイン
   post "/guest_login", to: "guest_sessions#create", as: :guest_login
 
+  # ゲスト→正式アカウントへの昇格（メールアドレス・パスワードを設定する）
+  resource :guest_upgrade, only: %i[edit update], controller: "guest_upgrades"
+
   # パスワードリセット
   resources :password_resets, only: %i[new create edit update]
 

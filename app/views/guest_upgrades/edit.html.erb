@@ -1,0 +1,35 @@
+<h1 style="color: #c4b5fd;">正式なアカウントとして登録</h1>
+
+<p style="font-size: 15px; line-height: 1.8; color: #dcdcdc;">
+  ゲストのまま使い続けると、この端末・ブラウザを変えたときに今のデータへ戻ってこられなくなります。<br>
+  メールアドレスとパスワードを設定すると、どの端末からでもログインしてデータを引き継げるようになります。
+</p>
+
+<% if @user.errors.any? %>
+  <ul>
+    <% @user.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= form_with model: @user, url: guest_upgrade_path, method: :patch do |f| %>
+  <div style="margin-bottom: 16px;">
+    <%= f.label :email, "メールアドレス" %><br>
+    <%= f.email_field :email, maxlength: 150, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <%= f.label :password, "パスワード（8文字以上72文字以下で入力してください）" %><br>
+    <%= f.password_field :password, minlength: 8, maxlength: 72, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
+  </div>
+
+  <div style="margin-bottom: 40px;">
+    <%= f.label :password_confirmation, "パスワード（確認用）" %><br>
+    <%= f.password_field :password_confirmation, minlength: 8, maxlength: 72, style: "width: 100%; max-width: 720px; padding: 10px; box-sizing: border-box;" %>
+  </div>
+
+  <div style="margin-bottom: 4em;">
+    <%= f.submit "正式登録する", style: "padding: 10px 20px;" %>
+  </div>
+<% end %>

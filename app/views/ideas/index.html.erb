@@ -69,6 +69,14 @@
               style: "color: #fdba74; font-weight: bold; text-decoration: underline; border: 1px solid #60a5fa; border-radius: 6px; padding: 1px 4px; display: inline-block;" %>
     から作成できます。
   </p>
+
+  <% if current_user.guest? %>
+    <p style="margin: 16px 0 0 0; padding: 12px 16px; border: 1px solid #f0a8d0; border-radius: 8px; font-size: 15px;">
+      現在ゲストとして利用中です。この端末・ブラウザを変えると、今のデータへ戻ってこられなくなります。<br>
+      <%= link_to "正式なアカウントとして登録する", edit_guest_upgrade_path, style: "color: #fdba74; font-weight: bold; text-decoration: underline;" %>
+      と、データを引き継げるようになります。
+    </p>
+  <% end %>
 </div>
 
 <div class="story-section-card" data-controller="scroll-into-view">
