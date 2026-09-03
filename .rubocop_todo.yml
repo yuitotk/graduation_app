@@ -85,6 +85,7 @@ Rails/I18nLocaleTexts:
     - 'app/controllers/ai_generations_controller.rb'
     - 'app/controllers/application_controller.rb'
     - 'app/controllers/ideas_controller.rb'
+    - 'app/controllers/oauths_controller.rb'
     - 'app/controllers/user_sessions_controller.rb'
     - 'app/controllers/users_controller.rb'
 
