@@ -160,8 +160,8 @@ Rails.application.config.sorcery.configure do |config|
   #
   # ✅ Googleログイン設定
   # key/secretは環境変数（.env、本番はRenderの環境変数）から読み込む。コードやgitには値を書かない。
-  config.google.key    = ENV["GOOGLE_CLIENT_ID"]
-  config.google.secret = ENV["GOOGLE_CLIENT_SECRET"]
+  config.google.key    = ENV.fetch("GOOGLE_CLIENT_ID", nil)
+  config.google.secret = ENV.fetch("GOOGLE_CLIENT_SECRET", nil)
   # "/"から始まる相対パスにしておくと、sorceryがアクセスしてきたリクエストのホスト名を見て
   # 自動的に「http://localhost:3000/oauth/callback?provider=google」や
   # 「https://graduation-app-hkc2.onrender.com/oauth/callback?provider=google」に組み立ててくれる。
