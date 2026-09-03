@@ -99,6 +99,15 @@
     <% end %>
   </div>
 
+  <%# ゲストで利用中のときだけ、どのページにも出す案内 %>
+  <% if logged_in? && current_user.guest? %>
+    <p style="margin: 8px 0 0 0; padding: 10px 14px; border: 1px solid #f0a8d0; border-radius: 8px; font-size: 14px;">
+      現在ゲストとして利用中です。この端末・ブラウザを変えると、今のデータへ戻ってこられなくなります。
+      <%= link_to "正式なアカウントとして登録する", edit_guest_upgrade_path, style: "color: #fdba74; font-weight: bold; text-decoration: underline;" %>
+      と、データを引き継げるようになります。
+    </p>
+  <% end %>
+
   <%# お問い合わせ・利用規約・プライバシーポリシーのページでは、検索欄は不要なので出さない %>
   <% hide_search_bar =
        controller_name == "inquiries" ||
