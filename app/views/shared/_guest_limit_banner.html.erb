@@ -2,7 +2,7 @@
     idを付けているのは、AI作成を実行した直後（turbo_stream側）から
     ここだけをピンポイントで書き換えて、残り回数の表示をその場で
     最新にするため（app/views/ai_generations/create.turbo_stream.erb 参照）。 %>
-<p id="guest_limit_status" style="margin: 8px 0 0 0; padding: 10px 14px; border: 1px solid #f0a8d0; border-radius: 8px; font-size: 14px;">
+<p id="guest_limit_status" style="margin: 8px 0 0 0; padding: 10px 14px; border-radius: 8px; font-size: 14px;">
   ゲストとして利用中です。
   <%= link_to "正式なアカウントに登録する", edit_guest_upgrade_path, style: "color: #fdba74; font-weight: bold; text-decoration: underline;" %>
   と制限なしで使えます。
