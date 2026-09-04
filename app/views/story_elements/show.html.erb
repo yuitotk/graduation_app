@@ -220,7 +220,8 @@
 <div class="story-two-col">
   <div class="story-two-col__column story-two-col__column--wide">
     <div class="story-section-card">
-      <p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0; color: #7dd3fc;"><strong>名前：</strong><%= @story_element.name %></p>
+      <%# 見本ストーリーの要素だけ、名前の色を変えて一般の要素と区別する %>
+      <p style="font-size: 32px; font-weight: bold; margin: 0 0 16px 0; color: <%= @story_element.sample? ? "#facc15" : "#7dd3fc" %>;"><strong>名前：</strong><%= @story_element.name %></p>
       <p style="color: #7dd3fc;"><strong>分類：</strong><%= { "character" => "キャラクター", "item" => "アイテム", "setting" => "設定", "place" => "場所", "organization" => "団体・グループ" }[@story_element.kind] || @story_element.kind %></p>
       <p style="color: #7dd3fc;"><strong>マーカー：</strong><%= @story_element.marker.presence || "なし" %></p>
 

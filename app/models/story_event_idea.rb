@@ -11,6 +11,9 @@ class StoryEventIdea < ApplicationRecord
 
   before_save :set_text_updated_at, if: :should_update_text_updated_at?
 
+  # ✅ この詳細メモが「見本ストーリー」に属しているか（見た目の色分けに使う）
+  delegate :sample?, to: :story_event
+
   private
 
   def should_update_text_updated_at?

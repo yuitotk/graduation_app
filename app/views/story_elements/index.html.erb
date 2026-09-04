@@ -111,11 +111,12 @@
     <h2 style="color: #7dd3fc;"><%= title %></h2>
 
     <ul>
+      <%# 見本ストーリーの要素だけ、文字色を変えて一般の要素と区別する %>
       <% grouped_elements[kind].each do |e| %>
         <li>
           <%= link_to "#{e.marker.present? ? "#{e.marker}　" : ""}#{e.name}",
                       story_story_element_path(@story, e, breadcrumb_params),
-                      style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %>
+                      style: "color: #{e.sample? ? "#facc15" : "#9ecbff"}; font-weight: bold; text-decoration: underline;" %>
         </li>
       <% end %>
     </ul>

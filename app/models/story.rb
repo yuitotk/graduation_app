@@ -15,6 +15,12 @@ class Story < ApplicationRecord
 
   before_save :set_text_updated_at, if: :should_update_text_updated_at?
 
+  # ✅ 見本ストーリーかどうか（is_sampleカラムそのもの）。
+  #    要素・イベント・詳細メモ側は、ここへdelegateして同じ名前で判定できるようにする。
+  def sample?
+    is_sample?
+  end
+
   private
 
   def should_update_text_updated_at?

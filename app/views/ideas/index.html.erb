@@ -99,7 +99,8 @@
           アイデア詳細ページへ遷移させる(付けないと「Content missing」になる) %>
       <%= link_to idea_path(idea), style: "display: block; text-decoration: none; color: inherit;", data: { turbo_frame: "_top" } do %>
         <div style="margin-bottom: 20px; padding: 16px; border: 2px solid #555555; border-radius: 16px; background: #1e1e1e;">
-          <h2 style="color: #7dd3fc; text-decoration: none;"><%= idea.title %></h2>
+          <%# 見本アイデアだけ、タイトルの色を変えて一般のアイデアと区別する %>
+          <h2 style="color: <%= idea.sample? ? "#facc15" : "#7dd3fc" %>; text-decoration: none;"><%= idea.title %></h2>
 
           <% if idea.idea_image&.image? %>
             <div style="margin: 8px 0;">

@@ -34,6 +34,9 @@ class StoryElement < ApplicationRecord
     [KIND_ORDER[kind] || 99, japanese_name? ? 0 : 1, sortable_name, id]
   end
 
+  # ✅ この要素が「見本ストーリー」に属しているか（見た目の色分けに使う）
+  delegate :sample?, to: :story
+
   private
 
   def should_update_text_updated_at?

@@ -285,10 +285,12 @@
 
 <p><%= link_to back_label, back_path, style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></p>
 
-<h1 style="color: #c4b5fd;"><%= page_context_title %></h1>
+<%# 見本アイデアだけ、この文脈ラベル（「ホーム内アイデア」など）も同じ色にする %>
+<h1 style="color: <%= @idea.sample? ? "#facc15" : "#c4b5fd" %>;"><%= page_context_title %></h1>
 
 <div class="story-section-card">
-<h1 style="color: #7dd3fc; margin-top: 0; margin-bottom: 40px;"><%= @idea.title %></h1>
+<%# 見本アイデアだけ、タイトルの色を変えて一般のアイデアと区別する %>
+<h1 style="color: <%= @idea.sample? ? "#facc15" : "#7dd3fc" %>; margin-top: 0; margin-bottom: 40px;"><%= @idea.title %></h1>
 
 <% if placement.present? && placement.story_elements.present? %>
   <% elements = StoryElement.sorted_by_kind_and_name(placement.story_elements.to_a) %>
