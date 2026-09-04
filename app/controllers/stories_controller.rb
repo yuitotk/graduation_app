@@ -4,6 +4,7 @@ class StoriesController < ApplicationController
   before_action :set_story, only: %i[show edit update destroy consistency]
   before_action :sync_search_story_session, only: %i[show consistency]
   before_action :set_breadcrumbs, only: %i[show edit consistency]
+  before_action :block_if_guest_story_limit_reached, only: %i[new create]
 
   def index
     @stories = current_user.stories.order(:position, created_at: :desc)
@@ -132,6 +133,14 @@ class StoriesController < ApplicationController
   end
 
   private
+
+  # ✅ ゲストが上限件数まで既にストーリーを作っていたら、新規作成させない
+  def block_if_guest_story_limit_reached
+    return unless current_user.guest_story_limit_reached?
+
+    redirect_to stories_path,
+                alert: "ゲストはストーリーを#{User::GUEST_STORY_LIMIT}件までしか作成できません。正式なアカウントに登録すると制限なく作成できます。"
+  end
 
   def set_story
     @story = current_user.stories.find(params[:id])

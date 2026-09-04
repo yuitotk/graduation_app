@@ -11,6 +11,12 @@ class AiGenerationsController < ApplicationController
     prepare_marker_select_for_ai
     set_breadcrumbs
 
+    # ゲストが1日の上限まで使い切っていたら、OpenAIには問い合わせず、ここで止める
+    if current_user.guest_ai_limit_reached?
+      @error = "ゲストはAI作成を1日#{User::GUEST_AI_DAILY_LIMIT}回までしか使えません。正式なアカウントに登録すると制限なく使えます。"
+      return render :create, status: :unprocessable_entity
+    end
+
     word1 = params[:word1].to_s.strip
     word2 = params[:word2].to_s.strip
     word1_pos = normalize_part_of_speech(params[:word1_pos], default: "noun")
@@ -27,6 +33,7 @@ class AiGenerationsController < ApplicationController
       word1_pos: word1_pos,
       word2_pos: word2_pos
     )
+    current_user.ai_generations.create! if current_user.guest?
     @error = ""
     @word1 = word1
     @word2 = word2
