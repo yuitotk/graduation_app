@@ -1,3 +1,8 @@
+<%# ゲストの「残り回数」表示を、ヘッダーごと読み込み直さなくてもその場で最新にする %>
+<% if current_user.guest? %>
+  <%= turbo_stream.update "guest_limit_status", partial: "shared/guest_limit_banner" %>
+<% end %>
+
 <% if @error.present? %>
   <%= turbo_stream.update "ai_error" do %>
     <%= @error %>

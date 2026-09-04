@@ -101,12 +101,7 @@
 
   <%# ゲストで利用中のときだけ、どのページにも出す案内 %>
   <% if logged_in? && current_user.guest? %>
-    <p style="margin: 8px 0 0 0; padding: 10px 14px; border: 1px solid #f0a8d0; border-radius: 8px; font-size: 14px;">
-      ゲストとして利用中です。
-      <%= link_to "正式なアカウントに登録する", edit_guest_upgrade_path, style: "color: #fdba74; font-weight: bold; text-decoration: underline;" %>
-      と制限なしで使えます。
-      （ストーリー残り<%= current_user.stories_remaining %>件 / AI作成 本日残り<%= current_user.ai_generations_remaining_today %>回）
-    </p>
+    <%= render "shared/guest_limit_banner" %>
   <% end %>
 
   <%# お問い合わせ・利用規約・プライバシーポリシーのページでは、検索欄は不要なので出さない %>
