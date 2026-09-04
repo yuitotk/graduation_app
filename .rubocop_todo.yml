@@ -84,6 +84,8 @@ Rails/I18nLocaleTexts:
   Exclude:
     - 'app/controllers/ai_generations_controller.rb'
     - 'app/controllers/application_controller.rb'
+    - 'app/controllers/guest_sessions_controller.rb'
+    - 'app/controllers/guest_upgrades_controller.rb'
     - 'app/controllers/ideas_controller.rb'
     - 'app/controllers/oauths_controller.rb'
     - 'app/controllers/user_sessions_controller.rb'

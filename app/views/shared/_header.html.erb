@@ -99,6 +99,11 @@
     <% end %>
   </div>
 
+  <%# ゲストで利用中のときだけ、どのページにも出す案内 %>
+  <% if logged_in? && current_user.guest? %>
+    <%= render "shared/guest_limit_banner" %>
+  <% end %>
+
   <%# お問い合わせ・利用規約・プライバシーポリシーのページでは、検索欄は不要なので出さない %>
   <% hide_search_bar =
        controller_name == "inquiries" ||

@@ -23,3 +23,8 @@
 <div style="margin-top: 24px;">
   <%= render "shared/google_login_button", label: "Googleでログイン" %>
 </div>
+
+<div style="margin-top: 12px;">
+  <%= button_to "ゲストとして始める", guest_login_path,
+                style: "display: inline-block; padding: 10px 20px; border: 1px solid #fdba74; border-radius: 6px; background: #fdba74; color: #1f1f1f; font-weight: bold; cursor: pointer;" %>
+</div>

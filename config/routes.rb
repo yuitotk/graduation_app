@@ -20,6 +20,12 @@ Rails.application.routes.draw do
   get "/login/google",   to: "oauths#google",   as: :google_login
   get "/oauth/callback", to: "oauths#callback"
 
+  # ゲストログイン
+  post "/guest_login", to: "guest_sessions#create", as: :guest_login
+
+  # ゲスト→正式アカウントへの昇格（メールアドレス・パスワードを設定する）
+  resource :guest_upgrade, only: %i[edit update], controller: "guest_upgrades"
+
   # パスワードリセット
   resources :password_resets, only: %i[new create edit update]
 

@@ -421,6 +421,8 @@
         <%= link_to "ログイン", login_path,
                     style: "display: inline-block; padding: 12px 28px; border-radius: 8px; border: 1px solid #2563eb; background: transparent; color: #ffffff; text-decoration: none; font-weight: bold;" %>
         <%= render "shared/google_login_button", label: "Googleで始める" %>
+        <%= button_to "ゲストとして始める", guest_login_path,
+                      style: "display: inline-block; padding: 12px 28px; border-radius: 8px; border: 1px solid #fdba74; background: #fdba74; color: #1f1f1f; font-weight: bold; cursor: pointer;" %>
       </div>
     <% end %>
   </div>
