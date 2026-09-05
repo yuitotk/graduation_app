@@ -226,33 +226,36 @@ module Users
     end
 
     # ✅ すでにストーリー内の何かに配置(紐付け)済みのアイデア。
-    #    配置先の種類（ストーリー本体／イベント／要素／詳細メモ）を1つずつ変えて見本にする。
+    #    配置先の種類（ストーリー本体／イベント／要素／詳細メモ）を1つずつ変えて見本にし、
+    #    それぞれ内容に合った要素も紐付けて、「アイデアと要素を結びつける」機能も
+    #    実際に使われた状態にしておく。
     def build_placed_ideas
       place_idea(
         title: "地図を隠したのは誰か",
         memo: "犯人候補を整理しておくアイデアメモ。組合の誰かが関係しているかもしれない。",
-        placeable: story
+        placeable: story, element_keys: %i[guild]
       )
       place_idea(
         title: "羅針盤が壊れていたら",
         memo: "もし羅針盤が壊れていたら、別の手がかりで入り江の場所を探す展開も考えられる。",
-        placeable: events[2] # 羅針盤の発見
+        placeable: events[2], element_keys: %i[compass] # 羅針盤の発見
       )
       place_idea(
         title: "ウルフ老人の過去",
         memo: "ウルフ老人自身が、若い頃に地図を巡る争いに関わっていた可能性。",
-        placeable: elements[:wolf]
+        placeable: elements[:wolf], element_keys: %i[wolf sei]
       )
       place_idea(
         title: "破られたページの中身",
         memo: "破り取られたページには、争いの当事者の名前が書かれていたかもしれない。",
-        placeable: torn_page_memo
+        placeable: torn_page_memo, element_keys: %i[guild sei]
       )
     end
 
-    def place_idea(title:, memo:, placeable:)
+    def place_idea(title:, memo:, placeable:, element_keys: [])
       idea = user.ideas.create!(title: title, memo: memo, is_sample: true)
-      idea.create_idea_placement!(placeable: placeable, created_here: false, moved_at: Time.current)
+      placement = idea.create_idea_placement!(placeable: placeable, created_here: false, moved_at: Time.current)
+      placement.story_elements = element_keys.map { |key| elements[key] }
       idea
     end
 
