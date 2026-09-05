@@ -224,7 +224,8 @@
 <div class="story-two-col">
   <div class="story-two-col__column story-two-col__column--wide">
     <div class="story-section-card">
-      <h1 style="color: #7dd3fc; margin-top: 0;"><%= @story_event.title %></h1>
+      <%# 見本ストーリーのイベントだけ、タイトルの色を変えて一般のイベントと区別する %>
+      <h1 style="color: <%= @story_event.sample? ? "#facc15" : "#7dd3fc" %>; margin-top: 0;"><%= @story_event.title %></h1>
 
       <% if @story_event.story_event_image&.image? %>
         <div style="margin-top: 16px; margin-bottom: 20px;">

@@ -265,7 +265,8 @@
 <div class="story-two-col">
   <div class="story-two-col__column story-two-col__column--wide">
     <div class="story-section-card">
-      <h1 style="color: #7dd3fc; margin-top: 0;"><%= @story_event_idea.title %></h1>
+      <%# 見本ストーリーの詳細メモだけ、タイトルの色を変えて一般の詳細メモと区別する %>
+      <h1 style="color: <%= @story_event_idea.sample? ? "#facc15" : "#7dd3fc" %>; margin-top: 0;"><%= @story_event_idea.title %></h1>
 
       <% if @story_event_idea.image.present? %>
         <h4 style="color: #7dd3fc;">画像</h4>

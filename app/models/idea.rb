@@ -19,4 +19,9 @@ class Idea < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: TITLE_MAX_LENGTH }
   validates :memo, presence: true
+
+  # ✅ 見本アイデアかどうか（is_sampleカラムそのもの）
+  def sample?
+    is_sample?
+  end
 end

@@ -26,6 +26,10 @@ class User < ApplicationRecord
             length: { minimum: 8, maximum: 72 },
             if: -> { password.present? }
 
+  # ✅ 新規登録・ゲスト開始のどちらでも、user作成の直後に見本データ（ストーリー・要素・
+  #    イベント・詳細メモ・アイデア）を1人分作る（中身はUsers::SampleContentSeeder）
+  after_create :seed_sample_content
+
   # ✅ ゲストログイン用のuserを1件作る。
   #    メールアドレス・パスワードは何も入力させず、本人には見えない仮のメールアドレスを
   #    自動生成して割り当てる（emailはpresence必須なので、これで条件を満たす）。
@@ -35,8 +39,9 @@ class User < ApplicationRecord
   end
 
   # ✅ ゲストが、もうストーリーを上限まで作っているか
+  #    見本ストーリー（is_sample: true）は、自分で作った件数には数えない
   def guest_story_limit_reached?
-    guest? && stories.count >= GUEST_STORY_LIMIT
+    guest? && stories.where(is_sample: false).count >= GUEST_STORY_LIMIT
   end
 
   # ✅ ゲストが、今日はもうAI作成を上限まで使っているか
@@ -52,15 +57,20 @@ class User < ApplicationRecord
   end
 
   # ✅ あとストーリーを何件作れるか（ゲストでなければnil＝無制限）
+  #    見本ストーリー（is_sample: true）は、自分で作った件数には数えない
   def stories_remaining
     return nil unless guest?
 
-    [GUEST_STORY_LIMIT - stories.count, 0].max
+    [GUEST_STORY_LIMIT - stories.where(is_sample: false).count, 0].max
   end
 
   private
 
   def ai_generations_used_today
     ai_generations.where(created_at: Time.zone.now.beginning_of_day..).count
+  end
+
+  def seed_sample_content
+    Users::SampleContentSeeder.call(self)
   end
 end

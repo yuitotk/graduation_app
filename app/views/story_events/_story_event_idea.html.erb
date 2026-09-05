@@ -4,7 +4,8 @@
   <%= link_to story_story_event_story_event_idea_path(story, story_event, idea),
               style: "display: block; margin-bottom: 8px; border: 2px solid #555555; border-radius: 20px; padding: 24px; background-color: #1e1e1e; color: inherit; text-decoration: none;",
               data: { turbo_frame: "_top" } do %>
-    <h3 style="margin-top: 0; margin-bottom: 16px; color: #ddd6fe; text-decoration: none;">
+    <%# 見本ストーリーの詳細メモだけ、タイトルの色を変えて一般の詳細メモと区別する %>
+    <h3 style="margin-top: 0; margin-bottom: 16px; color: <%= idea.sample? ? "#facc15" : "#ddd6fe" %>; text-decoration: none;">
       <%= idea.title %>
     </h3>
 

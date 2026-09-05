@@ -214,12 +214,20 @@
   <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
     アイデアをこの作品に移動して素材を増やし、イベントを追加すると物語の流れを時系列で整理できます。
   </p>
+
+  <%# 見本ストーリーのときだけ、何のためのストーリーかを説明するバナーを出す %>
+  <% if @story.sample? %>
+    <p style="margin: 12px 0 0 0; padding: 10px 14px; border: 1px solid #facc15; border-radius: 8px; background: rgba(250, 204, 21, 0.12); color: #fde68a; font-size: 14px;">
+      これは使い方を確認するための見本ストーリーです。中の要素・イベント・詳細メモ・アイデアも、すべて見本として最初から入っています。必要なくなったら削除して問題ありません。
+    </p>
+  <% end %>
 </div>
 
 <div class="story-two-col">
   <div class="story-two-col__column story-two-col__column--wide">
     <div class="story-section-card">
-      <h1 style="color: #7dd3fc; margin-top: 0;"><%= @story.title %></h1>
+      <%# 見本ストーリーだけ、タイトルの色を変えて一般のストーリーと区別する %>
+      <h1 style="color: <%= @story.sample? ? "#facc15" : "#7dd3fc" %>; margin-top: 0;"><%= @story.title %></h1>
 
       <% if @story.story_image&.image? %>
         <div style="margin-top: 16px;">

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_04_100637) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_04_100639) do
   create_table "ai_generations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
@@ -65,6 +65,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_04_100637) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_sample", default: false, null: false
     t.index ["user_id"], name: "index_ideas_on_user_id"
   end
 
@@ -94,6 +95,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_04_100637) do
     t.datetime "updated_at", null: false
     t.integer "position"
     t.datetime "text_updated_at"
+    t.boolean "is_sample", default: false, null: false
     t.index ["user_id"], name: "index_stories_on_user_id"
   end
 
