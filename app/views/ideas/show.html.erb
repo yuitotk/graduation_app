@@ -358,6 +358,13 @@
   別ストーリーに移動も可能です。ホームに戻すことはできません。
 </p>
 
+<%# 見本ストーリーに配置済みの見本アイデアだけ、移動できる範囲を説明する %>
+<% if @idea.confined_to_sample_story? %>
+  <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8; color: #fde68a;">
+    このアイデアは見本アイデアのため、この見本ストーリーの中にのみ移動できます。
+  </p>
+<% end %>
+
 
 <ul>
   <li><%= link_to "ストーリー詳細ページへ", idea_path(@idea, current_breadcrumb_params.merge(tab: "stories")), style: "color: #9ecbff; font-weight: bold; text-decoration: underline;" %></li>
