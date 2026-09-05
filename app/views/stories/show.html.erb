@@ -218,7 +218,7 @@
   <%# 見本ストーリーのときだけ、何のためのストーリーかを説明するバナーを出す %>
   <% if @story.sample? %>
     <p style="margin: 12px 0 0 0; padding: 10px 14px; border: 1px solid #facc15; border-radius: 8px; background: rgba(250, 204, 21, 0.12); color: #fde68a; font-size: 14px;">
-      これは使い方を確認するための見本ストーリーです。中の要素・イベント・詳細メモ・アイデアも、すべて見本として最初から入っています。必要なくなったら削除して問題ありません。
+      これは使い方を確認するための見本ストーリーです。中の要素・イベント・詳細メモ・アイデアも、すべて見本として最初から入っています。中の見本アイデアは、このストーリーの中でのみ移動できます。必要なくなったら削除して問題ありません。
     </p>
   <% end %>
 </div>
@@ -312,7 +312,7 @@
                    frame_id: "created_here_ideas_list",
                    page_param: :created_here_page,
                    link_params: {},
-                   link_style: "color: #7dd3fc; font-weight: bold; text-decoration: underline;" %>
+                   link_color: "#7dd3fc" %>
       </div>
     </div>
 
@@ -325,7 +325,7 @@
                    frame_id: "moved_ideas_list",
                    page_param: :moved_page,
                    link_params: {},
-                   link_style: "color: #7dd3fc; font-weight: bold; text-decoration: underline;" %>
+                   link_color: "#7dd3fc" %>
       </div>
     </div>
     </div>

@@ -295,7 +295,7 @@
 <%# 見本アイデアのときだけ、何のためのアイデアかを説明するバナーを出す %>
 <% if @idea.sample? %>
   <p style="margin: 12px 0 40px 0; padding: 10px 14px; border: 1px solid #facc15; border-radius: 8px; background: rgba(250, 204, 21, 0.12); color: #fde68a; font-size: 14px;">
-    これは使い方を確認するための見本アイデアです。必要なくなったら削除して問題ありません。
+    これは使い方を確認するための見本アイデアです。アイデアに迷ったときは、これを元にストーリーを作ってみる、初心者向けのテンプレートとしても使えます。必要なくなったら削除して問題ありません。
   </p>
 <% end %>
 
@@ -357,6 +357,13 @@
 <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8;">
   別ストーリーに移動も可能です。ホームに戻すことはできません。
 </p>
+
+<%# 見本ストーリーに配置済みの見本アイデアだけ、移動できる範囲を説明する %>
+<% if @idea.confined_to_sample_story? %>
+  <p style="margin: 8px 0 20px 20px; font-size: 17px; line-height: 1.8; color: #fde68a;">
+    このアイデアは見本アイデアのため、この見本ストーリーの中にのみ移動できます。
+  </p>
+<% end %>
 
 
 <ul>
