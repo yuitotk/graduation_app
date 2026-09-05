@@ -217,7 +217,7 @@ module Users
 
     def build_story
       @story = user.stories.create!(
-        title: "灯台守と消えた地図",
+        title: "灯台守と消えた地図（ミステリー・ファンタジー）",
         description: "小さな港町の灯台守見習いが、記録庫から消えた古い地図を巡って手がかりを追う物語です。" \
                      "この一件は、創記録の使い方を確認するための見本として最初から入っています。",
         is_sample: true,
