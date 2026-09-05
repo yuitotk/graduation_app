@@ -24,7 +24,11 @@ module Users
       cove: { kind: :place, name: "北の入り江", marker: "🌊",
               memo: "地図に記された、人が近づかない入り江。" },
       guild: { kind: :organization, name: "灯台守組合", marker: "⚓",
-               memo: "灯台守たちの組合。過去に地図を巡る対立があった。" }
+               memo: "灯台守たちの組合。過去に地図を巡る対立があった。" },
+      sei: { kind: :character, name: "セイ", marker: "🗝️",
+             memo: "北の入り江の隠れ家に一人で暮らす人物。灯台守組合とは因縁のある一族の末裔。" },
+      hideout: { kind: :place, name: "入り江の隠れ家", marker: "🏚️",
+                 memo: "入り江の奥、岩陰に隠すように建てられた小屋。長年、外部の目から隠されていた。" }
     }.freeze
 
     # ✅ イベント（=章）の一覧。build_eventsで、タイトルの先頭に並び順どおり
@@ -34,7 +38,13 @@ module Users
       { title: "ウルフ老人への相談", body: "ミナは幼い頃から世話になっているウルフ老人を訪ね、地図について尋ねる。" },
       { title: "羅針盤の発見", body: "灯台の壁の隙間から、潮読みの羅針盤を見つける。" },
       { title: "組合の記録を調べる", body: "灯台守組合の古い記録から、過去に地図を巡る争いがあったことを知る。" },
-      { title: "北の入り江への旅", body: "羅針盤が示す先、誰も近づかない北の入り江へ、ウルフ老人と共に向かう。" }
+      { title: "北の入り江への旅", body: "羅針盤が示す先、誰も近づかない北の入り江へ、ウルフ老人と共に向かう。" },
+      { title: "入り江の隠れ家", body: "入り江の奥、岩陰に隠すように建てられた小さな小屋を見つける。" },
+      { title: "小屋の住人セイ", body: "小屋には、長年そこで一人暮らしているという人物、セイが住んでいた。" },
+      { title: "地図を持ち出した理由", body: "セイは、消えた地図を自分が持ち出したことを認め、その理由を静かに語り始める。" },
+      { title: "50年前の対立の真相",
+        body: "セイの祖先と灯台守組合との間にあった対立が、地図を巡る因縁の始まりだったことが明らかになる。" },
+      { title: "これからの約束", body: "地図の扱いをどうするか、ミナたちはセイやウルフ老人と話し合い、新しい約束を交わす。" }
     ].freeze
 
     # ✅ 各イベント（EVENT_DEFINITIONSと同じ並び順）に登場させる要素のkey一覧。
@@ -45,7 +55,12 @@ module Users
       %i[mina wolf],
       %i[mina compass lighthouse],
       %i[mina guild],
-      %i[mina wolf compass cove]
+      %i[mina wolf compass cove],
+      %i[mina wolf cove hideout],
+      %i[mina wolf sei hideout],
+      %i[mina sei],
+      %i[mina wolf sei guild],
+      %i[mina wolf sei guild]
     ].freeze
 
     # ✅ 詳細メモ（=話）の一覧。event_index はEVENT_DEFINITIONS（章の並び順）の
@@ -86,7 +101,46 @@ module Users
       { event_index: 4, title: "入り江で見た影",
         memo: "入り江の奥に、何か人工物のような影が見えた。", element_keys: [] },
       { event_index: 4, title: "ウルフ老人の足取りが鈍る",
-        memo: "入り江に近づくにつれ、ウルフ老人の足取りが鈍くなった。", element_keys: %i[wolf cove] }
+        memo: "入り江に近づくにつれ、ウルフ老人の足取りが鈍くなった。", element_keys: %i[wolf cove] },
+      # -- 6章 入り江の隠れ家 --
+      { event_index: 5, title: "小屋を覆う蔦",
+        memo: "小屋は蔦に覆われ、外からはほとんど見えないようになっていた。", element_keys: %i[hideout] },
+      { event_index: 5, title: "焚き火の跡",
+        memo: "小屋の前には、最近使われたばかりのような焚き火の跡があった。", element_keys: [] },
+      { event_index: 5, title: "警戒するウルフ老人",
+        memo: "ウルフ老人は、この小屋の存在を知っていたような素振りを見せた。", element_keys: %i[wolf] },
+      # -- 7章 小屋の住人セイ --
+      { event_index: 6, title: "セイの第一声",
+        memo: "セイは驚いた様子もなく、「来ると思っていた」とだけ言った。", element_keys: %i[sei] },
+      { event_index: 6, title: "机の上の古い写真",
+        memo: "小屋の机には、若い頃のウルフ老人らしき人物が写った古い写真があった。", element_keys: %i[sei wolf] },
+      { event_index: 6, title: "セイの静かな目",
+        memo: "セイの目は、長い年月をひとりで過ごしてきた者特有の静けさをたたえていた。", element_keys: %i[sei] },
+      # -- 8章 地図を持ち出した理由 --
+      { event_index: 7, title: "地図を持ち出した夜",
+        memo: "セイは、地図が消えた夜、自分がひとりで灯台に忍び込んだことを話した。", element_keys: %i[sei] },
+      { event_index: 7, title: "理由はまだ話さない",
+        memo: "なぜ地図が必要だったのかは、まだはっきりと語ろうとしない。", element_keys: %i[sei] },
+      { event_index: 7, title: "ミナの問いかけ",
+        memo: "ミナは、責めるでもなく、ただ静かに理由を尋ねた。", element_keys: %i[mina sei] },
+      # -- 9章 50年前の対立の真相 --
+      { event_index: 8, title: "セイの祖先の名前",
+        memo: "セイの祖先の名は、組合の記録に記された「争いの当事者」の一人と一致していた。",
+        element_keys: %i[sei guild] },
+      { event_index: 8, title: "奪われた側だった過去",
+        memo: "セイの一族は、50年前、組合によって地図の管理者の座を追われた側だったと分かる。",
+        element_keys: %i[sei guild] },
+      { event_index: 8, title: "ウルフ老人がずっと黙っていた理由",
+        memo: "ウルフ老人自身も、当時その場に居合わせた一人だったことを、ようやく認める。",
+        element_keys: %i[wolf sei] },
+      # -- 10章 これからの約束 --
+      { event_index: 9, title: "セイの願い",
+        memo: "セイは、地図を独り占めしたいわけではなく、一族の名誉を回復したいだけだったと語る。",
+        element_keys: %i[sei] },
+      { event_index: 9, title: "組合との新しい関係",
+        memo: "灯台守組合とセイの一族との関係を、これからどう築き直すかを話し合う。", element_keys: %i[sei guild] },
+      { event_index: 9, title: "灯台へ戻る道",
+        memo: "話し合いを終え、ミナたちは地図を手に、灯台への帰り道を歩き始める。", element_keys: %i[mina wolf] }
     ].freeze
 
     # ✅ 「破られたページ」はDETAIL_MEMO_DEFINITIONSの11番目(0始まりで10)。
