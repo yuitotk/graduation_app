@@ -29,6 +29,8 @@ class IdeasController < ApplicationController
                                        .joins(story_event: :story)
                                        .where(stories: { user_id: current_user.id })
                                        .order(created_at: :desc)
+
+    restrict_move_destinations_to_sample_story! if @idea.confined_to_sample_story?
   end
 
   def new
@@ -144,6 +146,19 @@ class IdeasController < ApplicationController
   # rubocop:enable Metrics/AbcSize
 
   private
+
+  # ✅ 見本ストーリーの中に置かれている見本アイデアは、そのストーリーの外へ
+  #    移動できない(IdeaPlacementsController側で拒否している)。ここでは
+  #    「移動先を選ぶ」画面の候補一覧自体を、同じ見本ストーリーの中だけに
+  #    絞り込み、そもそも選べない選択肢を出さないようにする。
+  def restrict_move_destinations_to_sample_story!
+    sample_story = @idea.current_story
+
+    @stories = @stories.where(id: sample_story.id)
+    @story_events = @story_events.where(story_id: sample_story.id)
+    @story_elements = @story_elements.select { |element| element.story_id == sample_story.id }
+    @story_event_ideas = @story_event_ideas.where(stories: { id: sample_story.id })
+  end
 
   def set_breadcrumbs_for_new
     placeable = find_placeable_for_current_user(params[:placeable_type], params[:placeable_id])
