@@ -7,7 +7,9 @@
     frame_id    - この欄を囲むTurbo Frameの id（他の欄を巻き込まず、この欄だけ切り替えるための目印）
     page_param  - ページ番号をURLに乗せるときのパラメータ名（欄ごとに別の名前にする）
     link_params - アイデアへのリンクに付け足す追加パラメータ（戻り先の情報など）
-    link_style  - リンクの見た目（呼び出し元によって色が違うため）
+    link_color  - リンクの文字色（呼び出し元によって色が違うため）。
+                  ただし見本アイデア(idea.sample?)のときは、これより優先して
+                  ゴールド(#facc15)にし、一般のアイデアと区別する。
 %>
 <%#
   この欄を包む側(呼び出し元)で data-controller="scroll-into-view" を持つ要素を
@@ -25,7 +27,10 @@
           <%# data-turbo-frame="_top": この欄(Turbo Frame)の外に出て、画面全体を
               アイデア詳細ページへ遷移させる。付けないと、この欄の中だけで
               遷移しようとして「Content missing」と表示されてしまう。 %>
-          <%= link_to idea.title, idea_path(idea, **link_params), style: link_style, data: { turbo_frame: "_top" } %>
+          <% color = idea.sample? ? "#facc15" : link_color %>
+          <%= link_to idea.title, idea_path(idea, **link_params),
+                      style: "color: #{color}; font-weight: bold; text-decoration: underline;",
+                      data: { turbo_frame: "_top" } %>
         </li>
       <% end %>
     </ul>
