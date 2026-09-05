@@ -290,7 +290,14 @@
 
 <div class="story-section-card">
 <%# 見本アイデアだけ、タイトルの色を変えて一般のアイデアと区別する %>
-<h1 style="color: <%= @idea.sample? ? "#facc15" : "#7dd3fc" %>; margin-top: 0; margin-bottom: 40px;"><%= @idea.title %></h1>
+<h1 style="color: <%= @idea.sample? ? "#facc15" : "#7dd3fc" %>; margin-top: 0; margin-bottom: <%= @idea.sample? ? "0" : "40px" %>;"><%= @idea.title %></h1>
+
+<%# 見本アイデアのときだけ、何のためのアイデアかを説明するバナーを出す %>
+<% if @idea.sample? %>
+  <p style="margin: 12px 0 40px 0; padding: 10px 14px; border: 1px solid #facc15; border-radius: 8px; background: rgba(250, 204, 21, 0.12); color: #fde68a; font-size: 14px;">
+    これは使い方を確認するための見本アイデアです。必要なくなったら削除して問題ありません。
+  </p>
+<% end %>
 
 <% if placement.present? && placement.story_elements.present? %>
   <% elements = StoryElement.sorted_by_kind_and_name(placement.story_elements.to_a) %>

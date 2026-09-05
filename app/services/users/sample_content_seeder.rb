@@ -8,20 +8,22 @@ module Users
   #    上限には数えないようにしてある（User#guest_story_limit_reached?側で除外）。
   # rubocop:disable Metrics/ClassLength
   class SampleContentSeeder
-    # ✅ 要素（kind・名前・メモ）の一覧。build_elementsで、この定義から
+    # ✅ 要素（kind・名前・メモ・マーカー）の一覧。build_elementsで、この定義から
     #    story.story_elementsを1件ずつ作り、keyで引けるHashにする。
+    #    marker（最大4文字の絵文字など）は、検索結果やAI作成の配置先選択などで
+    #    名前の前に付く短い目印。マーカー機能も実際に使われた状態にしておく。
     ELEMENT_DEFINITIONS = {
-      mina: { kind: :character, name: "ミナ",
+      mina: { kind: :character, name: "ミナ", marker: "👧",
               memo: "灯台守見習い。好奇心旺盛で、周りをよく観察している。" },
-      wolf: { kind: :character, name: "ウルフ老人",
+      wolf: { kind: :character, name: "ウルフ老人", marker: "👴",
               memo: "元漁師。地図の噂を知っているが、口が重い。" },
-      compass: { kind: :item, name: "潮読みの羅針盤",
+      compass: { kind: :item, name: "潮読みの羅針盤", marker: "🧭",
                  memo: "潮の流れを読める、灯台に隠されていた古い羅針盤。" },
-      lighthouse: { kind: :place, name: "灯台",
+      lighthouse: { kind: :place, name: "灯台", marker: "🔦",
                     memo: "ミナが働く古い灯台。物語はここから始まる。" },
-      cove: { kind: :place, name: "北の入り江",
+      cove: { kind: :place, name: "北の入り江", marker: "🌊",
               memo: "地図に記された、人が近づかない入り江。" },
-      guild: { kind: :organization, name: "灯台守組合",
+      guild: { kind: :organization, name: "灯台守組合", marker: "⚓",
                memo: "灯台守たちの組合。過去に地図を巡る対立があった。" }
     }.freeze
 
