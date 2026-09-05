@@ -45,6 +45,7 @@ ja:
   flash:
     idea_placements:
       moved: "アイデアを移動しました"
+      cannot_move_sample_idea_out: "この見本アイデアは、見本ストーリーの外へは移動できません。"
 
   activerecord:
     models:

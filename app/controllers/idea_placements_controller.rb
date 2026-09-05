@@ -6,16 +6,39 @@ class IdeaPlacementsController < ApplicationController
     idea = current_user.ideas.find(params[:idea_id])
     placeable = find_placeable!(params[:placeable_type], params[:placeable_id])
 
+    return block_move_out_of_sample_story(idea) if move_out_of_sample_story?(idea, placeable)
+
+    move_idea!(idea, placeable)
+    redirect_to redirect_target(placeable), notice: t("flash.idea_placements.moved")
+  end
+
+  private
+
+  def block_move_out_of_sample_story(idea)
+    redirect_to idea_path(idea), alert: t("flash.idea_placements.cannot_move_sample_idea_out")
+  end
+
+  def move_idea!(idea, placeable)
     placement = idea.idea_placement || idea.build_idea_placement
     placement.placeable = placeable
     placement.created_here = false
     placement.moved_at = Time.current
     placement.save!
-
-    redirect_to redirect_target(placeable), notice: t("flash.idea_placements.moved")
   end
 
-  private
+  # ✅ 見本ストーリーの中にすでに配置されている見本アイデアを、
+  #    その見本ストーリーの外へ移動しようとしていないか確認する。
+  #    ホームに残っている未配置の見本アイデア（ストーリー化候補）には掛からない。
+  def move_out_of_sample_story?(idea, destination_placeable)
+    return false unless idea.confined_to_sample_story?
+
+    story_of(destination_placeable) != idea.current_story
+  end
+
+  # ✅ 配置先(placeable)が、種類によらずどのストーリーに属しているか
+  def story_of(placeable)
+    placeable.is_a?(Story) ? placeable : placeable.story
+  end
 
   def find_placeable!(type, id)
     case type

@@ -20,6 +20,9 @@ class StoryEventIdea < ApplicationRecord
   # ✅ この詳細メモが「見本ストーリー」に属しているか（見た目の色分けに使う）
   delegate :sample?, to: :story_event
 
+  # ✅ この詳細メモがどのストーリーに属しているか（Idea#current_storyから使う）
+  delegate :story, to: :story_event
+
   private
 
   def should_update_text_updated_at?
